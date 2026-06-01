@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { Search, Calendar, ChevronDown, MoreHorizontal, Phone, MapPin, Check, ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Search, Calendar, ChevronDown, MoreHorizontal, Phone, MapPin, Check, ArrowRight, Info } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
@@ -14,6 +15,12 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type Order = {
   id: string;
@@ -84,9 +91,9 @@ const initialOrders: Order[] = [
   },
   {
     id: "#873927",
-    item: { name: "Hermès Birkin", desc: "Togo Leather • Gold Hardware", image: "/dior-bag.webp", price: "AED 45,000" },
-    seller: { name: "Jennifer Aniston", phone: "+1 (626) 389-2743", location: "Beverly Hills, CA" },
-    buyer: { name: "Angelina Jolie", phone: "+1 (145) 125-3622", location: "New York, NY" },
+    item: { name: "Classic Flap Bag", desc: "Black Caviar Leather • Gold Hardware", image: "/dior-bag.webp", price: "AED 45,000" },
+    seller: { name: "Emma Richards", phone: "+1 (626) 389-2743", location: "Beverly Hills, CA" },
+    buyer: { name: "Rachel Miller", phone: "+1 (145) 125-3622", location: "New York, NY" },
     pickup: "Today • 4-7 PM",
     delivery: "Tomorrow",
     status: "Issue",
@@ -123,9 +130,24 @@ const initialOrders: Order[] = [
   },
 ];
 
+const issueOptions = [
+  { id: "Item failed verification", desc: "Authentication mismatch detected" },
+  { id: "Seller unavailable", desc: "Seller could not complete pickup" },
+  { id: "Buyer rejected", desc: "Buyer rejected item at delivery" },
+  { id: "Other", desc: "Add issue manually" },
+];
+
 export default function Overview() {
+  const router = useRouter();
   const [ordersList, setOrdersList] = useState<Order[]>(initialOrders);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+
+  // Issue reporting state
+  const [isReportIssueOpen, setIsReportIssueOpen] = useState(false);
+  const [issueOrder, setIssueOrder] = useState<Order | null>(null);
+  const [issueStep, setIssueStep] = useState<"form" | "success">("form");
+  const [selectedIssueOption, setSelectedIssueOption] = useState<string>("Buyer rejected");
+  const [issueDetails, setIssueDetails] = useState("");
 
   const selectedOrder = ordersList.find(o => o.id === selectedOrderId) || null;
 
@@ -161,6 +183,21 @@ export default function Overview() {
         ? { ...o, progress: nextProgress, status: newStatus, statusColor: newStatusColor, statusBg: newStatusBg, dotColor: newDotColor }
         : o
     ));
+  };
+
+  const openReportIssue = (order: Order) => {
+    setIssueOrder(order);
+    setIssueStep("form");
+    setIsReportIssueOpen(true);
+  };
+
+  const submitIssue = () => {
+    setIssueStep("success");
+  };
+
+  const handleBackToDashboard = () => {
+    setIsReportIssueOpen(false);
+    router.push("/issues");
   };
 
   return (
@@ -260,6 +297,14 @@ export default function Overview() {
                         >
                           View details
                         </DropdownMenuItem>
+                        {order.status === "Issue" && (
+                          <DropdownMenuItem 
+                            className="cursor-pointer hover:bg-white/5 focus:bg-white/5 focus:text-white text-sm text-red-400 focus:text-red-400"
+                            onClick={() => openReportIssue(order)}
+                          >
+                            Report Issue
+                          </DropdownMenuItem>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </td>
@@ -271,7 +316,7 @@ export default function Overview() {
       </div>
 
       {/* Order Details Drawer */}
-      <Sheet open={selectedOrder !== null} onOpenChange={(open) => !open && setSelectedOrderId(null)}>
+      <Sheet open={selectedOrderId !== null} onOpenChange={(open) => !open && setSelectedOrderId(null)}>
         <SheetContent className="w-full sm:max-w-md bg-[#141416] border-l border-white/10 text-white p-0 overflow-y-auto [&>button]:right-6 [&>button]:top-6 [&>button]:text-white [&>button]:bg-transparent [&>button]:opacity-100 hover:[&>button]:bg-white/10 hover:[&>button]:rounded-full [&>button]:p-1">
           <div className="p-6">
             <SheetHeader className="flex flex-row items-center justify-between space-y-0 mb-6 mt-1">
@@ -398,6 +443,118 @@ export default function Overview() {
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* Report Issue Dialog */}
+      <Dialog open={isReportIssueOpen} onOpenChange={setIsReportIssueOpen}>
+        <DialogContent className="bg-[#141416] border border-white/10 text-white sm:max-w-[425px] p-0 shadow-2xl rounded-2xl [&>button]:text-white [&>button]:opacity-80 hover:[&>button]:opacity-100 max-h-[90vh] flex flex-col overflow-hidden">
+          {issueStep === "form" && issueOrder && (
+            <>
+              {/* Sticky Header */}
+              <div className="px-6 pt-6 pb-4 border-b border-white/5 flex-shrink-0">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-semibold mb-1">Report Issue</DialogTitle>
+                  <div className="text-sm text-[#8C8C8C]">Select the issue related to this order</div>
+                </DialogHeader>
+              </div>
+
+              {/* Scrollable Body */}
+              <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5 no-scrollbar">
+                <div className="bg-[#1A1A1D] border border-white/5 rounded-xl p-4 flex gap-4 items-center">
+                  <div className="w-20 h-20 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
+                    <img src={issueOrder.item.image} alt="Item" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[#E6B95F] font-medium text-sm mb-1">{issueOrder.id}</div>
+                    <div className="font-semibold truncate text-[15px] mb-1">{issueOrder.item.name}</div>
+                    <div className="text-xs text-[#8C8C8C] truncate">{issueOrder.seller.name} to {issueOrder.buyer.name}</div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs text-[#8C8C8C] uppercase font-medium mb-3">Issue Options</div>
+                  <div className="space-y-3">
+                    {issueOptions.map((opt) => {
+                      const isSelected = selectedIssueOption === opt.id;
+                      return (
+                        <div 
+                          key={opt.id}
+                          onClick={() => setSelectedIssueOption(opt.id)}
+                          className={`p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-colors ${
+                            isSelected ? 'bg-[#1A1A1D] border-[#E6B95F]' : 'bg-[#141416] border-white/10 hover:border-white/20'
+                          }`}
+                        >
+                          <div>
+                            <div className={`font-medium mb-1 ${isSelected ? 'text-[#E6B95F]' : 'text-white'}`}>{opt.id}</div>
+                            <div className="text-xs text-[#8C8C8C]">{opt.desc}</div>
+                          </div>
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-[#E6B95F]' : 'border-white/20'}`}>
+                            {isSelected && <div className="w-2.5 h-2.5 bg-[#E6B95F] rounded-full" />}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs text-[#8C8C8C] uppercase font-medium mb-3">Add Details</div>
+                  <textarea 
+                    value={issueDetails}
+                    onChange={(e) => setIssueDetails(e.target.value)}
+                    placeholder="Type additional information.."
+                    className="w-full bg-[#1A1A1D] border border-white/10 rounded-xl p-4 text-sm text-white placeholder:text-[#8C8C8C] min-h-[100px] resize-none focus:outline-none focus:ring-1 focus:ring-[#E6B95F]/50"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 text-xs text-red-500">
+                  <Info className="w-4 h-4 shrink-0" />
+                  <span>This action may trigger refund or return flow</span>
+                </div>
+              </div>
+
+              {/* Sticky Footer */}
+              <div className="px-6 py-4 border-t border-white/5 flex-shrink-0">
+                <button 
+                  onClick={submitIssue}
+                  className="w-full h-12 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+                  Submit Issue <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </>
+          )}
+
+          {issueStep === "success" && (
+            <div className="p-6 flex flex-col items-center text-center">
+              <div className="w-28 h-28 rounded-full bg-[#1A1A1D] flex items-center justify-center my-8 relative">
+                <div className="absolute inset-0 bg-[#00D22B]/10 rounded-full animate-ping" />
+                <div className="w-16 h-16 rounded-full bg-gradient-to-b from-[#00E52F] to-[#00A321] flex items-center justify-center shadow-[0_0_30px_rgba(0,210,43,0.4)] relative z-10">
+                  <Check className="w-8 h-8 text-white font-bold" strokeWidth={4} />
+                </div>
+              </div>
+              
+              <h2 className="text-2xl font-semibold mb-2">Issue reported</h2>
+              <div className="text-sm text-[#8C8C8C] mb-8">Order status updated successfully</div>
+
+              <div className="w-full bg-[#1A1A1D] border border-white/5 rounded-xl p-5 mb-8 text-left space-y-3">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-[#8C8C8C]">Report Reference</span>
+                  <span className="font-semibold text-[#E6B95F]">#RP-992-K</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-[#8C8C8C]">Update Time</span>
+                  <span className="font-medium text-white">Just now</span>
+                </div>
+              </div>
+
+              <button 
+                onClick={handleBackToDashboard}
+                className="w-full h-12 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+                Back To Dashboard <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
