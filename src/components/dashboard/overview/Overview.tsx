@@ -29,7 +29,7 @@ type Order = {
   progress: number;
 };
 
-const orders: Order[] = [
+const initialOrders: Order[] = [
   {
     id: "#347892",
     item: { name: "Gucci Diana Tote", desc: "Black Leather • Bamboo Handle", image: "/gucchi-bag.webp", price: "AED 3,200" },
@@ -124,7 +124,44 @@ const orders: Order[] = [
 ];
 
 export default function Overview() {
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [ordersList, setOrdersList] = useState<Order[]>(initialOrders);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+
+  const selectedOrder = ordersList.find(o => o.id === selectedOrderId) || null;
+
+  const handleProgress = () => {
+    if (!selectedOrder) return;
+    const nextProgress = selectedOrder.progress + 1;
+    if (nextProgress > 3) return;
+
+    let newStatus = selectedOrder.status;
+    let newStatusBg = selectedOrder.statusBg;
+    let newStatusColor = selectedOrder.statusColor;
+    let newDotColor = selectedOrder.dotColor;
+
+    if (nextProgress === 1) {
+      newStatus = "Collected";
+      newStatusColor = "text-blue-400";
+      newStatusBg = "bg-blue-400/10";
+      newDotColor = "bg-blue-400";
+    } else if (nextProgress === 2) {
+      newStatus = "Verified";
+      newStatusColor = "text-purple-400";
+      newStatusBg = "bg-purple-400/10";
+      newDotColor = "bg-purple-400";
+    } else if (nextProgress === 3) {
+      newStatus = "Delivered";
+      newStatusColor = "text-green-500";
+      newStatusBg = "bg-green-500/10";
+      newDotColor = "bg-green-500";
+    }
+
+    setOrdersList(prev => prev.map(o => 
+      o.id === selectedOrder.id 
+        ? { ...o, progress: nextProgress, status: newStatus, statusColor: newStatusColor, statusBg: newStatusBg, dotColor: newDotColor }
+        : o
+    ));
+  };
 
   return (
     <>
@@ -172,7 +209,7 @@ export default function Overview() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {orders.map((order, i) => (
+              {ordersList.map((order, i) => (
                 <tr key={i} className="hover:bg-white/[0.02] transition-colors group">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="font-semibold text-[#E6B95F]">{order.id}</span>
@@ -219,7 +256,7 @@ export default function Overview() {
                       <DropdownMenuContent align="end" className="bg-[#1A1A1D] border border-white/10 text-white">
                         <DropdownMenuItem 
                           className="cursor-pointer hover:bg-white/5 focus:bg-white/5 focus:text-white text-sm"
-                          onClick={() => setSelectedOrder(order)}
+                          onClick={() => setSelectedOrderId(order.id)}
                         >
                           View details
                         </DropdownMenuItem>
@@ -234,7 +271,7 @@ export default function Overview() {
       </div>
 
       {/* Order Details Drawer */}
-      <Sheet open={selectedOrder !== null} onOpenChange={(open) => !open && setSelectedOrder(null)}>
+      <Sheet open={selectedOrder !== null} onOpenChange={(open) => !open && setSelectedOrderId(null)}>
         <SheetContent className="w-full sm:max-w-md bg-[#141416] border-l border-white/10 text-white p-0 overflow-y-auto [&>button]:right-6 [&>button]:top-6 [&>button]:text-white [&>button]:bg-transparent [&>button]:opacity-100 hover:[&>button]:bg-white/10 hover:[&>button]:rounded-full [&>button]:p-1">
           <div className="p-6">
             <SheetHeader className="flex flex-row items-center justify-between space-y-0 mb-6 mt-1">
@@ -348,9 +385,16 @@ export default function Overview() {
               </div>
             </div>
 
-            <button className="w-full h-12 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
-              Mark As Collected <ArrowRight className="w-4 h-4" />
-            </button>
+            {selectedOrder && selectedOrder.progress < 3 && (
+              <button 
+                onClick={handleProgress}
+                className="w-full h-12 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+                {selectedOrder.progress === 0 && "Mark As Collected"}
+                {selectedOrder.progress === 1 && "Mark As Verified"}
+                {selectedOrder.progress === 2 && "Mark As Delivered"}
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </SheetContent>
       </Sheet>

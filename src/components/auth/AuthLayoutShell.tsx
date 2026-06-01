@@ -14,7 +14,7 @@ export default function AuthLayoutShell({
 
       {/* Logo */}
       <div className="mb-12 z-10 flex flex-col items-center">
-        <h1 className="text-5xl font-serif text-gold-gradient tracking-wide">
+        <h1 className="text-6xl font-serif text-gold-gradient tracking-wide">
           Closeté
         </h1>
       </div>
