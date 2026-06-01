@@ -1,15 +1,9 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Calendar, ChevronDown, MoreHorizontal, Phone, MapPin, Check, ArrowRight, Info } from "lucide-react";
+import { Search, Calendar, ChevronDown, Phone, MapPin, Check, ArrowRight, Info, ShoppingCart } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useOrders, Order } from "@/context/OrdersContext";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Sheet,
   SheetContent,
@@ -143,24 +137,28 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 <th className="px-6 py-5">PICKUP</th>
                 <th className="px-6 py-5">DELIVERY</th>
                 <th className="px-6 py-5">STATUS</th>
-                <th className="px-6 py-5"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {filteredOrders.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-16 text-[#8C8C8C]">
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
-                        <Search className="w-5 h-5 text-white/20" />
+                  <td colSpan={7} className="text-center py-24 text-[#8C8C8C]">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="w-32 h-32 rounded-full bg-[#1A1A1D] border border-white/10 flex items-center justify-center mb-4 shadow-xl relative overflow-hidden">
+                         <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-30" />
+                         <ShoppingCart className="w-12 h-12 text-white/40 relative z-10" />
                       </div>
-                      <span>No orders found</span>
+                      <h3 className="text-2xl font-semibold text-white mb-1">No orders found</h3>
+                      <p className="text-sm text-[#8C8C8C] mb-6">There are currently no orders matching this filter</p>
+                      <button className="px-8 py-2.5 bg-gold-gradient text-black font-semibold rounded-full hover:opacity-90 transition-opacity">
+                        Clear Filters
+                      </button>
                     </div>
                   </td>
                 </tr>
               ) : (
                 filteredOrders.map((order, i) => (
-                  <tr key={order.id} className="hover:bg-white/[0.02] transition-colors group">
+                  <tr key={order.id} className="hover:bg-white/[0.02] transition-colors group cursor-pointer" onClick={() => setSelectedOrderId(order.id)}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="font-semibold text-[#E6B95F]">{order.id}</span>
                     </td>
@@ -195,31 +193,6 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                         <span className={`w-1.5 h-1.5 rounded-full ${order.dotColor}`}></span>
                         {order.status}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="text-[#8C8C8C] hover:text-white transition-colors cursor-pointer outline-none">
-                            <MoreHorizontal className="h-5 w-5" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-[#1A1A1D] border border-white/10 text-white">
-                          <DropdownMenuItem 
-                            className="cursor-pointer hover:bg-white/5 focus:bg-white/5 focus:text-white text-sm"
-                            onClick={() => setSelectedOrderId(order.id)}
-                          >
-                            View details
-                          </DropdownMenuItem>
-                          {order.status === "Issue" && (
-                            <DropdownMenuItem 
-                              className="cursor-pointer hover:bg-white/5 focus:bg-white/5 focus:text-white text-sm text-red-400 focus:text-red-400"
-                              onClick={() => openReportIssue(order)}
-                            >
-                              Report Issue
-                            </DropdownMenuItem>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
                     </td>
                   </tr>
                 ))
@@ -352,6 +325,17 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 {selectedOrder.progress === 1 && "Mark As Verified"}
                 {selectedOrder.progress === 2 && "Mark As Delivered"}
                 <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
+
+            {selectedOrder && selectedOrder.status === "Issue" && (
+              <button 
+                onClick={() => {
+                  setSelectedOrderId(null);
+                  openReportIssue(selectedOrder);
+                }}
+                className="w-full h-12 bg-red-500/10 text-red-500 font-semibold rounded-full flex items-center justify-center gap-2 hover:bg-red-500/20 transition-colors mt-4 border border-red-500/20">
+                Report Issue <Info className="w-4 h-4" />
               </button>
             )}
           </div>

@@ -1,7 +1,13 @@
 "use client";
 import React, { useState } from "react";
-import { AlertCircle, Calendar, ChevronDown, Search, ArrowRight, Phone, MapPin, Info } from "lucide-react";
+import { AlertCircle, Calendar, ChevronDown, Search, ArrowRight, Phone, MapPin, Info, ShoppingCart } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type IssueReport = {
   ref: string;
@@ -33,6 +39,8 @@ const issueReports: IssueReport[] = [
 
 export default function IssuesPage() {
   const [search, setSearch] = useState("");
+  const [selectedIssue, setSelectedIssue] = useState<IssueReport | null>(null);
+
   const filtered = issueReports.filter(
     (r) =>
       r.ref.toLowerCase().includes(search.toLowerCase()) ||
@@ -89,16 +97,23 @@ export default function IssuesPage() {
           <tbody className="divide-y divide-white/5">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={8} className="text-center py-16 text-[#8C8C8C]">
-                  <div className="flex flex-col items-center gap-3">
-                    <AlertCircle className="w-10 h-10 text-white/10" />
-                    <span>No issues reported yet</span>
+                <td colSpan={8} className="text-center py-24 text-[#8C8C8C]">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="w-32 h-32 rounded-full bg-[#1A1A1D] border border-white/10 flex items-center justify-center mb-4 shadow-xl relative overflow-hidden">
+                       <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-30" />
+                       <ShoppingCart className="w-12 h-12 text-white/40 relative z-10" />
+                    </div>
+                    <h3 className="text-2xl font-semibold text-white mb-1">No issues found</h3>
+                    <p className="text-sm text-[#8C8C8C] mb-6">There are currently no issues matching this filter</p>
+                    <button className="px-8 py-2.5 bg-gold-gradient text-black font-semibold rounded-full hover:opacity-90 transition-opacity">
+                      Clear Filters
+                    </button>
                   </div>
                 </td>
               </tr>
             ) : (
               filtered.map((report, i) => (
-                <tr key={i} className="hover:bg-white/[0.02] transition-colors">
+                <tr key={i} className="hover:bg-white/[0.02] transition-colors cursor-pointer" onClick={() => setSelectedIssue(report)}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="font-semibold text-[#E6B95F]">{report.ref}</span>
                   </td>
@@ -138,6 +153,59 @@ export default function IssuesPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Issue Details Dialog */}
+      <Dialog open={selectedIssue !== null} onOpenChange={(open) => !open && setSelectedIssue(null)}>
+        <DialogContent className="bg-[#141416] border border-white/10 text-white sm:max-w-[425px] p-6 shadow-2xl rounded-2xl [&>button]:text-white [&>button]:opacity-80 hover:[&>button]:opacity-100">
+          {selectedIssue && (
+            <>
+              <DialogHeader className="mb-6">
+                <DialogTitle className="text-2xl font-semibold mb-1">Issue Details</DialogTitle>
+                <div className="text-sm text-[#8C8C8C]">Reference: {selectedIssue.ref}</div>
+              </DialogHeader>
+
+              <div className="bg-[#1A1A1D] border border-white/5 rounded-xl p-4 flex gap-4 items-center mb-6">
+                <div className="w-20 h-20 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
+                  <img src={selectedIssue.image} alt="Item" className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[#E6B95F] font-medium text-sm mb-1">{selectedIssue.orderId}</div>
+                  <div className="font-semibold truncate text-[15px] mb-1">{selectedIssue.item}</div>
+                  <div className="text-xs text-[#8C8C8C] truncate">{selectedIssue.seller} to {selectedIssue.buyer}</div>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <div className="text-xs text-[#8C8C8C] uppercase font-medium mb-3">Issue Type</div>
+                <div className="p-4 rounded-xl border bg-[#1A1A1D] border-[#E6B95F] text-[#E6B95F] font-medium flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5" />
+                  {selectedIssue.issueType}
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <div className="text-xs text-[#8C8C8C] uppercase font-medium mb-3">Details</div>
+                <div className="w-full bg-[#1A1A1D] border border-white/10 rounded-xl p-4 text-sm text-[#EBEBEB] min-h-[100px]">
+                  {selectedIssue.details}
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-8">
+                 <button 
+                   onClick={() => setSelectedIssue(null)}
+                   className="flex-1 h-12 bg-white/5 hover:bg-white/10 text-white font-medium rounded-full transition-colors border border-white/10">
+                   Contact Parties
+                 </button>
+                 <button 
+                   onClick={() => setSelectedIssue(null)}
+                   className="flex-1 h-12 bg-gold-gradient text-black font-semibold rounded-full transition-colors hover:opacity-90">
+                   Resolve Issue
+                 </button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
