@@ -24,11 +24,12 @@ const issueOptions = [
   { id: "Other", desc: "Add issue manually" },
 ];
 
-const statusRouteMap: Record<string, string> = {
-  Collected: "/collected",
-  Verified: "/verified",
-  Delivered: "/delivered",
-};
+const orderSteps = [
+  { title: "Reserved", desc: "Item reserved for you" },
+  { title: "Collected", desc: "Picked up from seller" },
+  { title: "Verified", desc: "Authentication pending" },
+  { title: "Delivered", desc: "Delivery pending" }
+];
 
 type OrderTableProps = {
   title: string;
@@ -147,7 +148,17 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 </tr>
               ) : (
                 filteredOrders.map((order, i) => (
-                  <tr key={order.id} className="hover:bg-white/[0.02] transition-colors group cursor-pointer" onClick={() => setSelectedOrderId(order.id)}>
+                  <tr 
+                    key={order.id} 
+                    className="hover:bg-white/[0.02] transition-colors group cursor-pointer" 
+                    onClick={() => {
+                      if (order.status === "Issue") {
+                        openReportIssue(order);
+                      } else {
+                        setSelectedOrderId(order.id);
+                      }
+                    }}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="font-semibold text-[#E6B95F]">{order.id}</span>
                     </td>
@@ -263,45 +274,43 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
             {/* Progress */}
             <div className="mb-8">
               <div className="text-xs text-[#8C8C8C] uppercase mb-4 font-medium">Order Progress</div>
-              <div className="bg-[#1A1A1D] rounded-xl p-5">
-                <div className="relative border-l border-white/10 ml-3 space-y-6">
-                  
-                  {/* Reserved */}
-                  <div className="relative pl-6">
-                    <div className={`absolute -left-3.5 top-0.5 w-7 h-7 rounded-full flex items-center justify-center transition-all duration-500 ${selectedOrder && selectedOrder.progress >= 0 ? 'bg-gold-gradient text-black shadow-[0_0_10px_rgba(230,185,95,0.3)]' : 'bg-[#27272A] border border-white/10'}`}>
-                      {selectedOrder && selectedOrder.progress >= 0 ? <Check className="w-4 h-4 text-black" /> : <div className="w-2 h-2 rounded-full bg-[#8C8C8C]" />}
-                    </div>
-                    <div className={`transition-colors duration-500 text-sm mb-0.5 ${selectedOrder && selectedOrder.progress >= 0 ? "text-white font-medium" : "text-[#8C8C8C]"}`}>Reserved</div>
-                    <div className="text-xs text-[#8C8C8C]">Item reserved for you</div>
-                  </div>
+              <div className="bg-[#1A1A1D] rounded-xl p-8 py-10">
+                <div className="space-y-12">
+                  {orderSteps.map((step, index) => {
+                    const progress = selectedOrder?.progress ?? 0;
+                    const isCompleted = progress > index;
+                    const isActive = progress === index;
+                    const isPending = progress < index;
 
-                  {/* Collected */}
-                  <div className="relative pl-6">
-                    <div className={`absolute -left-3.5 top-0.5 w-7 h-7 rounded-full flex items-center justify-center transition-all duration-500 ${selectedOrder && selectedOrder.progress >= 1 ? 'bg-gold-gradient text-black shadow-[0_0_10px_rgba(230,185,95,0.3)]' : 'bg-[#27272A] border border-white/10'}`}>
-                      {selectedOrder && selectedOrder.progress >= 1 ? <div className="w-2 h-2 rounded-full bg-black" /> : <div className="w-2 h-2 rounded-full bg-[#8C8C8C]" />}
-                    </div>
-                    <div className={`transition-colors duration-500 text-sm mb-0.5 ${selectedOrder && selectedOrder.progress >= 1 ? "text-white font-medium" : "text-[#8C8C8C]"}`}>Collected</div>
-                    <div className="text-xs text-[#8C8C8C]">Picked up from seller</div>
-                  </div>
+                    return (
+                      <div key={index} className="relative pl-16">
+                        {/* Vertical line connecting to next step */}
+                        {index < orderSteps.length - 1 && (
+                          <div className={`absolute top-12 left-[23.5px] w-[2px] h-[calc(100%+8px)] transition-colors duration-500 ${progress > index ? 'bg-[#E6B95F]' : 'bg-[#27272A]'}`} />
+                        )}
 
-                  {/* Verified */}
-                  <div className="relative pl-6">
-                    <div className={`absolute -left-3.5 top-0.5 w-7 h-7 rounded-full flex items-center justify-center transition-all duration-500 ${selectedOrder && selectedOrder.progress >= 2 ? 'bg-gold-gradient text-black shadow-[0_0_10px_rgba(230,185,95,0.3)]' : 'bg-[#27272A] border border-white/10'}`}>
-                      {selectedOrder && selectedOrder.progress >= 2 ? <div className="w-2 h-2 rounded-full bg-black" /> : <div className="w-2 h-2 rounded-full bg-[#8C8C8C]" />}
-                    </div>
-                    <div className={`transition-colors duration-500 text-sm mb-0.5 ${selectedOrder && selectedOrder.progress >= 2 ? "text-white font-medium" : "text-[#8C8C8C]"}`}>Verified</div>
-                    <div className="text-xs text-[#8C8C8C]">Authentication pending</div>
-                  </div>
+                        {/* Step indicator */}
+                        <div className="absolute left-0 top-0 flex items-center justify-center w-12 h-12">
+                          {isActive && (
+                            <div className="absolute inset-0 rounded-full border-[1.5px] border-dashed border-[#D6A042] animate-[spin_8s_linear_infinite] scale-110" />
+                          )}
+                          <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-500 z-10 ${isCompleted || isActive ? 'bg-gold-gradient text-black shadow-[0_0_15px_rgba(230,185,95,0.4)]' : 'bg-[#27272A] border border-white/10'}`}>
+                            {isCompleted && <Check className="w-5 h-5 text-black" />}
+                            {isActive && <div className="w-2.5 h-2.5 rounded-full bg-black" />}
+                            {isPending && <div className="w-2.5 h-2.5 rounded-full bg-[#8C8C8C]" />}
+                          </div>
+                        </div>
 
-                  {/* Delivered */}
-                  <div className="relative pl-6">
-                    <div className={`absolute -left-3.5 top-0.5 w-7 h-7 rounded-full flex items-center justify-center transition-all duration-500 ${selectedOrder && selectedOrder.progress >= 3 ? 'bg-gold-gradient text-black shadow-[0_0_10px_rgba(230,185,95,0.3)]' : 'bg-[#27272A] border border-white/10'}`}>
-                      {selectedOrder && selectedOrder.progress >= 3 ? <div className="w-2 h-2 rounded-full bg-black" /> : <div className="w-2 h-2 rounded-full bg-[#8C8C8C]" />}
-                    </div>
-                    <div className={`transition-colors duration-500 text-sm mb-0.5 ${selectedOrder && selectedOrder.progress >= 3 ? "text-white font-medium" : "text-[#8C8C8C]"}`}>Delivered</div>
-                    <div className="text-xs text-[#8C8C8C]">Delivery pending</div>
-                  </div>
-
+                        {/* Text */}
+                        <div className={`transition-colors duration-500 text-[22px] leading-tight font-medium mb-1.5 ${isCompleted || isActive ? "text-white" : "text-[#8C8C8C]"}`}>
+                          {step.title}
+                        </div>
+                        <div className="text-[#8C8C8C] text-[15px]">
+                          {step.desc}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
