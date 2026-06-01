@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 
 const items = [
-  { href: "/overview", label: "All Orders", Icon: FileText },
+  { href: "/all-orders", label: "All Orders", Icon: FileText },
   { href: "/awaiting-collection", label: "Awaiting Collection", Icon: Clock },
   { href: "/collected", label: "Collected", Icon: PackageCheck },
   { href: "/verified", label: "Verified", Icon: ShieldCheck },
