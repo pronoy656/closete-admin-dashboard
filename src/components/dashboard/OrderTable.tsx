@@ -64,18 +64,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
     if (!selectedOrder) return;
     if (selectedOrder.progress >= 3) return;
 
-    const nextProgress = selectedOrder.progress + 1;
-    let nextRoute = "";
-    if (nextProgress === 1) nextRoute = "/collected";
-    else if (nextProgress === 2) nextRoute = "/verified";
-    else if (nextProgress === 3) nextRoute = "/delivered";
-
     advanceOrder(selectedOrder.id);
-    setSelectedOrderId(null);
-
-    if (nextRoute) {
-      router.push(nextRoute);
-    }
   };
 
   const openReportIssue = (order: Order) => {
@@ -189,8 +178,8 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                       {order.delivery}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${order.statusBg} ${order.statusColor}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${order.dotColor}`}></span>
+                      <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium transition-colors duration-500 ${order.statusBg} ${order.statusColor}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full transition-colors duration-500 ${order.dotColor}`}></span>
                         {order.status}
                       </span>
                     </td>
@@ -223,8 +212,8 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 <p className="text-sm text-[#8C8C8C]">{selectedOrder?.item.desc}</p>
               </div>
               <div className="flex flex-col items-end">
-                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${selectedOrder?.statusBg} ${selectedOrder?.statusColor} mb-2`}>
-                  <span className={`w-1.5 h-1.5 rounded-full ${selectedOrder?.dotColor}`}></span>
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors duration-500 ${selectedOrder?.statusBg} ${selectedOrder?.statusColor} mb-2`}>
+                  <span className={`w-1.5 h-1.5 rounded-full transition-colors duration-500 ${selectedOrder?.dotColor}`}></span>
                   {selectedOrder?.status}
                 </span>
                 <span className="font-semibold">{selectedOrder?.item.price}</span>
@@ -279,37 +268,37 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                   
                   {/* Reserved */}
                   <div className="relative pl-6">
-                    <div className={`absolute -left-3.5 top-0.5 w-7 h-7 rounded-full flex items-center justify-center ${selectedOrder && selectedOrder.progress >= 0 ? 'bg-gold-gradient text-black shadow-[0_0_10px_rgba(230,185,95,0.3)]' : 'bg-[#27272A] border border-white/10'}`}>
+                    <div className={`absolute -left-3.5 top-0.5 w-7 h-7 rounded-full flex items-center justify-center transition-all duration-500 ${selectedOrder && selectedOrder.progress >= 0 ? 'bg-gold-gradient text-black shadow-[0_0_10px_rgba(230,185,95,0.3)]' : 'bg-[#27272A] border border-white/10'}`}>
                       {selectedOrder && selectedOrder.progress >= 0 ? <Check className="w-4 h-4 text-black" /> : <div className="w-2 h-2 rounded-full bg-[#8C8C8C]" />}
                     </div>
-                    <div className={selectedOrder && selectedOrder.progress >= 0 ? "text-white font-medium text-sm mb-0.5" : "text-[#8C8C8C] text-sm mb-0.5"}>Reserved</div>
+                    <div className={`transition-colors duration-500 text-sm mb-0.5 ${selectedOrder && selectedOrder.progress >= 0 ? "text-white font-medium" : "text-[#8C8C8C]"}`}>Reserved</div>
                     <div className="text-xs text-[#8C8C8C]">Item reserved for you</div>
                   </div>
 
                   {/* Collected */}
                   <div className="relative pl-6">
-                    <div className={`absolute -left-3.5 top-0.5 w-7 h-7 rounded-full flex items-center justify-center ${selectedOrder && selectedOrder.progress >= 1 ? 'bg-gold-gradient text-black shadow-[0_0_10px_rgba(230,185,95,0.3)]' : 'bg-[#27272A] border border-white/10'}`}>
+                    <div className={`absolute -left-3.5 top-0.5 w-7 h-7 rounded-full flex items-center justify-center transition-all duration-500 ${selectedOrder && selectedOrder.progress >= 1 ? 'bg-gold-gradient text-black shadow-[0_0_10px_rgba(230,185,95,0.3)]' : 'bg-[#27272A] border border-white/10'}`}>
                       {selectedOrder && selectedOrder.progress >= 1 ? <div className="w-2 h-2 rounded-full bg-black" /> : <div className="w-2 h-2 rounded-full bg-[#8C8C8C]" />}
                     </div>
-                    <div className={selectedOrder && selectedOrder.progress >= 1 ? "text-white font-medium text-sm mb-0.5" : "text-[#8C8C8C] text-sm mb-0.5"}>Collected</div>
+                    <div className={`transition-colors duration-500 text-sm mb-0.5 ${selectedOrder && selectedOrder.progress >= 1 ? "text-white font-medium" : "text-[#8C8C8C]"}`}>Collected</div>
                     <div className="text-xs text-[#8C8C8C]">Picked up from seller</div>
                   </div>
 
                   {/* Verified */}
                   <div className="relative pl-6">
-                    <div className={`absolute -left-3.5 top-0.5 w-7 h-7 rounded-full flex items-center justify-center ${selectedOrder && selectedOrder.progress >= 2 ? 'bg-gold-gradient text-black shadow-[0_0_10px_rgba(230,185,95,0.3)]' : 'bg-[#27272A] border border-white/10'}`}>
+                    <div className={`absolute -left-3.5 top-0.5 w-7 h-7 rounded-full flex items-center justify-center transition-all duration-500 ${selectedOrder && selectedOrder.progress >= 2 ? 'bg-gold-gradient text-black shadow-[0_0_10px_rgba(230,185,95,0.3)]' : 'bg-[#27272A] border border-white/10'}`}>
                       {selectedOrder && selectedOrder.progress >= 2 ? <div className="w-2 h-2 rounded-full bg-black" /> : <div className="w-2 h-2 rounded-full bg-[#8C8C8C]" />}
                     </div>
-                    <div className={selectedOrder && selectedOrder.progress >= 2 ? "text-white font-medium text-sm mb-0.5" : "text-[#8C8C8C] text-sm mb-0.5"}>Verified</div>
+                    <div className={`transition-colors duration-500 text-sm mb-0.5 ${selectedOrder && selectedOrder.progress >= 2 ? "text-white font-medium" : "text-[#8C8C8C]"}`}>Verified</div>
                     <div className="text-xs text-[#8C8C8C]">Authentication pending</div>
                   </div>
 
                   {/* Delivered */}
                   <div className="relative pl-6">
-                    <div className={`absolute -left-3.5 top-0.5 w-7 h-7 rounded-full flex items-center justify-center ${selectedOrder && selectedOrder.progress >= 3 ? 'bg-gold-gradient text-black shadow-[0_0_10px_rgba(230,185,95,0.3)]' : 'bg-[#27272A] border border-white/10'}`}>
+                    <div className={`absolute -left-3.5 top-0.5 w-7 h-7 rounded-full flex items-center justify-center transition-all duration-500 ${selectedOrder && selectedOrder.progress >= 3 ? 'bg-gold-gradient text-black shadow-[0_0_10px_rgba(230,185,95,0.3)]' : 'bg-[#27272A] border border-white/10'}`}>
                       {selectedOrder && selectedOrder.progress >= 3 ? <div className="w-2 h-2 rounded-full bg-black" /> : <div className="w-2 h-2 rounded-full bg-[#8C8C8C]" />}
                     </div>
-                    <div className={selectedOrder && selectedOrder.progress >= 3 ? "text-white font-medium text-sm mb-0.5" : "text-[#8C8C8C] text-sm mb-0.5"}>Delivered</div>
+                    <div className={`transition-colors duration-500 text-sm mb-0.5 ${selectedOrder && selectedOrder.progress >= 3 ? "text-white font-medium" : "text-[#8C8C8C]"}`}>Delivered</div>
                     <div className="text-xs text-[#8C8C8C]">Delivery pending</div>
                   </div>
 

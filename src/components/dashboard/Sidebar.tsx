@@ -9,7 +9,8 @@ import {
   PackageCheck,
   ShieldCheck,
   Truck,
-  AlertCircle
+  AlertCircle,
+  LogOut
 } from "lucide-react";
 
 const items = [
@@ -53,6 +54,16 @@ export default function Sidebar({ active }: { active?: string }) {
           );
         })}
       </nav>
+
+      <div className="p-4 border-t border-white/5 mt-auto">
+        <Link
+          href="/"
+          className="flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors rounded-xl text-red-500/80 hover:bg-red-500/10 hover:text-red-500"
+        >
+          <LogOut className="h-5 w-5" />
+          <span>Logout</span>
+        </Link>
+      </div>
     </aside>
   );
 }
