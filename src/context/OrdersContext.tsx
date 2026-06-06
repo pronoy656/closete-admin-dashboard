@@ -13,6 +13,13 @@ export type Order = {
   statusBg: string;
   dotColor: string;
   progress: number;
+  issue?: {
+    reason: string;
+    notes?: string;
+    createdAt: string;
+    referenceId: string;
+    responses: { role: string; text: string; time: string }[];
+  };
 };
 
 const initialOrders: Order[] = [
@@ -79,7 +86,17 @@ const initialOrders: Order[] = [
     statusColor: "text-red-500",
     statusBg: "bg-red-500/10",
     dotColor: "bg-red-500",
-    progress: 1
+    progress: 1,
+    issue: {
+      reason: "Item failed verification",
+      notes: "The bag has deep scratches on the back that were not disclosed in the original listing.",
+      createdAt: "Today, 4:23 PM",
+      referenceId: "#RP-992-K",
+      responses: [
+        { role: "Buyer", text: "Requested refund due to undisclosed damage.", time: "Today, 4:23 PM" },
+        { role: "Admin", text: "Verification failed. Item flagged for review.", time: "Today, 4:45 PM" },
+      ]
+    }
   },
   {
     id: "#235689",
