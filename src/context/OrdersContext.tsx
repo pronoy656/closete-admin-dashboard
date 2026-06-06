@@ -13,6 +13,11 @@ export type Order = {
   statusBg: string;
   dotColor: string;
   progress: number;
+  aiAnalysis?: {
+    fakePercent: number;
+    originalPercent: number;
+    reason?: string;
+  };
   issue?: {
     reason: string;
     notes?: string;
@@ -34,7 +39,8 @@ const initialOrders: Order[] = [
     statusColor: "text-purple-400",
     statusBg: "bg-purple-400/10",
     dotColor: "bg-purple-400",
-    progress: 2
+    progress: 2,
+    aiAnalysis: { fakePercent: 5, originalPercent: 95 }
   },
   {
     id: "#234892",
@@ -47,7 +53,8 @@ const initialOrders: Order[] = [
     statusColor: "text-blue-400",
     statusBg: "bg-blue-400/10",
     dotColor: "bg-blue-400",
-    progress: 1
+    progress: 1,
+    aiAnalysis: { fakePercent: 8, originalPercent: 92 }
   },
   {
     id: "#958743",
@@ -60,7 +67,8 @@ const initialOrders: Order[] = [
     statusColor: "text-yellow-500",
     statusBg: "bg-yellow-500/10",
     dotColor: "bg-yellow-500",
-    progress: 0
+    progress: 0,
+    aiAnalysis: { fakePercent: 85, originalPercent: 15, reason: "Inconsistent stitching pattern and incorrect font alignment on the inner logo." }
   },
   {
     id: "#495873",
@@ -73,7 +81,8 @@ const initialOrders: Order[] = [
     statusColor: "text-purple-400",
     statusBg: "bg-purple-400/10",
     dotColor: "bg-purple-400",
-    progress: 2
+    progress: 2,
+    aiAnalysis: { fakePercent: 2, originalPercent: 98 }
   },
   {
     id: "#873927",
@@ -87,6 +96,7 @@ const initialOrders: Order[] = [
     statusBg: "bg-red-500/10",
     dotColor: "bg-red-500",
     progress: 1,
+    aiAnalysis: { fakePercent: 60, originalPercent: 40, reason: "Hardware engraving depth does not match authentic pieces from the reported year of production." },
     issue: {
       reason: "Item failed verification",
       notes: "The bag has deep scratches on the back that were not disclosed in the original listing.",
@@ -109,7 +119,8 @@ const initialOrders: Order[] = [
     statusColor: "text-blue-400",
     statusBg: "bg-blue-400/10",
     dotColor: "bg-blue-400",
-    progress: 1
+    progress: 1,
+    aiAnalysis: { fakePercent: 12, originalPercent: 88 }
   },
   {
     id: "#578932",
@@ -122,7 +133,8 @@ const initialOrders: Order[] = [
     statusColor: "text-green-500",
     statusBg: "bg-green-500/10",
     dotColor: "bg-green-500",
-    progress: 3
+    progress: 3,
+    aiAnalysis: { fakePercent: 4, originalPercent: 96 }
   },
 ];
 

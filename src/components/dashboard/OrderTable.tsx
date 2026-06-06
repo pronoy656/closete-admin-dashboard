@@ -132,13 +132,14 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 <th className="px-6 py-5">BUYER</th>
                 <th className="px-6 py-5">PICKUP</th>
                 <th className="px-6 py-5">DELIVERY</th>
+                <th className="px-6 py-5">AI ANALYSIS</th>
                 <th className="px-6 py-5">STATUS</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {filteredOrders.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-24 text-[#8C8C8C]">
+                  <td colSpan={8} className="text-center py-24 text-[#8C8C8C]">
                     <div className="flex flex-col items-center justify-center gap-2">
                       <div className="w-32 h-32 rounded-full bg-[#1A1A1D] border border-white/10 flex items-center justify-center mb-4 shadow-xl relative overflow-hidden">
                         <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-30" />
@@ -187,6 +188,28 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                     </td>
                     <td className="px-6 py-4 text-[#8C8C8C]">
                       {order.delivery}
+                    </td>
+                    <td className="px-6 py-4">
+                      {order.aiAnalysis ? (
+                        <div className="flex flex-col gap-1.5 min-w-[200px] max-w-[280px]">
+                          <div className="flex justify-between items-center text-xs">
+                            <span className="text-[#00D22B] font-medium">{order.aiAnalysis.originalPercent}% Original</span>
+                            <span className="text-red-500 font-medium">{order.aiAnalysis.fakePercent}% Fake</span>
+                          </div>
+                          <div className="w-full h-1.5 rounded-full bg-red-500/20 overflow-hidden flex">
+                            <div className="h-full bg-[#00D22B]" style={{ width: `${order.aiAnalysis.originalPercent}%` }} />
+                            <div className="h-full bg-red-500" style={{ width: `${order.aiAnalysis.fakePercent}%` }} />
+                          </div>
+                          {order.aiAnalysis.fakePercent >= 50 && order.aiAnalysis.reason && (
+                            <div className="mt-1 text-[11px] text-[#8C8C8C] leading-snug bg-red-500/5 p-2 rounded border border-red-500/10">
+                              <span className="text-red-400 font-semibold mb-0.5 block">Marked as Fake:</span>
+                              {order.aiAnalysis.reason}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-[#8C8C8C]">Pending analysis...</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium transition-colors duration-500 ${order.statusBg} ${order.statusColor}`}>
