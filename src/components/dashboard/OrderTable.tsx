@@ -206,7 +206,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
 
                           {/* Progress bar */}
                           <div className="w-full h-1.5 rounded-full bg-[#27272A] overflow-hidden flex">
-                            <div className="h-full bg-[#EBEBEB] transition-all duration-1000 ease-out" style={{ width: `${order.aiAnalysis.originalPercent}%` }} />
+                            <div className="h-full bg-[#8C8C8C] transition-all duration-1000 ease-out" style={{ width: `${order.aiAnalysis.originalPercent}%` }} />
                             <div className="h-full bg-red-500/80 transition-all duration-1000 ease-out" style={{ width: `${order.aiAnalysis.fakePercent}%` }} />
                           </div>
 
