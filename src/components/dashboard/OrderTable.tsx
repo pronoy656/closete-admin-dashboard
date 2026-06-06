@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Calendar, ChevronDown, Phone, MapPin, Check, ArrowRight, Info, ShoppingCart, ChevronLeft } from "lucide-react";
+import { Search, Calendar, ChevronDown, Phone, MapPin, Check, ArrowRight, Info, ShoppingCart, ChevronLeft, ShieldCheck, AlertTriangle, AlertCircle, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useOrders, Order } from "@/context/OrdersContext";
 import {
@@ -189,26 +189,45 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                     <td className="px-6 py-4 text-[#8C8C8C]">
                       {order.delivery}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 align-top">
                       {order.aiAnalysis ? (
-                        <div className="flex flex-col gap-1.5 min-w-[200px] max-w-[280px]">
-                          <div className="flex justify-between items-center text-xs">
-                            <span className="text-[#00D22B] font-medium">{order.aiAnalysis.originalPercent}% Original</span>
-                            <span className="text-red-500 font-medium">{order.aiAnalysis.fakePercent}% Fake</span>
+                        <div className="flex flex-col gap-2 min-w-[200px] max-w-[280px]">
+                          {/* Top row with icons and percentages */}
+                          <div className="flex justify-between items-center text-xs font-medium">
+                            <div className="flex items-center gap-1.5 text-[#8C8C8C]">
+                               <span>Authentic</span>
+                               <span className="text-white">{order.aiAnalysis.originalPercent}%</span>
+                            </div>
+                            <div className={`flex items-center gap-1.5 ${order.aiAnalysis.fakePercent > 0 ? 'text-[#8C8C8C]' : 'text-[#8C8C8C]'}`}>
+                               <span>Fake</span>
+                               <span className={order.aiAnalysis.fakePercent > 0 ? "text-red-400" : "text-white"}>{order.aiAnalysis.fakePercent}%</span>
+                            </div>
                           </div>
-                          <div className="w-full h-1.5 rounded-full bg-red-500/20 overflow-hidden flex">
-                            <div className="h-full bg-[#00D22B]" style={{ width: `${order.aiAnalysis.originalPercent}%` }} />
-                            <div className="h-full bg-red-500" style={{ width: `${order.aiAnalysis.fakePercent}%` }} />
+
+                          {/* Progress bar */}
+                          <div className="w-full h-1.5 rounded-full bg-[#27272A] overflow-hidden flex">
+                            <div className="h-full bg-[#EBEBEB] transition-all duration-1000 ease-out" style={{ width: `${order.aiAnalysis.originalPercent}%` }} />
+                            <div className="h-full bg-red-500/80 transition-all duration-1000 ease-out" style={{ width: `${order.aiAnalysis.fakePercent}%` }} />
                           </div>
+
+                          {/* Reason */}
                           {order.aiAnalysis.fakePercent >= 50 && order.aiAnalysis.reason && (
-                            <div className="mt-1 text-[11px] text-[#8C8C8C] leading-snug bg-red-500/5 p-2 rounded border border-red-500/10">
-                              <span className="text-red-400 font-semibold mb-0.5 block">Marked as Fake:</span>
-                              {order.aiAnalysis.reason}
+                            <div className="mt-1 text-[11px] leading-relaxed text-[#8C8C8C] bg-[#1A1A1D] p-2.5 rounded-lg border border-red-500/10">
+                              <div className="flex items-start gap-1.5">
+                                <AlertCircle className="w-3.5 h-3.5 text-red-500/70 shrink-0 mt-0.5" />
+                                <div>
+                                  <span className="text-red-400/90 font-medium block mb-0.5">Flagged</span>
+                                  {order.aiAnalysis.reason}
+                                </div>
+                              </div>
                             </div>
                           )}
                         </div>
                       ) : (
-                        <span className="text-xs text-[#8C8C8C]">Pending analysis...</span>
+                        <div className="flex items-center gap-2 text-xs text-[#8C8C8C]">
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span>Analyzing...</span>
+                        </div>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
