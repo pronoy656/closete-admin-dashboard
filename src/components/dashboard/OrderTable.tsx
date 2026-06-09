@@ -15,6 +15,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 
 const issueOptions = [
@@ -564,8 +565,8 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
               </div>
             </div>
 
-            <h2 className="text-2xl font-semibold mb-2">Issue reported</h2>
-            <div className="text-sm text-[#8C8C8C] mb-8">Order status updated successfully</div>
+            <DialogTitle className="text-2xl font-semibold mb-2">Issue reported</DialogTitle>
+            <DialogDescription className="text-sm text-[#8C8C8C] mb-8">Order status updated successfully</DialogDescription>
 
             <div className="w-full bg-[#1A1A1D] border border-white/5 rounded-xl p-5 mb-8 text-left space-y-3">
               <div className="flex justify-between items-center text-sm">
@@ -599,8 +600,8 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 </div>
               </div>
 
-              <h2 className="text-2xl font-semibold mb-2">Order updated successfully</h2>
-              <div className="text-sm text-[#8C8C8C] mb-6">Status updated to {successOrder.status}</div>
+              <DialogTitle className="text-2xl font-semibold mb-2">Order updated successfully</DialogTitle>
+              <DialogDescription className="text-sm text-[#8C8C8C] mb-6">Status updated to {successOrder.status}</DialogDescription>
 
               <div className="w-full bg-[#1A1A1D] border border-white/5 rounded-xl p-4 mb-4 text-left flex gap-4 items-center">
                 <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-white/5">

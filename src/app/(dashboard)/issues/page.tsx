@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 
 type IssueReport = {
@@ -161,7 +162,7 @@ export default function IssuesPage() {
             <>
               <DialogHeader className="mb-6">
                 <DialogTitle className="text-2xl font-semibold mb-1">Issue Details</DialogTitle>
-                <div className="text-sm text-[#8C8C8C]">Reference: {selectedIssue.ref}</div>
+                <DialogDescription className="text-sm text-[#8C8C8C]">Reference: {selectedIssue.ref}</DialogDescription>
               </DialogHeader>
 
               <div className="bg-[#1A1A1D] border border-white/5 rounded-xl p-4 flex gap-4 items-center mb-6">
