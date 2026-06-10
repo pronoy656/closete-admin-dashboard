@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { CustomInput } from "@/components/ui/CustomInput";
 import Link from "next/link";
 import { User, Key, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
 
@@ -30,37 +31,33 @@ export default function LoginForm() {
       <div className="w-full h-[1px] bg-white/5 mb-8" />
 
       <form onSubmit={onSubmit} className="space-y-6">
-        <div className="space-y-4">
-          <label className="text-sm font-medium text-[#EBEBEB]">User name</label>
-          <div className="relative">
-            <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#8C8C8C]" />
-            <Input
-              type="text"
-              required
-              placeholder="Enter username"
-              className="h-12 bg-[#27272A]/50 border-white/5 text-white placeholder:text-[#8C8C8C] pl-12 focus-visible:ring-[#FFAF2C]/30 focus-visible:border-[#FFAF2C]/50 rounded-xl"
-            />
-          </div>
+        <div>
+          <label className="text-sm font-medium text-[#EBEBEB] mb-4 block">User name</label>
+          <CustomInput
+            type="text"
+            required
+            placeholder="Enter username"
+            leftIcon={<User className="h-5 w-5" />}
+          />
         </div>
         
-        <div className="space-y-4 text-left">
-          <label className="text-sm font-medium text-[#EBEBEB]">Password</label>
-          <div className="relative">
-            <Key className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#8C8C8C]" />
-            <Input
-              type={showPassword ? "text" : "password"}
-              required
-              placeholder="Enter password"
-              className="h-12 bg-[#27272A]/50 border-white/5 text-white placeholder:text-[#8C8C8C] pl-12 pr-12 focus-visible:ring-[#FFAF2C]/30 focus-visible:border-[#FFAF2C]/50 rounded-xl"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8C8C8C] hover:text-white transition-colors"
-            >
-              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-            </button>
-          </div>
+        <div className="text-left">
+          <label className="text-sm font-medium text-[#EBEBEB] mb-4 block">Password</label>
+          <CustomInput
+            type={showPassword ? "text" : "password"}
+            required
+            placeholder="Enter password"
+            leftIcon={<Key className="h-5 w-5" />}
+            rightIcon={
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="hover:text-white transition-colors"
+              >
+                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              </button>
+            }
+          />
         </div>
 
         <div className="flex justify-end">
