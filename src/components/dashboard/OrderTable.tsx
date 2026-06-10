@@ -481,9 +481,13 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                       return (
                         <div key={opt.id} className="space-y-2">
                           <div
-                            onClick={() => setSelectedIssueOption(opt.id)}
-                            className={`${isSelected && opt.id === "Buyer rejected" ? 'flex flex-col gap-3' : 'flex items-center justify-between'} p-4 rounded-xl border cursor-pointer transition-colors ${isSelected ? 'bg-[#1A1A1D] border-[#FFAF2C]' : 'bg-[#141416] border-white/10 hover:border-white/20'
-                              }`}
+                            onClick={() => {
+                              setSelectedIssueOption(opt.id);
+                              if (opt.id !== "Other") {
+                                setIssueDetails("");
+                              }
+                            }}
+                            className={`${isSelected && opt.id === "Buyer rejected" ? 'flex flex-col gap-3' : 'flex items-center justify-between'} p-4 rounded-xl border cursor-pointer transition-colors ${isSelected ? 'bg-[#1A1A1D] border-[#FFAF2C]' : 'bg-[#141416] border-white/10 hover:border-white/20'}`}
                           >
                             <div className="flex items-center justify-between w-full">
                               <div>
@@ -519,8 +523,8 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                   </div>
                 </div>
 
-                {/* Add Details textarea only if Buyer rejected */}
-                {selectedIssueOption === "Buyer rejected" && (
+                {/* Add Details textarea only if Other issue option selected */}
+                {selectedIssueOption === "Other" && (
                   <div>
                     <div className="text-xs text-[#8C8C8C] uppercase font-medium mb-3">Add Details</div>
                     <textarea
@@ -542,9 +546,9 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
               <div className="px-6 py-4 border-t border-white/5 flex-shrink-0">
                 <button
                   onClick={submitIssue}
-                  disabled={selectedIssueOption === "Buyer rejected" && issueDetails.trim() === ""}
+                  disabled={selectedIssueOption === "Other" && issueDetails.trim() === ""}
                   className={`w-full h-12 font-semibold rounded-full flex items-center justify-center gap-2 transition-all ${
-                    selectedIssueOption === "Buyer rejected" && issueDetails.trim() === ""
+                    selectedIssueOption === "Other" && issueDetails.trim() === ""
                       ? "bg-white/10 text-[#8C8C8C] cursor-not-allowed"
                       : "bg-gold-gradient text-black hover:opacity-90"
                   }`}>
