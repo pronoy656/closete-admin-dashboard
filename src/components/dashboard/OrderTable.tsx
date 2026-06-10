@@ -466,7 +466,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                     <img src={selectedOrder.item.image} alt="Item" className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-[#E6B95F] font-medium text-sm mb-1">{selectedOrder.id}</div>
+                    <div className="text-[#FFAF2C] font-medium text-sm mb-1">{selectedOrder.id}</div>
                     <div className="font-semibold truncate text-[15px] mb-1">{selectedOrder.item.name}</div>
                     <div className="text-xs text-[#8C8C8C] truncate">{selectedOrder.seller.name} to {selectedOrder.buyer.name}</div>
                   </div>
@@ -482,32 +482,37 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                         <div key={opt.id} className="space-y-2">
                           <div
                             onClick={() => setSelectedIssueOption(opt.id)}
-                            className={`p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-colors ${isSelected ? 'bg-[#1A1A1D] border-[#E6B95F]' : 'bg-[#141416] border-white/10 hover:border-white/20'
+                            className={`${isSelected && opt.id === "Buyer rejected" ? 'flex flex-col gap-3' : 'flex items-center justify-between'} p-4 rounded-xl border cursor-pointer transition-colors ${isSelected ? 'bg-[#1A1A1D] border-[#FFAF2C]' : 'bg-[#141416] border-white/10 hover:border-white/20'
                               }`}
                           >
-                            <div>
-                              <div className={`font-medium mb-1 ${isSelected ? 'text-[#E6B95F]' : 'text-white'}`}>{opt.id}</div>
-                              <div className="text-xs text-[#8C8C8C]">{opt.desc}</div>
+                            <div className="flex items-center justify-between w-full">
+                              <div>
+                                <div className={`font-medium mb-1 ${isSelected ? 'text-[#FFAF2C]' : 'text-white'}`}>{opt.id}</div>
+                                <div className="text-xs text-[#8C8C8C]">{opt.desc}</div>
+                              </div>
+                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-[#FFAF2C]' : 'border-white/20'}`}>
+                                {isSelected && <div className="w-2.5 h-2.5 bg-[#FFAF2C] rounded-full" />}
+                              </div>
                             </div>
-                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-[#E6B95F]' : 'border-white/20'}`}>
-                              {isSelected && <div className="w-2.5 h-2.5 bg-[#E6B95F] rounded-full" />}
-                            </div>
-                          </div>
-                          {isSelected && opt.id === "Buyer rejected" && (
-                            <div className="relative mt-2">
-                              <select
-                                value={buyerRejectReason}
-                                onChange={(e) => setBuyerRejectReason(e.target.value)}
-                                className="w-full bg-[#27272A] border border-white/10 rounded-xl h-12 px-4 text-sm text-white appearance-none focus:outline-none focus:ring-1 focus:ring-[#E6B95F]/50"
+                            {isSelected && opt.id === "Buyer rejected" && (
+                              <div 
+                                className="relative w-full"
+                                onClick={(e) => e.stopPropagation()}
                               >
-                                <option value="Changed mind">Changed mind</option>
-                                <option value="Not as described">Not as described</option>
-                                <option value="Condition issue">Condition issue</option>
-                                <option value="Other">Other</option>
-                              </select>
-                              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8C8C8C] pointer-events-none" />
-                            </div>
-                          )}
+                                <select
+                                  value={buyerRejectReason}
+                                  onChange={(e) => setBuyerRejectReason(e.target.value)}
+                                  className="w-full bg-[#27272A] border border-white/10 rounded-xl h-12 px-4 text-sm text-white appearance-none focus:outline-none focus:ring-0 focus:border-white/10"
+                                >
+                                  <option value="Changed mind">Changed mind</option>
+                                  <option value="Not as described">Not as described</option>
+                                  <option value="Condition issue">Condition issue</option>
+                                  <option value="Other">Other</option>
+                                </select>
+                                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8C8C8C] pointer-events-none" />
+                              </div>
+                            )}
+                          </div>
                         </div>
                       );
                     })}
@@ -522,7 +527,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                       value={issueDetails}
                       onChange={(e) => setIssueDetails(e.target.value)}
                       placeholder="Type additional information.."
-                      className="w-full bg-[#1A1A1D] border border-white/10 rounded-xl p-4 text-sm text-white placeholder:text-[#8C8C8C] min-h-[100px] resize-none focus:outline-none focus:ring-1 focus:ring-[#E6B95F]/50"
+                      className="w-full bg-[#1A1A1D] border border-white/10 rounded-xl p-4 text-sm text-white placeholder:text-[#8C8C8C] min-h-[100px] resize-none focus:outline-none focus:ring-1 focus:ring-[#FFAF2C]/50 focus:border-[#FFAF2C]"
                     />
                   </div>
                 )}
