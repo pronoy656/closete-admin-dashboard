@@ -13,6 +13,7 @@ export type Order = {
   statusBg: string;
   dotColor: string;
   progress: number;
+  note?: string;
   aiAnalysis?: {
     fakePercent: number;
     originalPercent: number;
@@ -40,6 +41,7 @@ const initialOrders: Order[] = [
     statusBg: "bg-purple-400/10",
     dotColor: "bg-purple-400",
     progress: 2,
+    note: "Item is in excellent condition with minimal signs of wear on the handle.",
     aiAnalysis: { fakePercent: 5, originalPercent: 95 }
   },
   {
@@ -54,6 +56,7 @@ const initialOrders: Order[] = [
     statusBg: "bg-blue-400/10",
     dotColor: "bg-blue-400",
     progress: 1,
+    note: "Minor scuff marks on the bottom corners, otherwise pristine.",
     aiAnalysis: { fakePercent: 8, originalPercent: 92 }
   },
   {
@@ -68,6 +71,7 @@ const initialOrders: Order[] = [
     statusBg: "bg-yellow-500/10",
     dotColor: "bg-yellow-500",
     progress: 0,
+    note: "Inconsistent stitching pattern and incorrect font alignment on the inner logo.",
     aiAnalysis: { fakePercent: 85, originalPercent: 15, reason: "Inconsistent stitching pattern and incorrect font alignment on the inner logo." }
   },
   {
@@ -82,6 +86,7 @@ const initialOrders: Order[] = [
     statusBg: "bg-purple-400/10",
     dotColor: "bg-purple-400",
     progress: 2,
+    note: "Comes with original dust bag and authenticity card.",
     aiAnalysis: { fakePercent: 2, originalPercent: 98 }
   },
   {
@@ -96,6 +101,7 @@ const initialOrders: Order[] = [
     statusBg: "bg-red-500/10",
     dotColor: "bg-red-500",
     progress: 1,
+    note: "Visible scratches reported on the hardware. Buyer declined acceptance at delivery.",
     aiAnalysis: { fakePercent: 60, originalPercent: 40, reason: "Hardware engraving depth does not match authentic pieces from the reported year of production." },
     issue: {
       reason: "Item failed verification",
@@ -120,6 +126,7 @@ const initialOrders: Order[] = [
     statusBg: "bg-blue-400/10",
     dotColor: "bg-blue-400",
     progress: 1,
+    note: "Some discoloration on the interior lining, exterior looks great.",
     aiAnalysis: { fakePercent: 12, originalPercent: 88 }
   },
   {
@@ -134,6 +141,7 @@ const initialOrders: Order[] = [
     statusBg: "bg-green-500/10",
     dotColor: "bg-green-500",
     progress: 3,
+    note: "Perfect condition, barely used. Original packaging included.",
     aiAnalysis: { fakePercent: 4, originalPercent: 96 }
   },
 ];

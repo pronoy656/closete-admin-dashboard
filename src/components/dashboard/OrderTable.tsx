@@ -252,17 +252,17 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
         <SheetContent className="w-full sm:max-w-md bg-[#141416] border-l border-white/10 text-white p-0 overflow-hidden [&>button]:right-6 [&>button]:top-6 [&>button]:text-white [&>button]:bg-transparent [&>button]:opacity-100 hover:[&>button]:bg-white/10 hover:[&>button]:rounded-full [&>button]:p-1 flex flex-col">
           {sheetView === "details" && (
             <div className="p-6 overflow-y-auto h-full w-full no-scrollbar">
-              <SheetHeader className="flex flex-row items-center justify-between space-y-0 mb-6 mt-1">
-                <SheetTitle className="text-xl font-semibold text-white">Order Details</SheetTitle>
+              <SheetHeader className="flex flex-row items-center justify-between space-y-0 mb-0 -mt-6">
+                <SheetTitle className="text-xl font-semibold text-white -ml-4">Order Details</SheetTitle>
               </SheetHeader>
 
               {/* Image */}
-              <div className="w-full h-48 rounded-xl overflow-hidden mb-6">
+              <div className="w-full h-48 rounded-xl overflow-hidden mb-4">
                 <img src={selectedOrder?.item.image} alt={selectedOrder?.item.name} className="w-full h-full object-cover" />
               </div>
 
               {/* Header Info */}
-              <div className="flex justify-between items-start mb-2">
+              <div className="flex justify-between items-start mb-4">
                 <div>
                   <div className="text-[#FFAF2C] font-semibold mb-1">{selectedOrder?.id}</div>
                   <h3 className="text-xl font-medium">{selectedOrder?.item.name}</h3>
@@ -279,20 +279,24 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
 
               {/* Windows */}
               {selectedOrder?.status !== "Issue" && (
-                <div className="bg-[#1A1A1D] rounded-xl p-4 flex mt-6 mb-6">
-                  <div className="flex-1 border-r border-white/5 pr-4">
-                    <div className="text-xs text-[#8C8C8C] mb-1">Pickup Window</div>
-                    <div className="text-sm font-medium">{selectedOrder?.pickup.split('•').join('·')}</div>
-                  </div>
-                  <div className="flex-1 pl-4">
-                    <div className="text-xs text-[#8C8C8C] mb-1">Estimated Delivery</div>
-                    <div className="text-sm font-medium">{selectedOrder?.delivery}</div>
+                <div className="bg-[#1A1A1D] rounded-xl p-4 mb-6">
+                  <div className="flex">
+                    <div className="flex-1 border-r border-white/5 pr-4">
+                      <div className="text-xs text-[#8C8C8C] mb-1">Pickup Window</div>
+                      <div className="text-sm font-medium">{selectedOrder?.pickup.split('•').join('·')}</div>
+                    </div>
+                    <div className="flex-1 pl-4">
+                      <div className="text-xs text-[#8C8C8C] mb-1">Estimated Delivery</div>
+                      <div className="text-sm font-medium">{selectedOrder?.delivery}</div>
+                    </div>
                   </div>
                 </div>
               )}
 
+
+
               {/* Seller / Buyer */}
-              <div className="flex gap-4 mb-6">
+              <div className="flex gap-3 mb-6">
                 <div className="flex-1">
                   <div className="text-xs text-[#8C8C8C] uppercase mb-2 font-medium">Seller</div>
                   <div className="bg-[#1A1A1D] rounded-xl p-4">
@@ -319,12 +323,22 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 </div>
               </div>
 
+              {/* Note section */}
+              {selectedOrder?.note && (
+                <div className="mb-6">
+                  <div className="text-xs text-[#8C8C8C] uppercase mb-2 font-medium">Note</div>
+                  <div className="bg-[#1A1A1D] rounded-xl p-4">
+                    <div className="text-sm text-[#8C8C8C]">{selectedOrder.note}</div>
+                  </div>
+                </div>
+              )}
+
               {/* Progress */}
               {selectedOrder?.status !== "Issue" && (
                 <div className="mb-8">
                   <div className="text-xs text-[#8C8C8C] uppercase mb-4 font-medium">Order Progress</div>
-                  <div className="bg-[#1A1A1D] rounded-xl p-8 py-10">
-                    <div className="space-y-12">
+                  <div className="bg-[#1A1A1D] rounded-xl p-5">
+                    <div className="space-y-8">
                       {orderSteps.map((step, index) => {
                         const progress = selectedOrder?.progress ?? 0;
                         const isCompleted = progress > index;
@@ -332,29 +346,29 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                         const isPending = progress < index;
 
                         return (
-                          <div key={index} className="relative pl-16">
+                          <div key={index} className="relative pl-12">
                             {/* Vertical line connecting to next step */}
                             {index < orderSteps.length - 1 && (
-                              <div className={`absolute top-12 left-[23.5px] w-[2px] h-[calc(100%+8px)] transition-colors duration-500 ${progress > index ? 'bg-[#FFAF2C]' : 'bg-[#27272A]'}`} />
+                              <div className={`absolute top-9 left-[17px] w-[2px] h-[calc(100%+4px)] transition-colors duration-500 ${progress > index ? 'bg-[#FFAF2C]' : 'bg-[#27272A]'}`} />
                             )}
 
                             {/* Step indicator */}
-                            <div className="absolute left-0 top-0 flex items-center justify-center w-12 h-12">
+                            <div className="absolute left-0 top-0 flex items-center justify-center w-9 h-9">
                               {isActive && (
                                 <div className="absolute inset-0 rounded-full border-[1.5px] border-dashed border-[#D6A042] animate-[spin_8s_linear_infinite] scale-110" />
                               )}
-                              <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-500 z-10 ${isCompleted || isActive ? 'bg-gold-gradient text-black shadow-[0_0_15px_rgba(230,185,95,0.4)]' : 'bg-[#27272A] border border-white/10'}`}>
-                                {isCompleted && <Check className="w-5 h-5 text-black" />}
-                                {isActive && <div className="w-2.5 h-2.5 rounded-full bg-black" />}
-                                {isPending && <div className="w-2.5 h-2.5 rounded-full bg-[#8C8C8C]" />}
+                              <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-500 z-10 ${isCompleted || isActive ? 'bg-gold-gradient text-black shadow-[0_0_12px_rgba(230,185,95,0.4)]' : 'bg-[#27272A] border border-white/10'}`}>
+                                {isCompleted && <Check className="w-4 h-4 text-black" />}
+                                {isActive && <div className="w-2 h-2 rounded-full bg-black" />}
+                                {isPending && <div className="w-2 h-2 rounded-full bg-[#8C8C8C]" />}
                               </div>
                             </div>
 
                             {/* Text */}
-                            <div className={`transition-colors duration-500 text-[22px] leading-tight font-medium mb-1.5 ${isCompleted || isActive ? "text-white" : "text-[#8C8C8C]"}`}>
+                            <div className={`transition-colors duration-500 text-sm leading-tight font-medium mb-0.5 ${isCompleted || isActive ? "text-white" : "text-[#8C8C8C]"}`}>
                               {step.title}
                             </div>
-                            <div className="text-[#8C8C8C] text-[15px]">
+                            <div className="text-[#8C8C8C] text-xs">
                               {step.desc}
                             </div>
                           </div>
@@ -370,7 +384,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 <div className="mb-8">
                   <div className="text-xs text-[#8C8C8C] uppercase mb-4 font-medium">Issue Details</div>
                   
-                  <div className="bg-[#1A1A1D] rounded-xl p-5 border border-white/5 space-y-4">
+                  <div className="bg-[#1A1A1D] rounded-xl p-4 border border-white/5 space-y-4">
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-[#8C8C8C]">Reason</span>
                       <span className="font-semibold text-white">{selectedOrder.issue.reason}</span>
@@ -421,7 +435,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 <div className="flex gap-3 w-full">
                   <button
                     onClick={handleProgress}
-                    className="flex-1 h-12 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+                    className="flex-1 h-12 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity border-0 outline-none">
                     {selectedOrder.progress === 0 && "Mark As Collected"}
                     {selectedOrder.progress === 1 && "Mark As Verified"}
                     {selectedOrder.progress === 2 && "Mark As Delivered"}
@@ -438,7 +452,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
               {selectedOrder && selectedOrder.progress >= 3 && selectedOrder.status !== "Issue" && (
                 <button
                   onClick={() => openReportIssue(selectedOrder)}
-                  className="w-full h-12 bg-[#1A1A1D] text-white font-semibold rounded-full flex items-center justify-center gap-2 hover:bg-white/5 transition-colors mt-4 border border-white/10">
+                  className="w-full h-12 bg-[#1A1A1D] text-white font-semibold rounded-full flex items-center justify-center gap-2 hover:bg-white/5 transition-colors border border-white/10">
                   Report an Issue <Info className="w-4 h-4" />
                 </button>
               )}
@@ -587,7 +601,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
 
             <button
               onClick={handleBackToDashboard}
-              className="w-full h-12 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+              className="w-full h-12 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity border-0 outline-none">
               Back To Dashboard <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -632,7 +646,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
 
               <button
                 onClick={() => setSuccessUpdateOrderId(null)}
-                className="w-full h-12 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+                className="w-full h-12 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity border-0 outline-none">
                 Back To Dashboard <ArrowRight className="w-4 h-4" />
               </button>
             </div>
