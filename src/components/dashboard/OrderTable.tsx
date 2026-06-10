@@ -115,10 +115,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
               <ChevronDown className="h-4 w-4 text-[#8C8C8C] ml-2" />
             </button>
 
-            <button className="flex items-center gap-2 h-10 px-4 rounded-full border border-white/10 text-sm font-medium hover:bg-white/5 transition-colors min-w-[100px] justify-between">
-              <span>All</span>
-              <ChevronDown className="h-4 w-4 text-[#8C8C8C]" />
-            </button>
+          
           </div>
         </div>
 
