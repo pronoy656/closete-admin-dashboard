@@ -21,7 +21,7 @@ export default function AuthLayoutShell({
 
       {/* Main Card */}
       <div className="w-full max-w-[480px] bg-[#1E1E21]/80 backdrop-blur-xl border border-white/5 rounded-3xl p-8 md:p-12 z-10 shadow-2xl relative">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200px] h-[1px] bg-gradient-to-r from-transparent via-[#E6B95F]/50 to-transparent" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200px] h-[1px] bg-gradient-to-r from-transparent via-[#FFAF2C]/50 to-transparent" />
         {children}
       </div>
 

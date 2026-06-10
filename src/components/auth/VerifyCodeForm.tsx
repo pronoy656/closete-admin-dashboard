@@ -1,8 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
 
 export default function VerifyCodeForm() {
   const router = useRouter();
@@ -40,11 +39,12 @@ export default function VerifyCodeForm() {
   return (
     <div className="w-full">
       <div className="text-center mb-10">
-        <h1 className="text-3xl font-bold mb-2 text-slate-900">Verify Reset Password</h1>
-        <p className="text-slate-500">
-          Enter the code sent to your email to reset your password.
-        </p>
+        <h1 className="text-4xl font-serif mb-3 text-white tracking-wide">Verify Reset Password</h1>
+        <p className="text-[#8C8C8C]">Enter the code sent to your email to reset your password.</p>
       </div>
+
+      {/* Divider */}
+      <div className="w-full h-[1px] bg-white/5 mb-8" />
 
       <form onSubmit={onSubmit} className="space-y-8">
         <div className="flex justify-between gap-2">
@@ -57,19 +57,24 @@ export default function VerifyCodeForm() {
               value={digit}
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
-              className="w-14 h-16 bg-slate-50 border border-slate-200 rounded-xl text-center text-2xl font-bold text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
+              className="w-14 h-16 bg-[#27272A]/50 border border-white/10 rounded-xl text-center text-2xl font-bold text-white focus:border-[#FFAF2C] focus:ring-1 focus:ring-[#FFAF2C] outline-none transition-all"
             />
           ))}
         </div>
 
-        <Button
-          type="submit"
-          variant="brand"
-          className="w-full h-12 text-base"
-          disabled={loading}
-        >
-          {loading ? "Verifying..." : "Verify Code"}
-        </Button>
+        <div className="pt-8">
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full h-12 text-base font-semibold text-black bg-gold-gradient hover:opacity-90 rounded-full border-0 transition-opacity"
+          >
+            {loading ? "Verifying..." : (
+              <div className="flex items-center justify-center gap-2">
+                Verify Code <ArrowRight className="h-5 w-5" />
+              </div>
+            )}
+          </button>
+        </div>
       </form>
     </div>
   );

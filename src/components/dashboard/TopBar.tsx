@@ -21,7 +21,7 @@ export default function TopBar() {
           <Settings className="h-4 w-4 text-white" />
         </button>
 
-        <button className="h-10 w-10 rounded-full overflow-hidden border border-[#E6B95F]/50">
+        <button className="h-10 w-10 rounded-full overflow-hidden border border-[#FFAF2C]/50">
           <Image src="/auth-hero.png" alt="User" width={40} height={40} className="object-cover h-full w-full" />
         </button>
       </div>

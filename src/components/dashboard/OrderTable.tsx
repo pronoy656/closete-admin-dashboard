@@ -105,7 +105,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8C8C8C]" />
               <Input
                 placeholder="Search orders.."
-                className="w-full bg-transparent border-white/10 rounded-full h-10 pl-10 text-sm focus-visible:ring-[#E6B95F]/30 text-white"
+                className="w-full bg-transparent border-white/10 rounded-full h-10 pl-10 text-sm focus-visible:ring-[#FFAF2C]/30 text-white"
               />
             </div>
 
@@ -335,7 +335,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                           <div key={index} className="relative pl-16">
                             {/* Vertical line connecting to next step */}
                             {index < orderSteps.length - 1 && (
-                              <div className={`absolute top-12 left-[23.5px] w-[2px] h-[calc(100%+8px)] transition-colors duration-500 ${progress > index ? 'bg-[#E6B95F]' : 'bg-[#27272A]'}`} />
+                              <div className={`absolute top-12 left-[23.5px] w-[2px] h-[calc(100%+8px)] transition-colors duration-500 ${progress > index ? 'bg-[#FFAF2C]' : 'bg-[#27272A]'}`} />
                             )}
 
                             {/* Step indicator */}
@@ -381,7 +381,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                     </div>
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-[#8C8C8C]">Reference ID</span>
-                      <span className="font-semibold text-[#E6B95F]">{selectedOrder.issue.referenceId}</span>
+                      <span className="font-semibold text-[#FFAF2C]">{selectedOrder.issue.referenceId}</span>
                     </div>
                     
                     {selectedOrder.issue.notes && (
@@ -577,7 +577,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
             <div className="w-full bg-[#1A1A1D] border border-white/5 rounded-xl p-5 mb-8 text-left space-y-3">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-[#8C8C8C]">Report Reference</span>
-                <span className="font-semibold text-[#E6B95F]">#RP-992-K</span>
+                <span className="font-semibold text-[#FFAF2C]">#RP-992-K</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-[#8C8C8C]">Update Time</span>
@@ -615,7 +615,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start mb-1">
-                    <span className="text-[#E6B95F] font-medium text-sm">{successOrder.id}</span>
+                    <span className="text-[#FFAF2C] font-medium text-sm">{successOrder.id}</span>
                     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-medium bg-[#00D22B] text-white">
                       <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
                       {successOrder.status}

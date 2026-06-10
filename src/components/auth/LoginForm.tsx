@@ -4,11 +4,12 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { User, Key, Lock, ArrowRight } from "lucide-react";
+import { User, Key, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
 
 export default function LoginForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -29,7 +30,7 @@ export default function LoginForm() {
       <div className="w-full h-[1px] bg-white/5 mb-8" />
 
       <form onSubmit={onSubmit} className="space-y-6">
-        <div className="space-y-2">
+        <div className="space-y-4">
           <label className="text-sm font-medium text-[#EBEBEB]">User name</label>
           <div className="relative">
             <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#8C8C8C]" />
@@ -37,26 +38,33 @@ export default function LoginForm() {
               type="text"
               required
               placeholder="Enter username"
-              className="h-12 bg-[#27272A]/50 border-white/5 text-white placeholder:text-[#8C8C8C] pl-12 focus-visible:ring-[#E6B95F]/30 focus-visible:border-[#E6B95F]/50 rounded-xl"
+              className="h-12 bg-[#27272A]/50 border-white/5 text-white placeholder:text-[#8C8C8C] pl-12 focus-visible:ring-[#FFAF2C]/30 focus-visible:border-[#FFAF2C]/50 rounded-xl"
             />
           </div>
         </div>
         
-        <div className="space-y-2 text-left">
+        <div className="space-y-4 text-left">
           <label className="text-sm font-medium text-[#EBEBEB]">Password</label>
           <div className="relative">
             <Key className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#8C8C8C]" />
             <Input
-              type="password"
+              type={showPassword ? "text" : "password"}
               required
               placeholder="Enter password"
-              className="h-12 bg-[#27272A]/50 border-white/5 text-white placeholder:text-[#8C8C8C] pl-12 focus-visible:ring-[#E6B95F]/30 focus-visible:border-[#E6B95F]/50 rounded-xl"
+              className="h-12 bg-[#27272A]/50 border-white/5 text-white placeholder:text-[#8C8C8C] pl-12 pr-12 focus-visible:ring-[#FFAF2C]/30 focus-visible:border-[#FFAF2C]/50 rounded-xl"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8C8C8C] hover:text-white transition-colors"
+            >
+              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            </button>
           </div>
         </div>
 
         <div className="flex justify-end">
-          <Link href="/reset" className="text-sm font-medium text-[#E6B95F] hover:text-[#FFD375] transition-colors">
+          <Link href="/reset" className="text-sm font-medium text-[#FFAF2C] hover:text-[#FFD375] transition-colors">
             Forget password ?
           </Link>
         </div>
