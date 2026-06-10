@@ -12,6 +12,10 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: "Closeté Admin",
   description: "Admin dashboard for Closeté",
+  icons: {
+    icon: "/1024.png",
+    apple: "/1024.png",
+  },
 };
 
 export default function RootLayout({
