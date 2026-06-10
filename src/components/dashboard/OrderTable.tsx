@@ -159,7 +159,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                     onClick={() => setSelectedOrderId(order.id)}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="font-semibold text-[#E6B95F]">{order.id}</span>
+                      <span className="font-semibold text-[#FFAF2C]">{order.id}</span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -196,9 +196,9 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                                <span>Authentic</span>
                                <span className="text-white">{order.aiAnalysis.originalPercent}%</span>
                             </div>
-                            <div className={`flex items-center gap-1.5 ${order.aiAnalysis.fakePercent > 0 ? 'text-[#8C8C8C]' : 'text-[#8C8C8C]'}`}>
+                            <div className={`flex items-center gap-1.5 ${order.aiAnalysis.fakePercent > 0 ? 'text-red-500' : 'text-white'}`}>
                                <span>Fake</span>
-                               <span className={order.aiAnalysis.fakePercent > 0 ? "text-red-400" : "text-white"}>{order.aiAnalysis.fakePercent}%</span>
+                               <span>{order.aiAnalysis.fakePercent}%</span>
                             </div>
                           </div>
 
@@ -210,11 +210,11 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
 
                           {/* Reason */}
                           {order.aiAnalysis.fakePercent >= 50 && order.aiAnalysis.reason && (
-                            <div className="mt-1 text-[11px] leading-relaxed text-[#8C8C8C] bg-[#1A1A1D] p-2.5 rounded-lg border border-red-500/10">
+                            <div className="mt-1 text-[11px] leading-relaxed text-[#8C8C8C] bg-red-500/10 p-2.5 rounded-lg border border-red-500/10">
                               <div className="flex items-start gap-1.5">
-                                <AlertCircle className="w-3.5 h-3.5 text-red-500/70 shrink-0 mt-0.5" />
+                                <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
                                 <div>
-                                  <span className="text-red-400/90 font-medium block mb-0.5">Flagged</span>
+                                  <span className="block text-red-500 font-medium mb-0.5">Flagged</span>
                                   {order.aiAnalysis.reason}
                                 </div>
                               </div>
@@ -264,7 +264,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
               {/* Header Info */}
               <div className="flex justify-between items-start mb-2">
                 <div>
-                  <div className="text-[#E6B95F] font-semibold mb-1">{selectedOrder?.id}</div>
+                  <div className="text-[#FFAF2C] font-semibold mb-1">{selectedOrder?.id}</div>
                   <h3 className="text-xl font-medium">{selectedOrder?.item.name}</h3>
                   <p className="text-sm text-[#8C8C8C]">{selectedOrder?.item.desc}</p>
                 </div>
