@@ -88,7 +88,7 @@
     @apply outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
     background-color: #141416;
     color: white;
   }

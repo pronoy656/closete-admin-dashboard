@@ -26,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${dmSans.variable} antialiased`}
+        className={`${dmSans.variable} font-sans antialiased`}
         suppressHydrationWarning
       >
         <TooltipProvider>{children}</TooltipProvider>
