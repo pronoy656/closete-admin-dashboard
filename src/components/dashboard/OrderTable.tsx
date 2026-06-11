@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Calendar, ChevronDown, Phone, MapPin, Check, ArrowRight, Info, ShoppingCart, ChevronLeft, ShieldCheck, AlertTriangle, AlertCircle, Loader2 } from "lucide-react";
+import { Search, Calendar, ChevronDown, Phone, MapPin, Check, ArrowRight, Info, ShoppingCart, ChevronLeft, ShieldCheck, AlertTriangle, AlertCircle, Loader2, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useOrders, Order } from "@/context/OrdersContext";
 import {
@@ -43,6 +43,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
   const { orders, advanceOrder } = useOrders();
 
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   // Issue reporting state
   const [sheetView, setSheetView] = useState<"details" | "reportIssue">("details");
@@ -115,7 +116,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
               <ChevronDown className="h-4 w-4 text-[#8C8C8C] ml-2" />
             </button>
 
-          
+
           </div>
         </div>
 
@@ -193,12 +194,12 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                           {/* Top row with icons and percentages */}
                           <div className="flex justify-between items-center text-xs font-medium">
                             <div className="flex items-center gap-1.5 text-[#8C8C8C]">
-                               <span>Authentic</span>
-                               <span className="text-white">{order.aiAnalysis.originalPercent}%</span>
+                              <span>Authentic</span>
+                              <span className="text-white">{order.aiAnalysis.originalPercent}%</span>
                             </div>
                             <div className={`flex items-center gap-1.5 ${order.aiAnalysis.fakePercent > 0 ? 'text-red-500' : 'text-white'}`}>
-                               <span>Fake</span>
-                               <span>{order.aiAnalysis.fakePercent}%</span>
+                              <span>Fake</span>
+                              <span>{order.aiAnalysis.fakePercent}%</span>
                             </div>
                           </div>
 
@@ -249,213 +250,217 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
           setTimeout(() => setSheetView("details"), 300);
         }
       }}>
-        <SheetContent className="w-full sm:max-w-md bg-[#141416] border-l border-white/10 text-white p-0 overflow-hidden [&>button]:right-6 [&>button]:top-6 [&>button]:text-white [&>button]:bg-transparent [&>button]:opacity-100 hover:[&>button]:bg-white/10 hover:[&>button]:rounded-full [&>button]:p-1 flex flex-col">
+        <SheetContent showCloseButton={false} className="w-full max-w-[500px] bg-[#141416] border-l border-white/10 text-white p-0 overflow-hidden flex flex-col">
           {sheetView === "details" && (
-            <div className="p-6 overflow-y-auto h-full w-full no-scrollbar">
-              <SheetHeader className="flex flex-row items-center justify-between space-y-0 mb-0 -mt-6">
-                <SheetTitle className="text-xl font-semibold text-white -ml-4">Order Details</SheetTitle>
-              </SheetHeader>
-
-              {/* Image */}
-              <div className="w-full h-48 rounded-xl overflow-hidden mb-4">
-                <img src={selectedOrder?.item.image} alt={selectedOrder?.item.name} className="w-full h-full object-cover" />
+            <div className="flex flex-col h-full w-full">
+              {/* Sticky Header */}
+              <div className="px-6 flex-shrink-0 flex items-center justify-between">
+                <SheetHeader className="m-0 space-y-0">
+                  <SheetTitle className="text-xl font-semibold text-white">Order Details</SheetTitle>
+                </SheetHeader>
+                <button
+                  onClick={() => setSelectedOrderId(null)}
+                  className="w-9 h-9 flex items-center justify-center rounded-full border-2 border-white hover:border-white transition-colors text-white hover:text-white flex-shrink-0"
+                >
+                  <X className="w-4 h-4" strokeWidth={2.5} />
+                </button>
               </div>
 
-              {/* Header Info */}
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <div className="text-[#FFAF2C] font-semibold mb-1">{selectedOrder?.id}</div>
-                  <h3 className="text-xl font-medium">{selectedOrder?.item.name}</h3>
-                  <p className="text-sm text-[#8C8C8C]">{selectedOrder?.item.desc}</p>
-                </div>
-                <div className="flex flex-col items-end">
-                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors duration-500 ${selectedOrder?.statusBg} ${selectedOrder?.statusColor} mb-2`}>
-                    <span className={`w-1.5 h-1.5 rounded-full transition-colors duration-500 ${selectedOrder?.dotColor}`}></span>
-                    {selectedOrder?.status}
-                  </span>
-                  <span className="font-semibold">{selectedOrder?.item.price}</span>
-                </div>
-              </div>
+              {/* Scrollable Body */}
+              <div className="flex-1 overflow-y-auto px-6 py-4 no-scrollbar space-y-4">
 
-              {/* Windows */}
-              {selectedOrder?.status !== "Issue" && (
-                <div className="bg-[#1A1A1D] rounded-xl p-4 mb-6">
-                  <div className="flex">
-                    <div className="flex-1 border-r border-white/5 pr-4">
-                      <div className="text-xs text-[#8C8C8C] mb-1">Pickup Window</div>
-                      <div className="text-sm font-medium">{selectedOrder?.pickup.split('•').join('·')}</div>
-                    </div>
-                    <div className="flex-1 pl-4">
-                      <div className="text-xs text-[#8C8C8C] mb-1">Estimated Delivery</div>
-                      <div className="text-sm font-medium">{selectedOrder?.delivery}</div>
-                    </div>
+                {/* Image */}
+                <div className="w-full h-48 rounded-xl overflow-hidden">
+                  <img src={selectedOrder?.item.image} alt={selectedOrder?.item.name} className="w-full h-full object-cover" />
+                </div>
+
+                {/* Header Info */}
+                <div className="flex justify-between items-start">
+                  <div>
+                    <div className="text-[#FFAF2C] font-semibold mb-1">{selectedOrder?.id}</div>
+                    <h3 className="text-xl font-medium">{selectedOrder?.item.name}</h3>
+                    <p className="text-sm text-[#8C8C8C]">{selectedOrder?.item.desc}</p>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors duration-500 ${selectedOrder?.statusBg} ${selectedOrder?.statusColor} mb-2`}>
+                      <span className={`w-1.5 h-1.5 rounded-full transition-colors duration-500 ${selectedOrder?.dotColor}`}></span>
+                      {selectedOrder?.status}
+                    </span>
+                    <span className="font-semibold">{selectedOrder?.item.price}</span>
                   </div>
                 </div>
-              )}
 
-
-
-              {/* Seller / Buyer */}
-              <div className="flex gap-3 mb-6">
-                <div className="flex-1">
-                  <div className="text-xs text-[#8C8C8C] uppercase mb-2 font-medium">Seller</div>
+                {/* Windows */}
+                {selectedOrder?.status !== "Issue" && (
                   <div className="bg-[#1A1A1D] rounded-xl p-4">
-                    <div className="font-medium mb-2">{selectedOrder?.seller.name}</div>
-                    <div className="flex items-center gap-2 text-sm text-[#8C8C8C] mb-1">
-                      <Phone className="w-4 h-4 shrink-0" /> <span className="truncate">{selectedOrder?.seller.phone}</span>
+                    <div className="flex gap-4">
+                      <div className="flex-1 border-l-2 border-white pl-3">
+                        <div className="text-xs text-[#8C8C8C] mb-1">Pickup Window</div>
+                        <div className="text-sm font-medium text-white">{selectedOrder?.pickup.split('•').join(' · ')}</div>
+                      </div>
+                      <div className="flex-1 border-l-2 border-white pl-3">
+                        <div className="text-xs text-[#8C8C8C] mb-1">Estimated Delivery</div>
+                        <div className="text-sm font-medium text-white">{selectedOrder?.delivery}</div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-[#8C8C8C]">
-                      <MapPin className="w-4 h-4 shrink-0" /> <span className="truncate">{selectedOrder?.seller.location}</span>
+                  </div>
+                )}
+
+                {/* Seller / Buyer */}
+                <div className="flex gap-3">
+                  <div className="flex-1">
+                    <div className="text-xs text-[#8C8C8C] uppercase mb-2 font-medium">Seller</div>
+                    <div className="bg-[#1A1A1D] rounded-xl p-4">
+                      <div className="font-medium mb-2">{selectedOrder?.seller.name}</div>
+                      <div className="flex items-center gap-2 text-sm text-[#8C8C8C] mb-1">
+                        <Phone className="w-4 h-4 shrink-0" /> <span className="truncate">{selectedOrder?.seller.phone}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-[#8C8C8C]">
+                        <MapPin className="w-4 h-4 shrink-0" /> <span className="truncate">{selectedOrder?.seller.location}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-xs text-[#8C8C8C] uppercase mb-2 font-medium">Buyer</div>
+                    <div className="bg-[#1A1A1D] rounded-xl p-4">
+                      <div className="font-medium mb-2">{selectedOrder?.buyer.name}</div>
+                      <div className="flex items-center gap-2 text-sm text-[#8C8C8C] mb-1">
+                        <Phone className="w-4 h-4 shrink-0" /> <span className="truncate">{selectedOrder?.buyer.phone}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-[#8C8C8C]">
+                        <MapPin className="w-4 h-4 shrink-0" /> <span className="truncate">{selectedOrder?.buyer.location}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="flex-1">
-                  <div className="text-xs text-[#8C8C8C] uppercase mb-2 font-medium">Buyer</div>
-                  <div className="bg-[#1A1A1D] rounded-xl p-4">
-                    <div className="font-medium mb-2">{selectedOrder?.buyer.name}</div>
-                    <div className="flex items-center gap-2 text-sm text-[#8C8C8C] mb-1">
-                      <Phone className="w-4 h-4 shrink-0" /> <span className="truncate">{selectedOrder?.buyer.phone}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-[#8C8C8C]">
-                      <MapPin className="w-4 h-4 shrink-0" /> <span className="truncate">{selectedOrder?.buyer.location}</span>
+
+                {/* Note section */}
+                {selectedOrder?.note && (
+                  <div>
+                    <div className="text-xs text-[#8C8C8C] uppercase mb-2 font-medium">Note</div>
+                    <div className="bg-[#1A1A1D] rounded-xl p-4">
+                      <div className="text-sm text-[#8C8C8C]">{selectedOrder.note}</div>
                     </div>
                   </div>
-                </div>
-              </div>
+                )}
 
-              {/* Note section */}
-              {selectedOrder?.note && (
-                <div className="mb-6">
-                  <div className="text-xs text-[#8C8C8C] uppercase mb-2 font-medium">Note</div>
-                  <div className="bg-[#1A1A1D] rounded-xl p-4">
-                    <div className="text-sm text-[#8C8C8C]">{selectedOrder.note}</div>
-                  </div>
-                </div>
-              )}
+                {/* Progress */}
+                {selectedOrder?.status !== "Issue" && (
+                  <div>
+                    <div className="text-xs text-[#8C8C8C] uppercase mb-4 font-medium">Order Progress</div>
+                    <div className="bg-[#1A1A1D] rounded-xl p-5">
+                      <div className="space-y-8">
+                        {orderSteps.map((step, index) => {
+                          const progress = selectedOrder?.progress ?? 0;
+                          const isCompleted = progress > index;
+                          const isActive = progress === index;
+                          const isPending = progress < index;
 
-              {/* Progress */}
-              {selectedOrder?.status !== "Issue" && (
-                <div className="mb-8">
-                  <div className="text-xs text-[#8C8C8C] uppercase mb-4 font-medium">Order Progress</div>
-                  <div className="bg-[#1A1A1D] rounded-xl p-5">
-                    <div className="space-y-8">
-                      {orderSteps.map((step, index) => {
-                        const progress = selectedOrder?.progress ?? 0;
-                        const isCompleted = progress > index;
-                        const isActive = progress === index;
-                        const isPending = progress < index;
-
-                        return (
-                          <div key={index} className="relative pl-12">
-                            {/* Vertical line connecting to next step */}
-                            {index < orderSteps.length - 1 && (
-                              <div className={`absolute top-9 left-[17px] w-[2px] h-[calc(100%+4px)] transition-colors duration-500 ${progress > index ? 'bg-[#FFAF2C]' : 'bg-[#27272A]'}`} />
-                            )}
-
-                            {/* Step indicator */}
-                            <div className="absolute left-0 top-0 flex items-center justify-center w-9 h-9">
-                              {isActive && (
-                                <div className="absolute inset-0 rounded-full border-[1.5px] border-dashed border-[#D6A042] animate-[spin_8s_linear_infinite] scale-110" />
+                          return (
+                            <div key={index} className="relative pl-12">
+                              {index < orderSteps.length - 1 && (
+                                <div className={`absolute top-9 left-[17px] w-[2px] h-[calc(100%+4px)] transition-colors duration-500 ${progress > index ? 'bg-[#FFAF2C]' : 'bg-[#27272A]'}`} />
                               )}
-                              <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-500 z-10 ${isCompleted || isActive ? 'bg-gold-gradient text-black shadow-[0_0_12px_rgba(230,185,95,0.4)]' : 'bg-[#27272A] border border-white/10'}`}>
-                                {isCompleted && <Check className="w-4 h-4 text-black" />}
-                                {isActive && <div className="w-2 h-2 rounded-full bg-black" />}
-                                {isPending && <div className="w-2 h-2 rounded-full bg-[#8C8C8C]" />}
+                              <div className="absolute left-0 top-0 flex items-center justify-center w-9 h-9">
+                                {isActive && (
+                                  <div className="absolute inset-0 rounded-full border-[1.5px] border-dashed border-[#D6A042] animate-[spin_8s_linear_infinite] scale-110" />
+                                )}
+                                <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-500 z-10 ${isCompleted || isActive ? 'bg-gold-gradient text-black shadow-[0_0_12px_rgba(230,185,95,0.4)]' : 'bg-[#27272A] border border-white/10'}`}>
+                                  {isCompleted && <Check className="w-4 h-4 text-black" />}
+                                  {isActive && <div className="w-2 h-2 rounded-full bg-black" />}
+                                  {isPending && <div className="w-2 h-2 rounded-full bg-[#8C8C8C]" />}
+                                </div>
+                              </div>
+                              <div className={`transition-colors duration-500 text-sm leading-tight font-medium mb-0.5 ${isCompleted || isActive ? "text-white" : "text-[#8C8C8C]"}`}>
+                                {step.title}
+                              </div>
+                              <div className="text-[#8C8C8C] text-xs">
+                                {step.desc}
                               </div>
                             </div>
-
-                            {/* Text */}
-                            <div className={`transition-colors duration-500 text-sm leading-tight font-medium mb-0.5 ${isCompleted || isActive ? "text-white" : "text-[#8C8C8C]"}`}>
-                              {step.title}
-                            </div>
-                            <div className="text-[#8C8C8C] text-xs">
-                              {step.desc}
-                            </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Read-only Issue Details */}
-              {selectedOrder?.status === "Issue" && selectedOrder.issue && (
-                <div className="mb-8">
-                  <div className="text-xs text-[#8C8C8C] uppercase mb-4 font-medium">Issue Details</div>
-                  
-                  <div className="bg-[#1A1A1D] rounded-xl p-4 border border-white/5 space-y-4">
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-[#8C8C8C]">Reason</span>
-                      <span className="font-semibold text-white">{selectedOrder.issue.reason}</span>
+                {/* Read-only Issue Details */}
+                {selectedOrder?.status === "Issue" && selectedOrder.issue && (
+                  <div>
+                    <div className="text-xs text-[#8C8C8C] uppercase mb-4 font-medium">Issue Details</div>
+                    <div className="bg-[#1A1A1D] rounded-xl p-4 border border-white/5 space-y-4">
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-[#8C8C8C]">Reason</span>
+                        <span className="font-semibold text-white">{selectedOrder.issue.reason}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-[#8C8C8C]">Created</span>
+                        <span className="font-semibold text-white">{selectedOrder.issue.createdAt}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-[#8C8C8C]">Reference ID</span>
+                        <span className="font-semibold text-[#FFAF2C]">{selectedOrder.issue.referenceId}</span>
+                      </div>
+                      {selectedOrder.issue.notes && (
+                        <div className="pt-4 border-t border-white/5 text-sm">
+                          <span className="text-[#8C8C8C] block mb-2 font-medium">Notes</span>
+                          <div className="bg-[#141416] p-4 rounded-lg text-white border border-white/5">
+                            {selectedOrder.issue.notes}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-[#8C8C8C]">Created</span>
-                      <span className="font-semibold text-white">{selectedOrder.issue.createdAt}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-[#8C8C8C]">Reference ID</span>
-                      <span className="font-semibold text-[#FFAF2C]">{selectedOrder.issue.referenceId}</span>
-                    </div>
-                    
-                    {selectedOrder.issue.notes && (
-                      <div className="pt-4 border-t border-white/5 text-sm">
-                        <span className="text-[#8C8C8C] block mb-2 font-medium">Notes</span>
-                        <div className="bg-[#141416] p-4 rounded-lg text-white border border-white/5">
-                          {selectedOrder.issue.notes}
+                    {selectedOrder.issue.responses && selectedOrder.issue.responses.length > 0 && (
+                      <div className="mt-6">
+                        <div className="text-xs text-[#8C8C8C] uppercase mb-4 font-medium">Responses & Activity</div>
+                        <div className="space-y-3">
+                          {selectedOrder.issue.responses.map((resp, i) => (
+                            <div key={i} className="bg-[#1A1A1D] border border-white/5 p-4 rounded-xl">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${resp.role === "Admin" ? "bg-purple-500/10 text-purple-400" :
+                                  resp.role === "Buyer" ? "bg-blue-500/10 text-blue-400" :
+                                    "bg-orange-500/10 text-orange-400"
+                                  }`}>{resp.role}</span>
+                                <span className="text-xs text-[#8C8C8C]">{resp.time}</span>
+                              </div>
+                              <div className="text-sm text-white">{resp.text}</div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
                   </div>
+                )}
 
-                  {selectedOrder.issue.responses && selectedOrder.issue.responses.length > 0 && (
-                    <div className="mt-6">
-                      <div className="text-xs text-[#8C8C8C] uppercase mb-4 font-medium">Responses & Activity</div>
-                      <div className="space-y-3">
-                        {selectedOrder.issue.responses.map((resp, i) => (
-                          <div key={i} className="bg-[#1A1A1D] border border-white/5 p-4 rounded-xl">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                                resp.role === "Admin" ? "bg-purple-500/10 text-purple-400" :
-                                resp.role === "Buyer" ? "bg-blue-500/10 text-blue-400" :
-                                "bg-orange-500/10 text-orange-400"
-                              }`}>{resp.role}</span>
-                              <span className="text-xs text-[#8C8C8C]">{resp.time}</span>
-                            </div>
-                            <div className="text-sm text-white">{resp.text}</div>
-                          </div>
-                        ))}
-                      </div>
+                {/* Action Buttons */}
+                {selectedOrder && selectedOrder.status !== "Issue" && (
+                  selectedOrder.progress < 3 ? (
+                    <div className="flex gap-3 w-full">
+                      <button
+                        onClick={handleProgress}
+                        className="flex-1 h-12 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity border-0 outline-none whitespace-nowrap text-sm">
+                        {selectedOrder.progress === 0 && "Mark As Collected"}
+                        {selectedOrder.progress === 1 && "Mark As Verified"}
+                        {selectedOrder.progress === 2 && "Mark As Delivered"}
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => openReportIssue(selectedOrder)}
+                        className="flex-1 h-12 bg-[#27272A] text-[#8C8C8C] font-semibold rounded-full flex items-center justify-center hover:bg-white/5 transition-colors border border-white/10 whitespace-nowrap text-sm">
+                        Report an Issue
+                      </button>
                     </div>
-                  )}
-                </div>
-              )}
+                  ) : (
+                    <button
+                      onClick={() => openReportIssue(selectedOrder)}
+                      className="w-full h-12 bg-[#27272A] text-[#8C8C8C] font-semibold rounded-full flex items-center justify-center hover:bg-white/5 transition-colors border border-white/10 text-sm">
+                      Report An Issue
+                    </button>
+                  )
+                )}
+              </div>
 
-              {selectedOrder && selectedOrder.progress < 3 && selectedOrder.status !== "Issue" && (
-                <div className="flex gap-3 w-full">
-                  <button
-                    onClick={handleProgress}
-                    className="flex-1 h-12 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity border-0 outline-none">
-                    {selectedOrder.progress === 0 && "Mark As Collected"}
-                    {selectedOrder.progress === 1 && "Mark As Verified"}
-                    {selectedOrder.progress === 2 && "Mark As Delivered"}
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => openReportIssue(selectedOrder)}
-                    className="flex-1 h-12 bg-[#1A1A1D] text-white font-semibold rounded-full flex items-center justify-center gap-2 hover:bg-white/5 transition-colors border border-white/10">
-                    Report an Issue <Info className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
-
-              {selectedOrder && selectedOrder.progress >= 3 && selectedOrder.status !== "Issue" && (
-                <button
-                  onClick={() => openReportIssue(selectedOrder)}
-                  className="w-full h-12 bg-[#1A1A1D] text-white font-semibold rounded-full flex items-center justify-center gap-2 hover:bg-white/5 transition-colors border border-white/10">
-                  Report an Issue <Info className="w-4 h-4" />
-                </button>
-              )}
             </div>
           )}
 
@@ -513,21 +518,43 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                               </div>
                             </div>
                             {isSelected && opt.id === "Buyer rejected" && (
-                              <div 
+                              <div
                                 className="relative w-full"
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                <select
-                                  value={buyerRejectReason}
-                                  onChange={(e) => setBuyerRejectReason(e.target.value)}
-                                  className="w-full bg-[#27272A] border border-white/10 rounded-xl h-12 px-4 text-sm text-white appearance-none focus:outline-none focus:ring-0 focus:border-white/10"
+                                {/* Custom dropdown trigger */}
+                                <button
+                                  type="button"
+                                  onClick={() => setDropdownOpen((o) => !o)}
+                                  className="w-full bg-[#1E1E21] border border-white/10 rounded-xl h-12 px-4 text-sm text-white flex items-center justify-between focus:outline-none"
                                 >
-                                  <option value="Changed mind">Changed mind</option>
-                                  <option value="Not as described">Not as described</option>
-                                  <option value="Condition issue">Condition issue</option>
-                                  <option value="Other">Other</option>
-                                </select>
-                                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8C8C8C] pointer-events-none" />
+                                  <span>{buyerRejectReason}</span>
+                                  {dropdownOpen
+                                    ? <ChevronDown className="w-4 h-4 text-[#8C8C8C] rotate-180 transition-transform" />
+                                    : <ChevronDown className="w-4 h-4 text-[#8C8C8C] transition-transform" />}
+                                </button>
+
+                                {/* Dropdown list */}
+                                {dropdownOpen && (
+                                  <div className="absolute left-0 right-0 top-[calc(100%+4px)] bg-[#1E1E21] rounded-xl border border-white/10 overflow-hidden z-50 shadow-2xl">
+                                    {["Changed mind", "Not as described", "Condition issue", "Other"].map((opt) => (
+                                      <button
+                                        key={opt}
+                                        type="button"
+                                        onClick={() => {
+                                          setBuyerRejectReason(opt);
+                                          setDropdownOpen(false);
+                                        }}
+                                        className="w-full flex items-center justify-between px-4 py-3.5 text-sm text-[#8C8C8C] hover:bg-white/5 transition-colors text-left"
+                                      >
+                                        <span className={buyerRejectReason === opt ? "text-white font-medium" : ""}>{opt}</span>
+                                        {buyerRejectReason === opt && (
+                                          <Check className="w-4 h-4 text-white" />
+                                        )}
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
                             )}
                           </div>
@@ -561,12 +588,11 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 <button
                   onClick={submitIssue}
                   disabled={selectedIssueOption === "Other" && issueDetails.trim() === ""}
-                  className={`w-full h-12 font-semibold rounded-full flex items-center justify-center gap-2 transition-all ${
-                    selectedIssueOption === "Other" && issueDetails.trim() === ""
-                      ? "bg-white/10 text-[#8C8C8C] cursor-not-allowed"
-                      : "bg-gold-gradient text-black hover:opacity-90"
-                  }`}>
-                  Submit Issue <ArrowRight className="w-4 h-4" />
+                  className={`w-full h-14 font-semibold rounded-full flex items-center justify-center gap-2 px-8 transition-all ${selectedIssueOption === "Other" && issueDetails.trim() === ""
+                    ? "bg-white/10 text-[#8C8C8C] cursor-not-allowed"
+                    : "bg-gold-gradient text-black hover:opacity-90"
+                    }`}>
+                  Submit Issue <ArrowRight className="w-5 h-5" />
                 </button>
               </div>
             </div>
@@ -576,19 +602,39 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
 
       {/* Issue Reported Success Dialog */}
       <Dialog open={issueStep === "success"} onOpenChange={(open) => !open && setIssueStep("form")}>
-        <DialogContent className="bg-[#141416] border border-white/10 text-white sm:max-w-[425px] p-0 shadow-2xl rounded-2xl [&>button]:text-white [&>button]:opacity-80 hover:[&>button]:opacity-100 flex flex-col overflow-hidden items-center justify-center py-8">
-          <div className="p-6 flex flex-col items-center justify-center w-full h-full text-center">
-            <div className="w-28 h-28 rounded-full bg-[#1A1A1D] flex items-center justify-center my-4 relative">
-              <div className="absolute inset-0 bg-[#00D22B]/10 rounded-full animate-ping" />
-              <div className="w-16 h-16 rounded-full bg-gradient-to-b from-[#00E52F] to-[#00A321] flex items-center justify-center shadow-[0_0_30px_rgba(0,210,43,0.4)] relative z-10">
-                <Check className="w-8 h-8 text-white font-bold" strokeWidth={4} />
-              </div>
+        <DialogContent
+          className="text-white max-w-[380px] p-0 shadow-2xl rounded-3xl overflow-hidden [&>button]:hidden"
+          style={{
+            background: 'linear-gradient(#0D0D0F, #0D0D0F) padding-box, linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.12) 40%, transparent 85%) border-box',
+            border: '1px solid transparent',
+          }}
+        >
+          <div className="relative flex flex-col items-center text-center px-6 pt-8 pb-7">
+
+            {/* Close button */}
+            <button
+              onClick={() => setIssueStep("form")}
+              className="absolute top-4 right-4 w-6 h-6 rounded-full border-2 border-white/80 flex items-center justify-center hover:border-white transition-colors flex-shrink-0"
+            >
+              <X className="w-3 h-3 text-white" strokeWidth={2.5} />
+            </button>
+
+            {/* Layered circle icon */}
+            <div className="relative flex items-center justify-center mb-6">
+              <div className="w-40 h-40 rounded-full bg-[#1A1A1D]" />
+              <div className="absolute w-28 h-28 rounded-full bg-[#222224]" />
+              <img
+                src="/image 12.png"
+                alt="Success"
+                className="absolute w-20 h-20 object-contain drop-shadow-2xl"
+              />
             </div>
 
-            <DialogTitle className="text-2xl font-semibold mb-2">Issue reported</DialogTitle>
-            <DialogDescription className="text-sm text-[#8C8C8C] mb-8">Order status updated successfully</DialogDescription>
+            <DialogTitle className="text-2xl font-bold text-white mb-1">Issue reported</DialogTitle>
+            <DialogDescription className="text-sm text-[#8C8C8C] mb-5">Order status updated successfully</DialogDescription>
 
-            <div className="w-full bg-[#1A1A1D] border border-white/5 rounded-xl p-5 mb-8 text-left space-y-3">
+            {/* Info card */}
+            <div className="w-full bg-[#1A1A1D] rounded-2xl p-4 mb-5 text-left space-y-3">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-[#8C8C8C]">Report Reference</span>
                 <span className="font-semibold text-[#FFAF2C]">#RP-992-K</span>
@@ -601,7 +647,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
 
             <button
               onClick={handleBackToDashboard}
-              className="w-full h-12 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity border-0 outline-none">
+              className="w-full h-12 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
               Back To Dashboard <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -610,38 +656,65 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
 
       {/* Success Dialog for Status Update */}
       <Dialog open={successUpdateOrderId !== null} onOpenChange={(open) => !open && setSuccessUpdateOrderId(null)}>
-        <DialogContent className="bg-[#141416] border border-white/10 text-white sm:max-w-[425px] p-0 shadow-2xl rounded-2xl [&>button]:text-white [&>button]:opacity-80 hover:[&>button]:opacity-100 flex flex-col overflow-hidden items-center justify-center py-8">
+        <DialogContent
+          className="text-white max-w-[400px] p-0 shadow-2xl rounded-3xl overflow-hidden [&>button]:hidden"
+          style={{
+            background: 'linear-gradient(#0D0D0F, #0D0D0F) padding-box, linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.12) 40%, transparent 85%) border-box',
+            border: '1px solid transparent',
+          }}
+        >
           {successOrder && (
-            <div className="flex flex-col items-center w-full px-6 text-center mt-4">
-              <div className="w-28 h-28 rounded-full bg-[#1A1A1D] flex items-center justify-center mb-6 relative">
-                <div className="absolute inset-0 bg-[#00D22B]/10 rounded-full animate-ping" />
-                <div className="w-16 h-16 rounded-full bg-gradient-to-b from-[#00E52F] to-[#00A321] flex items-center justify-center shadow-[0_0_30px_rgba(0,210,43,0.4)] relative z-10">
-                  <Check className="w-8 h-8 text-white font-bold" strokeWidth={4} />
-                </div>
+            <div className="relative flex flex-col items-center text-center px-6 pt-8 pb-7">
+
+              {/* Close button */}
+              <button
+                onClick={() => setSuccessUpdateOrderId(null)}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full border-2 border-white/80 flex items-center justify-center hover:border-white transition-colors flex-shrink-0"
+              >
+                <X className="w-4 h-4 text-white" strokeWidth={2.5} />
+              </button>
+
+              {/* Layered circle icon */}
+              <div className="relative flex items-center justify-center mb-6">
+                <div className="w-40 h-40 rounded-full bg-[#1A1A1D]" />
+                <div className="absolute w-28 h-28 rounded-full bg-[#222224]" />
+                <img
+                  src="/image 12.png"
+                  alt="Success"
+                  className="absolute w-20 h-20 object-contain drop-shadow-2xl"
+                />
               </div>
 
-              <DialogTitle className="text-2xl font-semibold mb-2">Order updated successfully</DialogTitle>
-              <DialogDescription className="text-sm text-[#8C8C8C] mb-6">Status updated to {successOrder.status}</DialogDescription>
+              <DialogTitle className="text-2xl font-bold text-white mb-1">Order updated successfully</DialogTitle>
+              <DialogDescription className="text-sm text-[#8C8C8C] mb-5">
+                {successOrder.progress >= 3
+                  ? "Order has been delivered successfully"
+                  : successOrder.progress === 2
+                    ? "Product verification complete"
+                    : "Item picked up from seller"}
+              </DialogDescription>
 
-              <div className="w-full bg-[#1A1A1D] border border-white/5 rounded-xl p-4 mb-4 text-left flex gap-4 items-center">
-                <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-white/5">
+              {/* Order card */}
+              <div className="w-full bg-[#1A1A1D] rounded-2xl p-4 mb-4 text-left flex gap-4 items-center">
+                <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-white/5">
                   <img src={successOrder.item.image} alt={successOrder.item.name} className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start mb-1">
-                    <span className="text-[#FFAF2C] font-medium text-sm">{successOrder.id}</span>
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-medium bg-[#00D22B] text-white">
-                      <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                    <span className="text-[#FFAF2C] font-semibold text-sm">{successOrder.id}</span>
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ${successOrder.statusBg} ${successOrder.statusColor}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${successOrder.dotColor}`} />
                       {successOrder.status}
                     </span>
                   </div>
-                  <div className="font-semibold truncate text-[15px] mb-1">{successOrder.item.name}</div>
-                  <div className="text-xs text-[#8C8C8C] truncate">Buyer : {successOrder.buyer.name}</div>
+                  <div className="font-semibold text-white text-[15px] mb-0.5 truncate">{successOrder.item.name}</div>
+                  <div className="text-xs text-[#8C8C8C]">Buyer : <span className="text-white font-medium">{successOrder.buyer.name}</span></div>
                 </div>
               </div>
 
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00D22B]/10 text-[#00D22B] text-xs font-medium mb-8">
-                Update reason : Status changed to {successOrder.status}
+              {/* Approval reason */}
+              <div className="text-sm text-[#00D22B] mb-5">
+                Approval reason : Status changed to {successOrder.status}
               </div>
 
               <button
