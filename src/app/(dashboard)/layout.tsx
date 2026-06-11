@@ -12,9 +12,9 @@ export default function DashboardLayout({
     <OrdersProvider>
       <div className="min-h-screen bg-[#141416] text-white">
         <Sidebar />
-        <div className="ml-60 flex flex-col min-h-screen">
+        <div className="ml-56 flex flex-col min-h-screen">
           <TopBar />
-          <main className="px-6 py-6 flex-1 bg-[#141416]">{children}</main>
+          <main className="px-6 pt-3 pb-6 flex-1 bg-[#141416]">{children}</main>
         </div>
       </div>
     </OrdersProvider>

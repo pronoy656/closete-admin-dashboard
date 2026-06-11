@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Calendar, ChevronDown, Phone, MapPin, Check, ArrowRight, Info, ShoppingCart, ChevronLeft, ShieldCheck, AlertTriangle, AlertCircle, Loader2, X } from "lucide-react";
+import { Search, Calendar, ChevronDown, Phone, MapPin, Check, ArrowRight, Info, ShoppingBag, ChevronLeft, ShieldCheck, AlertTriangle, AlertCircle, Loader2, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useOrders, Order } from "@/context/OrdersContext";
 import {
@@ -140,10 +140,11 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 <tr>
                   <td colSpan={8} className="text-center py-24 text-[#8C8C8C]">
                     <div className="flex flex-col items-center justify-center gap-2">
-                      <div className="w-32 h-32 rounded-full bg-[#1A1A1D] border border-white/10 flex items-center justify-center mb-4 shadow-xl relative overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-30" />
-                        <ShoppingCart className="w-12 h-12 text-white/40 relative z-10" />
-                      </div>
+                      <img
+                        src="/empty-cart.png"
+                        alt="No orders"
+                        className="w-32 h-32 object-contain mb-6"
+                      />
                       <h3 className="text-2xl font-semibold text-white mb-1">No orders found</h3>
                       <p className="text-sm text-[#8C8C8C] mb-6">There are currently no orders matching this filter</p>
                       <button className="px-8 py-2.5 bg-gold-gradient text-black font-semibold rounded-full hover:opacity-90 transition-opacity">
