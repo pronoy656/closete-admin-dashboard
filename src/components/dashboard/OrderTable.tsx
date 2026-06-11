@@ -260,9 +260,9 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 </SheetHeader>
                 <button
                   onClick={() => setSelectedOrderId(null)}
-                  className="w-9 h-9 flex items-center justify-center rounded-full border-2 border-white hover:border-white transition-colors text-white hover:text-white flex-shrink-0"
+                  className="w-6 h-6 flex items-center justify-center rounded-full border-2 border-white hover:border-white transition-colors text-white hover:text-white flex-shrink-0"
                 >
-                  <X className="w-4 h-4" strokeWidth={2.5} />
+                  <X className="w-3 h-3" strokeWidth={2.5} />
                 </button>
               </div>
 
@@ -669,9 +669,9 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
               {/* Close button */}
               <button
                 onClick={() => setSuccessUpdateOrderId(null)}
-                className="absolute top-4 right-4 w-8 h-8 rounded-full border-2 border-white/80 flex items-center justify-center hover:border-white transition-colors flex-shrink-0"
+                className="absolute top-6.5 right-6.5 w-6 h-6 rounded-full border-2 border-white/80 flex items-center justify-center hover:border-white transition-colors flex-shrink-0"
               >
-                <X className="w-4 h-4 text-white" strokeWidth={2.5} />
+                <X className="w-3 h-3 text-white" strokeWidth={2.5} />
               </button>
 
               {/* Layered circle icon */}
