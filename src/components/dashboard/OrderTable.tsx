@@ -121,7 +121,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
         </div>
 
         {/* Table */}
-        <div className="w-full overflow-x-auto">
+        <div className="w-full overflow-x-auto overflow-y-hidden">
           <table className="w-full text-sm text-left">
             <thead className="text-xs text-[#8C8C8C] uppercase font-semibold border-b border-white/5 bg-[#141416]/50">
               <tr>
@@ -131,7 +131,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 <th className="px-6 py-5">BUYER</th>
                 <th className="px-6 py-5">PICKUP</th>
                 <th className="px-6 py-5">DELIVERY</th>
-                <th className="px-6 py-5">AI ANALYSIS</th>
+                <th className="px-6 py-5 text-center">AI INSIGHTS</th>
                 <th className="px-6 py-5">STATUS</th>
               </tr>
             </thead>
@@ -189,42 +189,79 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                     <td className="px-6 py-4 text-[#8C8C8C]">
                       {order.delivery}
                     </td>
-                    <td className="px-6 py-4 align-top">
+                    <td className="px-6 py-4 text-center">
                       {order.aiAnalysis ? (
-                        <div className="flex flex-col gap-2 min-w-[200px] max-w-[280px]">
-                          {/* Top row with icons and percentages */}
-                          <div className="flex justify-between items-center text-xs font-medium">
-                            <div className="flex items-center gap-1.5 text-[#8C8C8C]">
-                              <span>Authentic</span>
-                              <span className="text-white">{order.aiAnalysis.originalPercent}%</span>
-                            </div>
-                            <div className={`flex items-center gap-1.5 ${order.aiAnalysis.fakePercent > 0 ? 'text-red-500' : 'text-white'}`}>
-                              <span>Fake</span>
-                              <span>{order.aiAnalysis.fakePercent}%</span>
-                            </div>
-                          </div>
+                        (() => {
+                          const isAuthentic = (order.aiAnalysis.originalPercent ?? 0) >= (order.aiAnalysis.fakePercent ?? 0);
+                          const percentage = isAuthentic ? order.aiAnalysis.originalPercent : order.aiAnalysis.fakePercent;
+                          const strokeColor = isAuthentic ? "#107D2C" : "#FF383C";
+                          const radius = 16;
+                          const circumference = 2 * Math.PI * radius;
+                          const strokeDashoffset = circumference - (percentage / 100) * circumference;
+                          const tooltipReason = order.aiAnalysis.reason || "Materials, hardware engravings, and logo stamps are fully consistent with authentic brand specifications.";
+                          
+                          const tooltipBg = isAuthentic ? "bg-[#142518] border-[#1D3C22]" : "bg-[#2D1416] border-[#4C1C1F]";
+                          const caretBorderColor = isAuthentic ? "border-b-[#1D3C22]" : "border-b-[#4C1C1F]";
+                          const caretBgColor = isAuthentic ? "border-b-[#142518]" : "border-b-[#2D1416]";
 
-                          {/* Progress bar */}
-                          <div className="w-full h-1.5 rounded-full bg-[#27272A] overflow-hidden flex">
-                            <div className="h-full bg-[#8C8C8C] transition-all duration-1000 ease-out" style={{ width: `${order.aiAnalysis.originalPercent}%` }} />
-                            <div className="h-full bg-red-500/80 transition-all duration-1000 ease-out" style={{ width: `${order.aiAnalysis.fakePercent}%` }} />
-                          </div>
+                          return (
+                            <div className="flex flex-col items-center justify-center gap-1.5 mx-auto w-fit">
+                              {/* Circular progress bar */}
+                              <div className="relative flex items-center justify-center w-12 h-12">
+                                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                  {/* Background Track */}
+                                  <circle
+                                    cx="18"
+                                    cy="18"
+                                    r={radius}
+                                    fill="none"
+                                    stroke="#27272A"
+                                    strokeWidth="3.5"
+                                  />
+                                  {/* Progress Segment */}
+                                  <circle
+                                    cx="18"
+                                    cy="18"
+                                    r={radius}
+                                    fill="none"
+                                    stroke={strokeColor}
+                                    strokeWidth="3.5"
+                                    strokeDasharray={circumference}
+                                    strokeDashoffset={strokeDashoffset}
+                                    strokeLinecap="round"
+                                    className="transition-all duration-1000 ease-out"
+                                  />
+                                </svg>
+                                <span className="absolute text-[11px] font-semibold text-white">{percentage}%</span>
+                              </div>
 
-                          {/* Reason */}
-                          {order.aiAnalysis.fakePercent >= 50 && order.aiAnalysis.reason && (
-                            <div className="mt-1 text-[11px] leading-relaxed text-[#8C8C8C] bg-red-500/10 p-2.5 rounded-lg border border-red-500/10">
-                              <div className="flex items-start gap-1.5">
-                                <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
-                                <div>
-                                  <span className="block text-red-500 font-medium mb-0.5">Flagged</span>
-                                  {order.aiAnalysis.reason}
+                              {/* Label & Tooltip */}
+                              <div 
+                                onClick={(e) => e.stopPropagation()}
+                                className="relative group/tooltip inline-flex items-center gap-1 cursor-pointer"
+                              >
+                                <span className="text-xs text-[#8C8C8C] group-hover/tooltip:text-white transition-colors">
+                                  {isAuthentic ? "Authentic" : "Fake"}
+                                </span>
+                                <Info className="w-3.5 h-3.5 text-[#8C8C8C] group-hover/tooltip:text-white transition-colors" />
+                                
+                                {/* Tooltip box */}
+                                <div className={`absolute top-full left-1/2 -translate-x-1/2 mt-2.5 w-64 p-3 ${tooltipBg} border text-white text-xs rounded-xl shadow-2xl hidden group-hover/tooltip:block z-50 pointer-events-none text-center`}>
+                                  {/* Caret border */}
+                                  <div className={`absolute bottom-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[6px] ${caretBorderColor}`} />
+                                  {/* Caret inner */}
+                                  <div className={`absolute bottom-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-b-[5px] ${caretBgColor} translate-y-[1px]`} />
+                                  
+                                  <span className="block leading-relaxed">
+                                    {tooltipReason}
+                                  </span>
                                 </div>
                               </div>
                             </div>
-                          )}
-                        </div>
+                          );
+                        })()
                       ) : (
-                        <div className="flex items-center gap-2 text-xs text-[#8C8C8C]">
+                        <div className="flex flex-col items-center justify-center gap-2 text-xs text-[#8C8C8C] mx-auto w-fit">
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
                           <span>Analyzing...</span>
                         </div>

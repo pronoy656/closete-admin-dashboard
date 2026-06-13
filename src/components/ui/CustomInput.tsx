@@ -18,7 +18,7 @@ export function CustomInput({
   return (
     <div className={cn("relative", containerClassName)}>
       {leftIcon && (
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8C8C8C]">
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8C8C8C] flex items-center justify-center">
           {leftIcon}
         </div>
       )}
@@ -32,7 +32,7 @@ export function CustomInput({
         {...props}
       />
       {rightIcon && (
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8C8C8C]">
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8C8C8C] flex items-center justify-center">
           {rightIcon}
         </div>
       )}

@@ -32,7 +32,7 @@ export default function LoginForm() {
 
       <form onSubmit={onSubmit} className="space-y-6">
         <div>
-          <label className="text-sm font-medium text-[#EBEBEB] mb-4 block">User name</label>
+          <label className="text-sm font-medium text-[#EBEBEB] mb-2.5 block">User name</label>
           <CustomInput
             type="text"
             required
@@ -40,9 +40,9 @@ export default function LoginForm() {
             leftIcon={<User className="h-5 w-5" />}
           />
         </div>
-        
+
         <div className="text-left">
-          <label className="text-sm font-medium text-[#EBEBEB] mb-4 block">Password</label>
+          <label className="text-sm font-medium text-[#EBEBEB] mb-2.5 block">Password</label>
           <CustomInput
             type={showPassword ? "text" : "password"}
             required
@@ -52,7 +52,7 @@ export default function LoginForm() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="hover:text-white transition-colors"
+                className="hover:text-white transition-colors flex items-center justify-center"
               >
                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>

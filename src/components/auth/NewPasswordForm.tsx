@@ -31,7 +31,7 @@ export default function NewPasswordForm() {
 
       <form onSubmit={onSubmit} className="space-y-6">
         <div className="text-left">
-          <label className="text-sm font-medium text-[#EBEBEB] mb-4 block">New Password</label>
+          <label className="text-sm font-medium text-[#EBEBEB] mb-3.5 block">New Password</label>
           <CustomInput
             type={showNewPassword ? "text" : "password"}
             required
@@ -41,7 +41,7 @@ export default function NewPasswordForm() {
               <button
                 type="button"
                 onClick={() => setShowNewPassword(!showNewPassword)}
-                className="hover:text-white transition-colors"
+                className="hover:text-white transition-colors flex items-center justify-center"
               >
                 {showNewPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
@@ -49,7 +49,7 @@ export default function NewPasswordForm() {
           />
         </div>
         <div className="text-left">
-          <label className="text-sm font-medium text-[#EBEBEB] mb-4 block">Confirm Password</label>
+          <label className="text-sm font-medium text-[#EBEBEB] mb-3.5 block">Confirm Password</label>
           <CustomInput
             type={showConfirmPassword ? "text" : "password"}
             required
@@ -59,7 +59,7 @@ export default function NewPasswordForm() {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="hover:text-white transition-colors"
+                className="hover:text-white transition-colors flex items-center justify-center"
               >
                 {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>

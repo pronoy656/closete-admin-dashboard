@@ -29,7 +29,7 @@ export default function ResetEmailForm() {
 
       <form onSubmit={onSubmit} className="space-y-6">
         <div className="text-left">
-          <label className="text-sm font-medium text-[#EBEBEB] mb-4 block">Email</label>
+          <label className="text-sm font-medium text-[#EBEBEB] mb-3.5 block">Email</label>
           <CustomInput
             type="email"
             required
