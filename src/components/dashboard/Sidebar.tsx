@@ -27,7 +27,7 @@ export default function Sidebar({ active }: { active?: string }) {
   const current = active ?? pathname ?? "";
 
   return (
-    <aside className="h-screen w-56 bg-[#141416] text-[#8C8C8C] fixed left-0 top-0 flex flex-col">
+    <aside className="h-screen w-56 bg-black text-[#8C8C8C] fixed left-0 top-0 flex flex-col">
       <div className="p-6 pb-4">
         <h1 className="text-3xl font-serif text-gold-gradient">
           Closeté

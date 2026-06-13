@@ -40,7 +40,7 @@ type OrderTableProps = {
 
 export default function OrderTable({ title, filterStatus, showAllStatuses }: OrderTableProps) {
   const router = useRouter();
-  const { orders, advanceOrder } = useOrders();
+  const { orders, advanceOrder, resolveIssue } = useOrders();
 
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -73,6 +73,16 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
     setSelectedOrderId(null);
   };
 
+  const handleResolveIssue = (orderId: string) => {
+    resolveIssue(orderId, "resolve");
+    setSelectedOrderId(null);
+  };
+
+  const handleMoveToQueue = (orderId: string) => {
+    resolveIssue(orderId, "queue");
+    setSelectedOrderId(null);
+  };
+
   const openReportIssue = (order: Order) => {
     setSelectedOrderId(order.id);
     setSheetView("reportIssue");
@@ -95,10 +105,10 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
 
   return (
     <>
-      <div className="w-full h-full text-white bg-[#1A1A1D] rounded-2xl border border-white/5 overflow-hidden">
+      <div className="w-full h-full text-white bg-[#1A1A1D] rounded-2xl overflow-hidden">
 
         {/* Header */}
-        <div className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5">
+        <div className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <h2 className="text-xl font-semibold">{title}</h2>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -121,18 +131,18 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
         </div>
 
         {/* Table */}
-        <div className="w-full overflow-x-auto overflow-y-hidden">
-          <table className="w-full text-sm text-left">
-            <thead className="text-xs text-[#8C8C8C] uppercase font-semibold border-b border-white/5 bg-[#141416]/50">
-              <tr>
-                <th className="px-6 py-5">ORDER ID</th>
-                <th className="px-6 py-5">ITEM</th>
-                <th className="px-6 py-5">SELLER</th>
-                <th className="px-6 py-5">BUYER</th>
-                <th className="px-6 py-5">PICKUP</th>
-                <th className="px-6 py-5">DELIVERY</th>
-                <th className="px-6 py-5 text-center">AI INSIGHTS</th>
-                <th className="px-6 py-5">STATUS</th>
+        <div className="w-full overflow-x-auto overflow-y-hidden px-6">
+          <table className="w-full text-sm text-left border-separate border-spacing-0">
+            <thead>
+              <tr className="text-xs text-[#8C8C8C] bg-white/5 uppercase font-semibold">
+                <th className="px-6 py-5 border-y border-l border-white/5 rounded-l-2xl">ORDER ID</th>
+                <th className="px-6 py-5 border-y border-white/5">ITEM</th>
+                <th className="px-6 py-5 border-y border-white/5">SELLER</th>
+                <th className="px-6 py-5 border-y border-white/5">BUYER</th>
+                <th className="px-6 py-5 border-y border-white/5">PICKUP</th>
+                <th className="px-6 py-5 border-y border-white/5">DELIVERY</th>
+                <th className="px-6 py-5 text-center border-y border-white/5">AI INSIGHTS</th>
+                <th className="px-6 py-5 border-y border-r border-white/5 rounded-r-2xl">STATUS</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -199,7 +209,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                           const circumference = 2 * Math.PI * radius;
                           const strokeDashoffset = circumference - (percentage / 100) * circumference;
                           const tooltipReason = order.aiAnalysis.reason || "Materials, hardware engravings, and logo stamps are fully consistent with authentic brand specifications.";
-                          
+
                           const tooltipBg = isAuthentic ? "bg-[#142518] border-[#1D3C22]" : "bg-[#2D1416] border-[#4C1C1F]";
                           const caretBorderColor = isAuthentic ? "border-b-[#1D3C22]" : "border-b-[#4C1C1F]";
                           const caretBgColor = isAuthentic ? "border-b-[#142518]" : "border-b-[#2D1416]";
@@ -236,7 +246,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                               </div>
 
                               {/* Label & Tooltip */}
-                              <div 
+                              <div
                                 onClick={(e) => e.stopPropagation()}
                                 className="relative group/tooltip inline-flex items-center gap-1 cursor-pointer"
                               >
@@ -244,14 +254,14 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                                   {isAuthentic ? "Authentic" : "Fake"}
                                 </span>
                                 <Info className="w-3.5 h-3.5 text-[#8C8C8C] group-hover/tooltip:text-white transition-colors" />
-                                
+
                                 {/* Tooltip box */}
                                 <div className={`absolute top-full left-1/2 -translate-x-1/2 mt-2.5 w-64 p-3 ${tooltipBg} border text-white text-xs rounded-xl shadow-2xl hidden group-hover/tooltip:block z-50 pointer-events-none text-center`}>
                                   {/* Caret border */}
                                   <div className={`absolute bottom-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[6px] ${caretBorderColor}`} />
                                   {/* Caret inner */}
                                   <div className={`absolute bottom-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-b-[5px] ${caretBgColor} translate-y-[1px]`} />
-                                  
+
                                   <span className="block leading-relaxed">
                                     {tooltipReason}
                                   </span>
@@ -288,7 +298,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
           setTimeout(() => setSheetView("details"), 300);
         }
       }}>
-        <SheetContent showCloseButton={false} className="w-full max-w-[500px] bg-[#141416] border-l border-white/10 text-white p-0 overflow-hidden flex flex-col">
+        <SheetContent showCloseButton={false} className="w-full max-w-[500px] bg-black border-l border-white/10 text-white p-0 overflow-hidden flex flex-col">
           {sheetView === "details" && (
             <div className="flex flex-col h-full w-full">
               {/* Sticky Header */}
@@ -443,7 +453,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                       {selectedOrder.issue.notes && (
                         <div className="pt-4 border-t border-white/5 text-sm">
                           <span className="text-[#8C8C8C] block mb-2 font-medium">Notes</span>
-                          <div className="bg-[#141416] p-4 rounded-lg text-white border border-white/5">
+                          <div className="bg-black p-4 rounded-lg text-white border border-white/5">
                             {selectedOrder.issue.notes}
                           </div>
                         </div>
@@ -468,6 +478,21 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                         </div>
                       </div>
                     )}
+
+                    <div className="mt-8 flex gap-3">
+                      <button 
+                        onClick={() => handleMoveToQueue(selectedOrder.id)}
+                        className="flex-1 py-3 bg-[#1A1A1D] border border-white/10 rounded-xl text-sm font-semibold text-white hover:bg-white/5 transition-colors"
+                      >
+                        Move Back to Queue
+                      </button>
+                      <button 
+                        onClick={() => handleResolveIssue(selectedOrder.id)}
+                        className="flex-1 py-3 bg-gold-gradient text-black rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity"
+                      >
+                        Resolve Issue
+                      </button>
+                    </div>
                   </div>
                 )}
 
@@ -544,7 +569,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                                 setIssueDetails("");
                               }
                             }}
-                            className={`${isSelected && opt.id === "Buyer rejected" ? 'flex flex-col gap-3' : 'flex items-center justify-between'} p-4 rounded-xl border cursor-pointer transition-colors ${isSelected ? 'bg-[#1A1A1D] border-[#FFAF2C]' : 'bg-[#141416] border-white/10 hover:border-white/20'}`}
+                            className={`${isSelected && opt.id === "Buyer rejected" ? 'flex flex-col gap-3' : 'flex items-center justify-between'} p-4 rounded-xl border cursor-pointer transition-colors ${isSelected ? 'bg-[#1A1A1D] border-[#FFAF2C]' : 'bg-black border-white/10 hover:border-white/20'}`}
                           >
                             <div className="flex items-center justify-between w-full">
                               <div>

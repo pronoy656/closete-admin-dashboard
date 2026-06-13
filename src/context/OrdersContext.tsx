@@ -149,6 +149,7 @@ const initialOrders: Order[] = [
 type OrdersContextType = {
   orders: Order[];
   advanceOrder: (orderId: string) => void;
+  resolveIssue: (orderId: string, resolution: "queue" | "resolve") => void;
   getOrderById: (orderId: string) => Order | undefined;
 };
 
@@ -195,10 +196,50 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
     }));
   };
 
+  const resolveIssue = (orderId: string, resolution: "queue" | "resolve") => {
+    setOrders(prev => prev.map(o => {
+      if (o.id !== orderId) return o;
+      
+      let nextProgress = resolution === "queue" ? 0 : o.progress;
+      let newStatus = "Reserved";
+      let newStatusBg = "bg-yellow-500/10";
+      let newStatusColor = "text-yellow-500";
+      let newDotColor = "bg-yellow-500";
+
+      if (nextProgress === 1) {
+        newStatus = "Collected";
+        newStatusColor = "text-blue-400";
+        newStatusBg = "bg-blue-400/10";
+        newDotColor = "bg-blue-400";
+      } else if (nextProgress === 2) {
+        newStatus = "Verified";
+        newStatusColor = "text-purple-400";
+        newStatusBg = "bg-purple-400/10";
+        newDotColor = "bg-purple-400";
+      } else if (nextProgress === 3) {
+        newStatus = "Delivered";
+        newStatusColor = "text-green-500";
+        newStatusBg = "bg-green-500/10";
+        newDotColor = "bg-green-500";
+      }
+
+      const { issue, ...rest } = o;
+
+      return {
+        ...rest,
+        progress: nextProgress,
+        status: newStatus,
+        statusColor: newStatusColor,
+        statusBg: newStatusBg,
+        dotColor: newDotColor
+      };
+    }));
+  };
+
   const getOrderById = (orderId: string) => orders.find(o => o.id === orderId);
 
   return (
-    <OrdersContext.Provider value={{ orders, advanceOrder, getOrderById }}>
+    <OrdersContext.Provider value={{ orders, advanceOrder, resolveIssue, getOrderById }}>
       {children}
     </OrdersContext.Provider>
   );

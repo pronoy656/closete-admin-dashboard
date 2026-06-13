@@ -41,29 +41,31 @@ export default function LoginForm() {
           />
         </div>
 
-        <div className="text-left">
-          <label className="text-sm font-medium text-[#EBEBEB] mb-2.5 block">Password</label>
-          <CustomInput
-            type={showPassword ? "text" : "password"}
-            required
-            placeholder="Enter password"
-            leftIcon={<Key className="h-5 w-5" />}
-            rightIcon={
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="hover:text-white transition-colors flex items-center justify-center"
-              >
-                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-              </button>
-            }
-          />
-        </div>
+        <div className="space-y-3">
+          <div className="text-left">
+            <label className="text-sm font-medium text-[#EBEBEB] mb-2.5 block">Password</label>
+            <CustomInput
+              type={showPassword ? "text" : "password"}
+              required
+              placeholder="Enter password"
+              leftIcon={<Key className="h-5 w-5" />}
+              rightIcon={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="hover:text-white transition-colors flex items-center justify-center"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              }
+            />
+          </div>
 
-        <div className="flex justify-end">
-          <Link href="/reset" className="text-sm font-medium text-[#FFAF2C] hover:text-[#FFD375] transition-colors">
-            Forget password ?
-          </Link>
+          <div className="flex justify-end">
+            <Link href="/reset" className="text-sm font-medium text-[#FFAF2C] hover:text-[#FFD375] transition-colors">
+              Forget password ?
+            </Link>
+          </div>
         </div>
 
         <div className="pt-8 space-y-4">

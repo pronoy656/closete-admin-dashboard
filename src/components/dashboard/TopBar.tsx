@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export default function TopBar() {
   return (
-    <div className="flex items-center justify-between px-6 py-4 bg-[#141416] sticky top-0 z-10 h-20">
+    <div className="flex items-center justify-between px-6 py-4 bg-black sticky top-0 z-10 h-20">
       <div className="text-xl font-semibold text-white">
         Active Operations
       </div>
