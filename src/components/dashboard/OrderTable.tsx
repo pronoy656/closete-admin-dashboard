@@ -11,6 +11,11 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -258,26 +263,26 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                               </div>
 
                               {/* Label & Tooltip */}
-                              <div
-                                onClick={(e) => e.stopPropagation()}
-                                className="relative group/tooltip inline-flex items-center gap-1 cursor-pointer"
-                              >
-                                <span className="text-xs text-[#8C8C8C] group-hover/tooltip:text-white transition-colors">
-                                  {isAuthentic ? "Authentic" : "Fake"}
-                                </span>
-                                <Info className="w-3.5 h-3.5 text-[#8C8C8C] group-hover/tooltip:text-white transition-colors" />
-
-                                {/* Tooltip box */}
-                                <div className={`absolute top-full left-1/2 -translate-x-1/2 mt-2.5 w-64 p-3 ${tooltipBg} border text-white text-xs rounded-xl shadow-2xl hidden group-hover/tooltip:block z-50 pointer-events-none text-center`}>
-                                  {/* Caret border */}
-                                  <div className={`absolute bottom-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[6px] ${caretBorderColor}`} />
-                                  {/* Caret inner */}
-                                  <div className={`absolute bottom-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-b-[5px] ${caretBgColor} translate-y-[1px]`} />
-
-                                  <span className="block leading-relaxed">
-                                    {tooltipReason}
-                                  </span>
-                                </div>
+                              <div onClick={(e) => e.stopPropagation()}>
+                                <Tooltip delayDuration={100}>
+                                  <TooltipTrigger asChild>
+                                    <div className="relative group/tooltip inline-flex items-center gap-1 cursor-pointer">
+                                      <span className="text-xs text-[#8C8C8C] group-hover/tooltip:text-white transition-colors">
+                                        {isAuthentic ? "Authentic" : "Fake"}
+                                      </span>
+                                      <Info className="w-3.5 h-3.5 text-[#8C8C8C] group-hover/tooltip:text-white transition-colors" />
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent 
+                                    side="bottom"
+                                    sideOffset={8}
+                                    className={`w-64 p-3 ${tooltipBg} border text-white text-xs rounded-xl shadow-2xl text-center`}
+                                  >
+                                    <span className="block leading-relaxed">
+                                      {tooltipReason}
+                                    </span>
+                                  </TooltipContent>
+                                </Tooltip>
                               </div>
                             </div>
                           );
@@ -310,13 +315,13 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
           setTimeout(() => setSheetView("details"), 300);
         }
       }}>
-        <SheetContent showCloseButton={false} className="w-full max-w-[500px] bg-black border-l border-white/10 text-white p-0 overflow-hidden flex flex-col">
+        <SheetContent showCloseButton={false} className="w-full max-w-[550px] bg-black border-l border-white/10 text-white p-0 overflow-hidden flex flex-col">
           {sheetView === "details" && (
             <div className="flex flex-col h-full w-full">
               {/* Sticky Header */}
               <div className="px-6 flex-shrink-0 flex items-center justify-between">
                 <SheetHeader className="m-0 space-y-0">
-                  <SheetTitle className="text-xl font-semibold text-white">Order Details</SheetTitle>
+                  <SheetTitle className="text-2xl font-semibold text-white">Order Details</SheetTitle>
                 </SheetHeader>
                 <button
                   onClick={() => setSelectedOrderId(null)}
@@ -337,16 +342,16 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 {/* Header Info */}
                 <div className="flex justify-between items-start">
                   <div>
-                    <div className="text-[#FFAF2C] font-semibold mb-1">{selectedOrder?.id}</div>
-                    <h3 className="text-xl font-medium">{selectedOrder?.item.name}</h3>
-                    <p className="text-sm text-[#8C8C8C]">{selectedOrder?.item.desc}</p>
+                    <div className="text-[#FFAF2C] font-semibold mb-1 text-base">{selectedOrder?.id}</div>
+                    <h3 className="text-2xl font-medium">{selectedOrder?.item.name}</h3>
+                    <p className="text-base text-[#8C8C8C]">{selectedOrder?.item.desc}</p>
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors duration-500 ${selectedOrder?.statusBg} ${selectedOrder?.statusColor} mb-2`}>
-                      <span className={`w-1.5 h-1.5 rounded-full transition-colors duration-500 ${selectedOrder?.dotColor}`}></span>
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium transition-colors duration-500 ${selectedOrder?.statusBg} ${selectedOrder?.statusColor} mb-2`}>
+                      <span className={`w-2 h-2 rounded-full transition-colors duration-500 ${selectedOrder?.dotColor}`}></span>
                       {selectedOrder?.status}
                     </span>
-                    <span className="font-semibold">{selectedOrder?.item.price}</span>
+                    <span className="font-semibold text-lg">{selectedOrder?.item.price}</span>
                   </div>
                 </div>
 
@@ -354,13 +359,13 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 {selectedOrder?.status !== "Issue" && (
                   <div className="bg-[#1A1A1D] rounded-xl p-4">
                     <div className="flex gap-4">
-                      <div className="flex-1 border-l-2 border-white pl-3">
-                        <div className="text-xs text-[#8C8C8C] mb-1">Pickup Window</div>
-                        <div className="text-sm font-medium text-white">{selectedOrder?.pickup.split('•').join(' · ')}</div>
+                      <div className="flex-1 border-l-2 border-white pl-4">
+                        <div className="text-sm text-[#8C8C8C] mb-1">Pickup Window</div>
+                        <div className="text-base font-medium text-white">{selectedOrder?.pickup.split('•').join(' · ')}</div>
                       </div>
-                      <div className="flex-1 border-l-2 border-white pl-3">
-                        <div className="text-xs text-[#8C8C8C] mb-1">Estimated Delivery</div>
-                        <div className="text-sm font-medium text-white">{selectedOrder?.delivery}</div>
+                      <div className="flex-1 border-l-2 border-white pl-4">
+                        <div className="text-sm text-[#8C8C8C] mb-1">Estimated Delivery</div>
+                        <div className="text-base font-medium text-white">{selectedOrder?.delivery}</div>
                       </div>
                     </div>
                   </div>
@@ -369,25 +374,25 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 {/* Seller / Buyer */}
                 <div className="flex gap-3">
                   <div className="flex-1">
-                    <div className="text-xs text-[#8C8C8C] uppercase mb-2 font-medium">Seller</div>
-                    <div className="bg-[#1A1A1D] rounded-xl p-4">
-                      <div className="font-medium mb-2">{selectedOrder?.seller.name}</div>
-                      <div className="flex items-center gap-2 text-sm text-[#8C8C8C] mb-1">
+                    <div className="text-sm text-[#8C8C8C] uppercase mb-2 font-medium">Seller</div>
+                    <div className="bg-[#1A1A1D] rounded-xl p-5">
+                      <div className="font-semibold text-lg mb-2">{selectedOrder?.seller.name}</div>
+                      <div className="flex items-center gap-2 text-[15px] text-[#8C8C8C] mb-2">
                         <Phone className="w-4 h-4 shrink-0" /> <span className="truncate">{selectedOrder?.seller.phone}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-[#8C8C8C]">
+                      <div className="flex items-center gap-2 text-[15px] text-[#8C8C8C]">
                         <MapPin className="w-4 h-4 shrink-0" /> <span className="truncate">{selectedOrder?.seller.location}</span>
                       </div>
                     </div>
                   </div>
                   <div className="flex-1">
-                    <div className="text-xs text-[#8C8C8C] uppercase mb-2 font-medium">Buyer</div>
-                    <div className="bg-[#1A1A1D] rounded-xl p-4">
-                      <div className="font-medium mb-2">{selectedOrder?.buyer.name}</div>
-                      <div className="flex items-center gap-2 text-sm text-[#8C8C8C] mb-1">
+                    <div className="text-sm text-[#8C8C8C] uppercase mb-2 font-medium">Buyer</div>
+                    <div className="bg-[#1A1A1D] rounded-xl p-5">
+                      <div className="font-semibold text-lg mb-2">{selectedOrder?.buyer.name}</div>
+                      <div className="flex items-center gap-2 text-[15px] text-[#8C8C8C] mb-2">
                         <Phone className="w-4 h-4 shrink-0" /> <span className="truncate">{selectedOrder?.buyer.phone}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-[#8C8C8C]">
+                      <div className="flex items-center gap-2 text-[15px] text-[#8C8C8C]">
                         <MapPin className="w-4 h-4 shrink-0" /> <span className="truncate">{selectedOrder?.buyer.location}</span>
                       </div>
                     </div>
