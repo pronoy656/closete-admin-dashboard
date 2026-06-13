@@ -27,11 +27,15 @@ export default function Sidebar({ active }: { active?: string }) {
   const current = active ?? pathname ?? "";
 
   return (
-    <aside className="h-screen w-56 bg-black text-[#8C8C8C] fixed left-0 top-0 flex flex-col">
+    <aside className="h-screen w-56 bg-black text-[#A2A2A2] fixed left-0 top-0 flex flex-col">
       <div className="p-6 pb-4">
-        <h1 className="text-3xl font-serif text-gold-gradient">
-          Closeté
-        </h1>
+        <img
+          src="/Closeté.png"
+          alt="Closeté Logo"
+          width={90}
+          height={40}
+          className="w-[110px] h-[32px] object-contain"
+        />
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-3">
