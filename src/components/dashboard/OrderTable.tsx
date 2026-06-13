@@ -103,6 +103,18 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
     router.push("/issues");
   };
 
+  const getCurrentFormattedTime = () => {
+    const now = new Date();
+    const day = now.getDate();
+    const month = now.toLocaleString('en-US', { month: 'short' });
+    const year = now.getFullYear();
+    let hours = now.getHours();
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    return `${day} ${month}, ${year} | ${hours}.${minutes} ${ampm}`;
+  };
+
   return (
     <>
       <div className="w-full h-full text-white bg-[#1A1A1D] rounded-2xl overflow-hidden">
@@ -704,7 +716,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-[#8C8C8C]">Update Time</span>
-                <span className="font-medium text-white">Just now</span>
+                <span className="font-medium text-white">{getCurrentFormattedTime()}</span>
               </div>
             </div>
 
