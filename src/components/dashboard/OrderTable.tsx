@@ -320,8 +320,8 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
             <div className="flex flex-col h-full w-full">
               {/* Sticky Header */}
               <div className="px-6 flex-shrink-0 flex items-center justify-between">
-                <SheetHeader className="m-0 space-y-0">
-                  <SheetTitle className="text-2xl font-semibold text-white">Order Details</SheetTitle>
+                <SheetHeader className="m-0 space-y-0 text-left">
+                  <SheetTitle className="text-2xl font-semibold text-white text-left -ml-3.5">Order Details</SheetTitle>
                 </SheetHeader>
                 <button
                   onClick={() => setSelectedOrderId(null)}
