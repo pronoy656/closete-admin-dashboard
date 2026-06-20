@@ -22,9 +22,9 @@ export default function LoginForm() {
 
   return (
     <div className="w-full">
-      <div className="text-center mb-10">
-        <h1 className="text-4xl font-serif mb-3 text-white tracking-wide">Welcome back</h1>
-        <p className="text-[#8C8C8C]">Sign in to manage orders and operations</p>
+      <div className="text-center mb-6 sm:mb-10">
+        <h1 className="text-3xl sm:text-4xl font-serif mb-2 sm:mb-3 text-white tracking-wide">Welcome back</h1>
+        <p className="text-sm sm:text-base text-[#8C8C8C]">Sign in to manage orders and operations</p>
       </div>
 
       {/* Divider */}
@@ -68,10 +68,10 @@ export default function LoginForm() {
           </div>
         </div>
 
-        <div className="pt-8 space-y-4">
-          <div className="flex items-center justify-center gap-2 text-sm text-[#8C8C8C]">
-            <Lock className="h-4 w-4" />
-            <span>Secure access for authorized operations staff</span>
+        <div className="pt-5 sm:pt-8 space-y-4">
+          <div className="flex items-center justify-center gap-1.5 sm:gap-2 text-[#8C8C8C]">
+            <Lock className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+            <span className="text-xs sm:text-sm whitespace-nowrap">Secure access for authorized operations staff</span>
           </div>
 
           <Button

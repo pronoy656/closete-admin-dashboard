@@ -10,7 +10,8 @@ import {
   ShieldCheck,
   Truck,
   AlertCircle,
-  LogOut
+  LogOut,
+  X
 } from "lucide-react";
 
 const items = [
@@ -22,22 +23,18 @@ const items = [
   { href: "/issues", label: "Issues", Icon: AlertCircle },
 ];
 
-export default function Sidebar({ active }: { active?: string }) {
+interface SidebarProps {
+  active?: string;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
+}
+
+export default function Sidebar({ active, mobileOpen = false, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
   const current = active ?? pathname ?? "";
 
-  return (
-    <aside className="h-screen w-56 bg-black text-[#A2A2A2] fixed left-0 top-0 flex flex-col">
-      <div className="p-6 pb-4">
-        <img
-          src="/Closeté.png"
-          alt="Closeté Logo"
-          width={90}
-          height={40}
-          className="w-[110px] h-[32px] object-contain"
-        />
-      </div>
-
+  const navContent = (
+    <>
       <nav className="flex-1 px-3 py-4 space-y-3">
         {items.map((item) => {
           const isActive = current === item.href || current.startsWith(item.href);
@@ -45,6 +42,7 @@ export default function Sidebar({ active }: { active?: string }) {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onMobileClose}
               className={cn(
                 "flex items-center gap-3.5 px-3 py-3.5 text-sm font-medium transition-colors rounded-xl",
                 isActive
@@ -68,6 +66,43 @@ export default function Sidebar({ active }: { active?: string }) {
           <span>Logout</span>
         </Link>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Desktop Sidebar — always visible on md+ */}
+      <aside className="hidden md:flex h-screen w-56 bg-black text-[#A2A2A2] fixed left-0 top-0 flex-col z-30">
+        <div className="p-6 pb-4">
+          <span className="text-3xl font-serif text-gold-gradient tracking-wide">Closeté</span>
+        </div>
+        {navContent}
+      </aside>
+
+      {/* Mobile Overlay + Drawer */}
+      {mobileOpen && (
+        <div className="md:hidden fixed inset-0 z-40 flex">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={onMobileClose}
+          />
+          {/* Drawer */}
+          <aside className="relative w-64 max-w-[80vw] bg-[#0D0D0F] border-r border-white/5 flex flex-col h-full z-50">
+            {/* Close button */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
+              <span className="text-3xl font-serif text-gold-gradient tracking-wide">Closeté</span>
+              <button
+                onClick={onMobileClose}
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors"
+              >
+                <X className="w-4 h-4 text-white" />
+              </button>
+            </div>
+            {navContent}
+          </aside>
+        </div>
+      )}
+    </>
   );
 }

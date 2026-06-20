@@ -22,6 +22,13 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 
 const issueOptions = [
   { id: "Item failed verification", desc: "Authentication mismatch detected" },
@@ -125,11 +132,11 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
       <div className="w-full h-full text-white bg-[#1A1A1D] rounded-2xl overflow-hidden">
 
         {/* Header */}
-        <div className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <h2 className="text-xl font-semibold">{title}</h2>
+        <div className="p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4">
+          <h2 className="text-lg sm:text-xl font-semibold">{title}</h2>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="relative w-64">
+          <div className="flex flex-wrap items-center gap-2 md:gap-3">
+            <div className="relative flex-1 min-w-0 md:w-64 md:flex-none">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8C8C8C]" />
               <Input
                 placeholder="Search orders.."
@@ -137,18 +144,88 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
               />
             </div>
 
-            <button className="flex items-center gap-2 h-10 px-4 rounded-full border border-white/10 text-sm font-medium hover:bg-white/5 transition-colors">
-              <Calendar className="h-4 w-4 text-[#8C8C8C]" />
-              <span>15 Jun, 2026</span>
-              <ChevronDown className="h-4 w-4 text-[#8C8C8C] ml-2" />
-            </button>
-
-
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center justify-center h-10 w-10 rounded-full border border-white/10 hover:bg-white/5 active:scale-95 transition-all shrink-0 cursor-pointer">
+                  <Calendar className="h-4 w-4 text-[#8C8C8C]" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40 bg-[#1A1A1D] border-white/10 text-white rounded-xl shadow-2xl">
+                <DropdownMenuItem className="focus:bg-white/10 cursor-pointer">Today</DropdownMenuItem>
+                <DropdownMenuItem className="focus:bg-white/10 cursor-pointer">Yesterday</DropdownMenuItem>
+                <DropdownMenuItem className="focus:bg-white/10 cursor-pointer">Last 7 days</DropdownMenuItem>
+                <DropdownMenuItem className="focus:bg-white/10 cursor-pointer">Last 30 days</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
-        {/* Table */}
-        <div className="w-full overflow-x-auto overflow-y-hidden px-6">
+        {/* ===== MOBILE CARD LIST — hidden on md+ ===== */}
+        <div className="md:hidden px-3 pb-4 space-y-0">
+          {filteredOrders.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-2 py-16 text-[#8C8C8C]">
+              <img src="/empty-cart.png" alt="No orders" className="w-24 h-24 object-contain mb-4" />
+              <h3 className="text-xl font-semibold text-white">No orders found</h3>
+              <p className="text-sm text-center">There are currently no orders matching this filter</p>
+            </div>
+          ) : (
+            filteredOrders.map((order) => (
+              <div
+                key={order.id}
+                onClick={() => setSelectedOrderId(order.id)}
+                className="bg-[#1A1A1D] rounded-2xl mb-3 overflow-hidden cursor-pointer active:opacity-80 transition-opacity border border-white/5"
+              >
+                {/* Card top: image + name + status */}
+                <div className="flex items-center gap-3 p-3 pb-2.5">
+                  <div className="w-11 h-11 rounded-xl overflow-hidden bg-white/10 flex-shrink-0">
+                    <img src={order.item.image} alt={order.item.name} className="w-full h-full object-cover" />
+                  </div>
+                  <span className="flex-1 font-medium text-[#EBEBEB] text-[15px] leading-tight truncate">{order.item.name}</span>
+                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold shrink-0 ${order.statusBg} ${order.statusColor}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${order.dotColor}`} />
+                    {order.status}
+                  </span>
+                </div>
+
+                {/* Divider */}
+                <div className="h-px bg-white/5 mx-3" />
+
+                {/* Detail rows */}
+                <div className="px-3 py-2.5 space-y-2 text-[13px]">
+                  <div className="flex">
+                    <span className="w-20 text-[#8C8C8C] shrink-0">Order ID :</span>
+                    <span className="font-semibold text-[#FFAF2C]">{order.id}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-20 text-[#8C8C8C] shrink-0">Seller :</span>
+                    <span className="text-[#EBEBEB] truncate">
+                      <span className="text-[#8C8C8C] mr-1 text-[11px]">{order.seller.location}</span>
+                      {order.seller.name}
+                    </span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-20 text-[#8C8C8C] shrink-0">Buyer :</span>
+                    <span className="text-[#EBEBEB] truncate">
+                      <span className="text-[#8C8C8C] mr-1 text-[11px]">{order.buyer.location}</span>
+                      {order.buyer.name}
+                    </span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-20 text-[#8C8C8C] shrink-0">Pickup :</span>
+                    <span className="text-[#EBEBEB]">{order.pickup}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-20 text-[#8C8C8C] shrink-0">Delivery :</span>
+                    <span className="text-[#EBEBEB]">{order.delivery}</span>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* ===== DESKTOP TABLE — hidden on mobile ===== */}
+        <div className="hidden md:block w-full overflow-x-auto overflow-y-hidden px-6">
           <table className="w-full text-sm text-left border-separate border-spacing-0">
             <thead>
               <tr className="text-xs text-[#8C8C8C] bg-white/5 uppercase font-semibold">
@@ -316,13 +393,11 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
         }
       }}>
         <SheetContent showCloseButton={false} className="w-full max-w-[550px] bg-black border-l border-white/10 text-white p-0 overflow-hidden flex flex-col">
-          {sheetView === "details" && (
+          {(sheetView === "details" || sheetView === "reportIssue") && (
             <div className="flex flex-col h-full w-full">
               {/* Sticky Header */}
-              <div className="px-6 flex-shrink-0 flex items-center justify-between">
-                <SheetHeader className="m-0 space-y-0 text-left">
-                  <SheetTitle className="text-2xl font-semibold text-white text-left -ml-3.5">Order Details</SheetTitle>
-                </SheetHeader>
+              <div className="px-4 sm:px-6 pt-3 pb-1.5 flex-shrink-0 flex items-center justify-between">
+                <span className="text-2xl font-semibold text-white">Order Details</span>
                 <button
                   onClick={() => setSelectedOrderId(null)}
                   className="w-6 h-6 flex items-center justify-center rounded-full border-2 border-white hover:border-white transition-colors text-white hover:text-white flex-shrink-0"
@@ -332,10 +407,10 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
               </div>
 
               {/* Scrollable Body */}
-              <div className="flex-1 overflow-y-auto px-6 py-4 no-scrollbar space-y-4">
+              <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 pb-6 no-scrollbar space-y-4">
 
                 {/* Image */}
-                <div className="w-full h-48 rounded-xl overflow-hidden">
+                <div className="w-full h-40 sm:h-48 rounded-xl overflow-hidden">
                   <img src={selectedOrder?.item.image} alt={selectedOrder?.item.name} className="w-full h-full object-cover" />
                 </div>
 
@@ -343,8 +418,8 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 <div className="flex justify-between items-start">
                   <div>
                     <div className="text-[#FFAF2C] font-semibold mb-1 text-base">{selectedOrder?.id}</div>
-                    <h3 className="text-2xl font-medium">{selectedOrder?.item.name}</h3>
-                    <p className="text-base text-[#8C8C8C]">{selectedOrder?.item.desc}</p>
+                    <h3 className="text-xl sm:text-2xl font-medium">{selectedOrder?.item.name}</h3>
+                    <p className="text-sm sm:text-base text-[#8C8C8C]">{selectedOrder?.item.desc}</p>
                   </div>
                   <div className="flex flex-col items-end">
                     <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium transition-colors duration-500 ${selectedOrder?.statusBg} ${selectedOrder?.statusColor} mb-2`}>
@@ -357,22 +432,24 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
 
                 {/* Windows */}
                 {selectedOrder?.status !== "Issue" && (
-                  <div className="bg-[#1A1A1D] rounded-xl p-4">
-                    <div className="flex gap-4">
-                      <div className="flex-1 border-l-2 border-white pl-4">
-                        <div className="text-sm text-[#8C8C8C] mb-1">Pickup Window</div>
-                        <div className="text-base font-medium text-white">{selectedOrder?.pickup.split('•').join(' · ')}</div>
+                  <div className="bg-[#1A1A1D] rounded-xl overflow-hidden">
+                    <div className="flex divide-x divide-white/10">
+                      {/* Pickup */}
+                      <div className="flex-1 p-4 border-l-2 border-white/50">
+                        <div className="text-xs text-[#8C8C8C] mb-1.5">Pickup Window</div>
+                        <div className="text-sm font-medium text-white leading-snug">{selectedOrder?.pickup.split('•').join(' · ')}</div>
                       </div>
-                      <div className="flex-1 border-l-2 border-white pl-4">
-                        <div className="text-sm text-[#8C8C8C] mb-1">Estimated Delivery</div>
-                        <div className="text-base font-medium text-white">{selectedOrder?.delivery}</div>
+                      {/* Delivery */}
+                      <div className="flex-1 p-4 border-l-2 border-white/50">
+                        <div className="text-xs text-[#8C8C8C] mb-1.5">Estimated Delivery</div>
+                        <div className="text-sm font-medium text-white leading-snug">{selectedOrder?.delivery}</div>
                       </div>
                     </div>
                   </div>
                 )}
 
                 {/* Seller / Buyer */}
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <div className="flex-1">
                     <div className="text-sm text-[#8C8C8C] uppercase mb-2 font-medium">Seller</div>
                     <div className="bg-[#1A1A1D] rounded-xl p-5">
@@ -516,10 +593,10 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 {/* Action Buttons */}
                 {selectedOrder && selectedOrder.status !== "Issue" && (
                   selectedOrder.progress < 3 ? (
-                    <div className="flex gap-3 w-full">
+                    <div className="flex flex-col sm:flex-row gap-3 w-full">
                       <button
                         onClick={handleProgress}
-                        className="flex-1 h-12 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity border-0 outline-none whitespace-nowrap text-sm">
+                        className="w-full py-3.5 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity border-0 outline-none text-sm">
                         {selectedOrder.progress === 0 && "Mark As Collected"}
                         {selectedOrder.progress === 1 && "Mark As Verified"}
                         {selectedOrder.progress === 2 && "Mark As Delivered"}
@@ -527,7 +604,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                       </button>
                       <button
                         onClick={() => openReportIssue(selectedOrder)}
-                        className="flex-1 h-12 bg-[#27272A] text-[#8C8C8C] font-semibold rounded-full flex items-center justify-center hover:bg-white/5 transition-colors border border-white/10 whitespace-nowrap text-sm">
+                        className="w-full py-3.5 bg-[#27272A] text-[#8C8C8C] font-semibold rounded-full flex items-center justify-center hover:bg-white/5 transition-colors border border-white/10 text-sm">
                         Report an Issue
                       </button>
                     </div>
@@ -544,29 +621,45 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
             </div>
           )}
 
-          {sheetView === "reportIssue" && issueStep === "form" && selectedOrder && (
-            <div className="flex flex-col h-full w-full">
+        </SheetContent>
+      </Sheet>
+
+      {/* Report Issue Dialog */}
+      <Dialog open={sheetView === "reportIssue" && issueStep === "form"} onOpenChange={(open) => !open && setSheetView("details")}>
+        <DialogContent
+          className="text-white w-[calc(100vw-32px)] max-w-[500px] max-h-[85vh] p-0 shadow-2xl rounded-3xl overflow-hidden [&>button]:hidden"
+          style={{
+            background: 'linear-gradient(#0D0D0F, #0D0D0F) padding-box, linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.12) 40%, transparent 85%) border-box',
+            border: '1px solid transparent',
+          }}
+        >
+          {selectedOrder && (
+            <div className="flex flex-col h-full w-full max-h-[85vh]">
               {/* Sticky Header */}
-              <div className="px-6 pt-6 pb-4 border-b border-white/5 flex-shrink-0 flex items-center gap-3 pr-14">
-                <button onClick={() => setSheetView("details")} className="text-[#8C8C8C] hover:text-white transition-colors">
-                  <ChevronLeft className="w-5 h-5" />
+              <div className="px-4 sm:px-6 pt-6 pb-4 border-b border-white/5 flex-shrink-0 flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold mb-1 text-white">Report Issue</h2>
+                  <div className="text-sm text-[#8C8C8C] font-normal">Select the issue related to this order</div>
+                </div>
+                {/* Close Button */}
+                <button
+                  onClick={() => setSheetView("details")}
+                  className="w-8 h-8 rounded-full border-2 border-white/80 flex items-center justify-center hover:border-white transition-colors flex-shrink-0"
+                >
+                  <X className="w-4 h-4 text-white" strokeWidth={2.5} />
                 </button>
-                <SheetHeader className="m-0 space-y-0 text-left">
-                  <SheetTitle className="text-2xl font-semibold mb-1 text-white text-left">Report Issue</SheetTitle>
-                  <div className="text-sm text-[#8C8C8C] text-left font-normal">Select the issue related to this order</div>
-                </SheetHeader>
               </div>
 
               {/* Scrollable body */}
-              <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5 no-scrollbar">
+              <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 pb-6 space-y-5 no-scrollbar">
                 {/* Order summary card */}
                 <div className="bg-[#1A1A1D] border border-white/5 rounded-xl p-4 flex gap-4 items-center">
-                  <div className="w-20 h-20 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
                     <img src={selectedOrder.item.image} alt="Item" className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-[#FFAF2C] font-medium text-sm mb-1">{selectedOrder.id}</div>
-                    <div className="font-semibold truncate text-[15px] mb-1">{selectedOrder.item.name}</div>
+                    <div className="font-semibold truncate text-[14px] sm:text-[15px] mb-1">{selectedOrder.item.name}</div>
                     <div className="text-xs text-[#8C8C8C] truncate">{selectedOrder.seller.name} to {selectedOrder.buyer.name}</div>
                   </div>
                 </div>
@@ -661,35 +754,35 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                   <Info className="w-4 h-4 shrink-0" />
                   <span>This action may trigger refund or return flow</span>
                 </div>
-              </div>
 
-              {/* Sticky Footer */}
-              <div className="px-6 py-4 border-t border-white/5 flex-shrink-0">
-                <button
-                  onClick={submitIssue}
-                  disabled={selectedIssueOption === "Other" && issueDetails.trim() === ""}
-                  className={`w-full h-14 font-semibold rounded-full flex items-center justify-center gap-2 px-8 transition-all ${selectedIssueOption === "Other" && issueDetails.trim() === ""
-                    ? "bg-white/10 text-[#8C8C8C] cursor-not-allowed"
-                    : "bg-gold-gradient text-black hover:opacity-90"
-                    }`}>
-                  Submit Issue <ArrowRight className="w-5 h-5" />
-                </button>
+                {/* Inline Footer Button */}
+                <div className="pt-2">
+                  <button
+                    onClick={submitIssue}
+                    disabled={selectedIssueOption === "Other" && issueDetails.trim() === ""}
+                    className={`w-full py-3.5 text-sm font-semibold rounded-full flex items-center justify-center gap-2 transition-all ${selectedIssueOption === "Other" && issueDetails.trim() === ""
+                      ? "bg-white/10 text-[#8C8C8C] cursor-not-allowed"
+                      : "bg-gold-gradient text-black hover:opacity-90"
+                      }`}>
+                    Submit Issue <ArrowRight className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
             </div>
           )}
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
 
       {/* Issue Reported Success Dialog */}
       <Dialog open={issueStep === "success"} onOpenChange={(open) => !open && setIssueStep("form")}>
         <DialogContent
-          className="text-white max-w-[380px] p-0 shadow-2xl rounded-3xl overflow-hidden [&>button]:hidden"
+          className="text-white w-[calc(100vw-32px)] max-w-[380px] p-0 shadow-2xl rounded-3xl overflow-hidden [&>button]:hidden"
           style={{
             background: 'linear-gradient(#0D0D0F, #0D0D0F) padding-box, linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.12) 40%, transparent 85%) border-box',
             border: '1px solid transparent',
           }}
         >
-          <div className="relative flex flex-col items-center text-center px-6 pt-8 pb-7">
+          <div className="relative flex flex-col items-center text-center px-4 sm:px-6 pt-7 pb-6">
 
             {/* Close button */}
             <button
@@ -700,21 +793,21 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
             </button>
 
             {/* Layered circle icon */}
-            <div className="relative flex items-center justify-center mb-6">
-              <div className="w-40 h-40 rounded-full bg-[#1A1A1D]" />
-              <div className="absolute w-28 h-28 rounded-full bg-[#222224]" />
+            <div className="relative flex items-center justify-center mb-5">
+              <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-[#1A1A1D]" />
+              <div className="absolute w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#222224]" />
               <img
                 src="/image 12.png"
                 alt="Success"
-                className="absolute w-20 h-20 object-contain drop-shadow-2xl"
+                className="absolute w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-2xl"
               />
             </div>
 
-            <DialogTitle className="text-2xl font-bold text-white mb-1">Issue reported</DialogTitle>
-            <DialogDescription className="text-sm text-[#8C8C8C] mb-5">Order status updated successfully</DialogDescription>
+            <DialogTitle className="text-xl sm:text-2xl font-bold text-white mb-1">Issue reported</DialogTitle>
+            <DialogDescription className="text-sm text-[#8C8C8C] mb-4">Order status updated successfully</DialogDescription>
 
             {/* Info card */}
-            <div className="w-full bg-[#1A1A1D] rounded-2xl p-4 mb-5 text-left space-y-3">
+            <div className="w-full bg-[#1A1A1D] rounded-2xl p-4 mb-4 text-left space-y-3">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-[#8C8C8C]">Report Reference</span>
                 <span className="font-semibold text-[#FFAF2C]">#RP-992-K</span>
@@ -727,7 +820,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
 
             <button
               onClick={handleBackToDashboard}
-              className="w-full h-12 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+              className="w-full h-11 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
               Back To Dashboard <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -737,36 +830,36 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
       {/* Success Dialog for Status Update */}
       <Dialog open={successUpdateOrderId !== null} onOpenChange={(open) => !open && setSuccessUpdateOrderId(null)}>
         <DialogContent
-          className="text-white max-w-[400px] p-0 shadow-2xl rounded-3xl overflow-hidden [&>button]:hidden"
+          className="text-white w-[calc(100vw-32px)] max-w-[400px] p-0 shadow-2xl rounded-3xl overflow-hidden [&>button]:hidden"
           style={{
             background: 'linear-gradient(#0D0D0F, #0D0D0F) padding-box, linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.12) 40%, transparent 85%) border-box',
             border: '1px solid transparent',
           }}
         >
           {successOrder && (
-            <div className="relative flex flex-col items-center text-center px-6 pt-8 pb-7">
+            <div className="relative flex flex-col items-center text-center px-4 sm:px-6 pt-7 pb-6">
 
               {/* Close button */}
               <button
                 onClick={() => setSuccessUpdateOrderId(null)}
-                className="absolute top-6.5 right-6.5 w-6 h-6 rounded-full border-2 border-white/80 flex items-center justify-center hover:border-white transition-colors flex-shrink-0"
+                className="absolute top-4 right-4 w-6 h-6 rounded-full border-2 border-white/80 flex items-center justify-center hover:border-white transition-colors flex-shrink-0"
               >
                 <X className="w-3 h-3 text-white" strokeWidth={2.5} />
               </button>
 
               {/* Layered circle icon */}
-              <div className="relative flex items-center justify-center mb-6">
-                <div className="w-40 h-40 rounded-full bg-[#1A1A1D]" />
-                <div className="absolute w-28 h-28 rounded-full bg-[#222224]" />
+              <div className="relative flex items-center justify-center mb-5">
+                <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-[#1A1A1D]" />
+                <div className="absolute w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#222224]" />
                 <img
                   src="/image 12.png"
                   alt="Success"
-                  className="absolute w-20 h-20 object-contain drop-shadow-2xl"
+                  className="absolute w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-2xl"
                 />
               </div>
 
-              <DialogTitle className="text-2xl font-bold text-white mb-1">Order updated successfully</DialogTitle>
-              <DialogDescription className="text-sm text-[#8C8C8C] mb-5">
+              <DialogTitle className="text-xl sm:text-2xl font-bold text-white mb-1">Order updated successfully</DialogTitle>
+              <DialogDescription className="text-sm text-[#8C8C8C] mb-4">
                 {successOrder.progress >= 3
                   ? "Order has been delivered successfully"
                   : successOrder.progress === 2
@@ -775,31 +868,31 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
               </DialogDescription>
 
               {/* Order card */}
-              <div className="w-full bg-[#1A1A1D] rounded-2xl p-4 mb-4 text-left flex gap-4 items-center">
-                <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-white/5">
+              <div className="w-full bg-[#1A1A1D] rounded-2xl p-3 sm:p-4 mb-4 text-left flex gap-3 items-center">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden flex-shrink-0 bg-white/5">
                   <img src={successOrder.item.image} alt={successOrder.item.name} className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start mb-1">
                     <span className="text-[#FFAF2C] font-semibold text-sm">{successOrder.id}</span>
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ${successOrder.statusBg} ${successOrder.statusColor}`}>
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold ${successOrder.statusBg} ${successOrder.statusColor}`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${successOrder.dotColor}`} />
                       {successOrder.status}
                     </span>
                   </div>
-                  <div className="font-semibold text-white text-[15px] mb-0.5 truncate">{successOrder.item.name}</div>
+                  <div className="font-semibold text-white text-[14px] sm:text-[15px] mb-0.5 truncate">{successOrder.item.name}</div>
                   <div className="text-xs text-[#8C8C8C]">Buyer : <span className="text-white font-medium">{successOrder.buyer.name}</span></div>
                 </div>
               </div>
 
               {/* Approval reason */}
-              <div className="text-sm text-[#00D22B] mb-5">
+              <div className="text-xs sm:text-sm text-[#00D22B] mb-4">
                 Approval reason : Status changed to {successOrder.status}
               </div>
 
               <button
                 onClick={() => setSuccessUpdateOrderId(null)}
-                className="w-full h-12 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity border-0 outline-none">
+                className="w-full h-11 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity border-0 outline-none">
                 Back To Dashboard <ArrowRight className="w-4 h-4" />
               </button>
             </div>
