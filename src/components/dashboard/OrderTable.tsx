@@ -218,6 +218,51 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                     <span className="w-20 text-[#8C8C8C] shrink-0">Delivery :</span>
                     <span className="text-[#EBEBEB]">{order.delivery}</span>
                   </div>
+                  <div className="flex items-center">
+                    <span className="w-20 text-[#8C8C8C] shrink-0">AI Insights :</span>
+                    <span className="text-[#EBEBEB]">
+                      {order.aiAnalysis ? (
+                        (() => {
+                          const isAuthentic = (order.aiAnalysis.originalPercent ?? 0) >= (order.aiAnalysis.fakePercent ?? 0);
+                          const percentage = isAuthentic ? order.aiAnalysis.originalPercent : order.aiAnalysis.fakePercent;
+                          const tooltipReason = order.aiAnalysis.reason || "Materials, hardware engravings, and logo stamps are fully consistent with authentic brand specifications.";
+                          const tooltipBg = isAuthentic ? "bg-[#142518] border-[#1D3C22]" : "bg-[#2D1416] border-[#4C1C1F]";
+
+                          return (
+                            <div className="flex items-center gap-1.5" onClick={(e) => { e.stopPropagation(); }}>
+                              <span className={isAuthentic ? "text-[#107D2C] font-medium" : "text-[#FF383C] font-medium"}>
+                                {percentage}% {isAuthentic ? "Authentic" : "Fake"}
+                              </span>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <button 
+                                    type="button" 
+                                    className="cursor-pointer focus:outline-none"
+                                    onClick={(e) => { e.stopPropagation(); }}
+                                  >
+                                    <Info className="w-3.5 h-3.5 text-[#8C8C8C] hover:text-white transition-colors" />
+                                  </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent 
+                                  side="bottom"
+                                  sideOffset={8}
+                                  className={`w-64 p-3 ${tooltipBg} border text-white text-xs rounded-xl shadow-2xl text-center z-50`}
+                                >
+                                  <span className="block leading-relaxed">
+                                    {tooltipReason}
+                                  </span>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          );
+                        })()
+                      ) : (
+                        <span className="flex items-center gap-1 text-[#8C8C8C]">
+                          <Loader2 className="w-3 h-3 animate-spin" /> Analyzing...
+                        </span>
+                      )}
+                    </span>
+                  </div>
                 </div>
               </div>
             ))
