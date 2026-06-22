@@ -230,7 +230,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
 
                           return (
                             <div className="flex items-center gap-1.5" onClick={(e) => { e.stopPropagation(); }}>
-                              <span className={isAuthentic ? "text-[#107D2C] font-medium" : "text-[#FF383C] font-medium"}>
+                              <span className={isAuthentic ? "text-green-500 font-medium" : "text-[#FF383C] font-medium"}>
                                 {percentage}% {isAuthentic ? "Authentic" : "Fake"}
                               </span>
                               <DropdownMenu>
@@ -343,7 +343,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                         (() => {
                           const isAuthentic = (order.aiAnalysis.originalPercent ?? 0) >= (order.aiAnalysis.fakePercent ?? 0);
                           const percentage = isAuthentic ? order.aiAnalysis.originalPercent : order.aiAnalysis.fakePercent;
-                          const strokeColor = isAuthentic ? "#107D2C" : "#FF383C";
+                          const strokeColor = isAuthentic ? "#22c55e" : "#FF383C";
                           const radius = 16;
                           const circumference = 2 * Math.PI * radius;
                           const strokeDashoffset = circumference - (percentage / 100) * circumference;
