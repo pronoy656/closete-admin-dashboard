@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, ReactNode } from "react";
 
 export type Order = {
   id: string;
-  item: { name: string; desc: string; image: string; price: string };
+  item: { name: string; desc: string; image: string; images?: string[]; price: string };
   seller: { name: string; phone: string; location: string };
   buyer: { name: string; phone: string; location: string };
   pickup: string;
@@ -31,7 +31,7 @@ export type Order = {
 const initialOrders: Order[] = [
   {
     id: "#347892",
-    item: { name: "Gucci Diana Tote", desc: "Black Leather • Bamboo Handle", image: "/gucchi-bag.webp", price: "AED 3,200" },
+    item: { name: "Gucci Diana Tote", desc: "Black Leather • Bamboo Handle", image: "/gucchi-bag.webp", images: ["/gucchi-bag.webp", "/dior-bag.webp", "/gucchi-bag.webp"], price: "AED 3,200" },
     seller: { name: "Kim Kardashian", phone: "+1 (626) 389-2743", location: "Calabasas, CA" },
     buyer: { name: "Gigi Hadid", phone: "+1 (145) 125-3622", location: "New York, NY" },
     pickup: "Today • 11 AM-2 PM",
@@ -46,7 +46,7 @@ const initialOrders: Order[] = [
   },
   {
     id: "#234892",
-    item: { name: "Louis Vuitton Neverfull", desc: "Monogram Canvas", image: "/dior-bag.webp", price: "AED 4,500" },
+    item: { name: "Louis Vuitton Neverfull", desc: "Monogram Canvas", image: "/dior-bag.webp", images: ["/dior-bag.webp", "/gucchi-bag.webp", "/dior-bag.webp", "/gucchi-bag.webp"], price: "AED 4,500" },
     seller: { name: "Hailey Bieber", phone: "+1 (626) 389-2743", location: "Calabasas, CA" },
     buyer: { name: "Kendall Jenner", phone: "+1 (145) 125-3622", location: "New York, NY" },
     pickup: "Today • 3-6 PM",
@@ -61,7 +61,7 @@ const initialOrders: Order[] = [
   },
   {
     id: "#958743",
-    item: { name: "Dior Book Tote", desc: "Oblique Embroidery", image: "/dior-bag.webp", price: "AED 5,200" },
+    item: { name: "Dior Book Tote", desc: "Oblique Embroidery", image: "/dior-bag.webp", images: ["/dior-bag.webp", "/gucchi-bag.webp"], price: "AED 5,200" },
     seller: { name: "Kylie Jenner", phone: "+1 (626) 389-2743", location: "Hidden Hills, CA" },
     buyer: { name: "Bella Hadid", phone: "+1 (145) 125-3622", location: "New York, NY" },
     pickup: "Today • 10 AM-1 PM",
@@ -76,7 +76,7 @@ const initialOrders: Order[] = [
   },
   {
     id: "#495873",
-    item: { name: "Prada Re-Edition 2005", desc: "Nylon • Silver Hardware", image: "/gucchi-bag.webp", price: "AED 2,800" },
+    item: { name: "Prada Re-Edition 2005", desc: "Nylon • Silver Hardware", image: "/gucchi-bag.webp", images: ["/gucchi-bag.webp", "/dior-bag.webp", "/gucchi-bag.webp"], price: "AED 2,800" },
     seller: { name: "Olivia Rodrigo", phone: "+1 (626) 389-2743", location: "Beverly Hills, CA" },
     buyer: { name: "Selena Gomez", phone: "+1 (145) 125-3622", location: "New York, NY" },
     pickup: "Today • 1-4 PM",
@@ -91,7 +91,7 @@ const initialOrders: Order[] = [
   },
   {
     id: "#873927",
-    item: { name: "Classic Flap Bag", desc: "Black Caviar Leather • Gold Hardware", image: "/dior-bag.webp", price: "AED 45,000" },
+    item: { name: "Classic Flap Bag", desc: "Black Caviar Leather • Gold Hardware", image: "/dior-bag.webp", images: ["/dior-bag.webp", "/gucchi-bag.webp", "/dior-bag.webp"], price: "AED 45,000" },
     seller: { name: "Emma Richards", phone: "+1 (626) 389-2743", location: "Beverly Hills, CA" },
     buyer: { name: "Rachel Miller", phone: "+1 (145) 125-3622", location: "New York, NY" },
     pickup: "Today • 4-7 PM",
@@ -116,7 +116,7 @@ const initialOrders: Order[] = [
   },
   {
     id: "#235689",
-    item: { name: "Celine Boston Bag", desc: "Macadam Canvas", image: "/gucchi-bag.webp", price: "AED 1,500" },
+    item: { name: "Celine Boston Bag", desc: "Macadam Canvas", image: "/gucchi-bag.webp", images: ["/gucchi-bag.webp", "/dior-bag.webp"], price: "AED 1,500" },
     seller: { name: "Blake Lively", phone: "+1 (626) 389-2743", location: "New York, NY" },
     buyer: { name: "Ryan Reynolds", phone: "+1 (145) 125-3622", location: "New York, NY" },
     pickup: "Today • 9 AM-12 PM",
@@ -131,7 +131,7 @@ const initialOrders: Order[] = [
   },
   {
     id: "#578932",
-    item: { name: "Fendi Baguette", desc: "Zucca Canvas", image: "/dior-bag.webp", price: "AED 2,100" },
+    item: { name: "Fendi Baguette", desc: "Zucca Canvas", image: "/dior-bag.webp", images: ["/dior-bag.webp", "/gucchi-bag.webp", "/dior-bag.webp", "/gucchi-bag.webp"], price: "AED 2,100" },
     seller: { name: "Sarah Jessica Parker", phone: "+1 (626) 389-2743", location: "New York, NY" },
     buyer: { name: "Carrie Bradshaw", phone: "+1 (145) 125-3622", location: "New York, NY" },
     pickup: "Today • 6-9 PM",

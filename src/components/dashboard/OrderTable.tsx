@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Calendar, ChevronDown, Phone, MapPin, Check, ArrowRight, Info, ShoppingBag, ChevronLeft, ShieldCheck, AlertTriangle, AlertCircle, Loader2, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -64,6 +64,14 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
   const [buyerRejectReason, setBuyerRejectReason] = useState("Changed mind");
   const [issueDetails, setIssueDetails] = useState("");
   const [successUpdateOrderId, setSuccessUpdateOrderId] = useState<string | null>(null);
+
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    if (selectedOrderId) {
+      setCurrentImageIndex(0);
+    }
+  }, [selectedOrderId]);
 
   // Filter orders based on status
   const filteredOrders = showAllStatuses
@@ -455,8 +463,53 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
               <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 pb-6 no-scrollbar space-y-4">
 
                 {/* Image */}
-                <div className="w-full h-40 sm:h-48 rounded-xl overflow-hidden">
-                  <img src={selectedOrder?.item.image} alt={selectedOrder?.item.name} className="w-full h-full object-cover" />
+                <div className="relative w-full h-40 sm:h-48 mb-4">
+                  <div className="w-full h-full rounded-xl overflow-hidden relative">
+                    {selectedOrder?.item.images && selectedOrder.item.images.length > 1 ? (
+                      <>
+                        <div className="w-[88%] h-full">
+                          <div className="flex h-full w-full">
+                            {selectedOrder.item.images.map((img, idx) => (
+                              <div 
+                                key={idx}
+                                className="w-full h-full flex-shrink-0 pr-2 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]"
+                                style={idx === 0 ? { marginLeft: `-${currentImageIndex * 100}%` } : {}}
+                              >
+                                <img 
+                                  src={img} 
+                                  alt={`${selectedOrder.item.name} - ${idx + 1}`} 
+                                  className="w-full h-full object-cover rounded-xl" 
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentImageIndex((prev) => (prev + 1) % selectedOrder.item.images!.length);
+                          }}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full text-white bg-gradient-to-br from-white/20 to-black/10 backdrop-blur-md border border-white/20 shadow-[inset_1px_2px_5px_rgba(255,255,255,0.8),inset_-1px_-2px_5px_rgba(0,0,0,0.3),0_8px_20px_rgba(0,0,0,0.4)] transition-all z-10 group brightness-110 hover:brightness-125"
+                        >
+                          <ArrowRight className="w-5 h-5 drop-shadow-sm group-hover:scale-110 transition-transform" strokeWidth={2.5} />
+                        </button>
+                      </>
+                    ) : (
+                      <img src={selectedOrder?.item.image} alt={selectedOrder?.item.name} className="w-full h-full object-cover rounded-xl" />
+                    )}
+                  </div>
+                  
+                  {/* Dots exactly on the middle of the bottom border */}
+                  {selectedOrder?.item.images && selectedOrder.item.images.length > 1 && (
+                    <div className="absolute left-1/2 -translate-x-1/2 bottom-0 translate-y-1/2 flex items-center gap-1.5 px-3 py-1.5 bg-[#1A1A1D] rounded-full border border-white/10 z-20 shadow-lg">
+                      {selectedOrder.item.images.map((_, idx) => (
+                        <div 
+                          key={idx} 
+                          className={`rounded-full transition-all duration-300 ${idx === currentImageIndex ? "w-2 h-2 bg-[#FFAF2C]" : "w-1.5 h-1.5 bg-[#8C8C8C]"}`}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Header Info */}
