@@ -530,15 +530,17 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
 
                 {/* Windows */}
                 {selectedOrder?.status !== "Issue" && (
-                  <div className="bg-[#1A1A1D] rounded-xl overflow-hidden">
-                    <div className="flex divide-x divide-white/10">
-                      {/* Pickup */}
-                      <div className="flex-1 p-4 border-l-2 border-white/50">
+                  <div className="bg-[#1A1A1D] rounded-xl p-4 sm:p-5 flex gap-4">
+                    {/* Pickup */}
+                    <div className="flex-1">
+                      <div className="border-l border-white pl-3 sm:pl-4">
                         <div className="text-xs text-[#8C8C8C] mb-1.5">Pickup Window</div>
                         <div className="text-sm font-medium text-white leading-snug">{selectedOrder?.pickup.split('•').join(' · ')}</div>
                       </div>
-                      {/* Delivery */}
-                      <div className="flex-1 p-4 border-l-2 border-white/50">
+                    </div>
+                    {/* Delivery */}
+                    <div className="flex-1">
+                      <div className="border-l border-white pl-3 sm:pl-4">
                         <div className="text-xs text-[#8C8C8C] mb-1.5">Estimated Delivery</div>
                         <div className="text-sm font-medium text-white leading-snug">{selectedOrder?.delivery}</div>
                       </div>
@@ -722,17 +724,15 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
         </SheetContent>
       </Sheet>
 
-      {/* Report Issue Dialog */}
-      <Dialog open={sheetView === "reportIssue" && issueStep === "form"} onOpenChange={(open) => !open && setSheetView("details")}>
-        <DialogContent
-          className="text-white w-[calc(100vw-32px)] max-w-[500px] max-h-[85vh] p-0 shadow-2xl rounded-3xl overflow-hidden [&>button]:hidden"
-          style={{
-            background: 'linear-gradient(#0D0D0F, #0D0D0F) padding-box, linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.12) 40%, transparent 85%) border-box',
-            border: '1px solid transparent',
-          }}
+      {/* Report Issue Sheet */}
+      <Sheet open={sheetView === "reportIssue" && issueStep === "form"} onOpenChange={(open) => !open && setSheetView("details")}>
+        <SheetContent
+          side="right"
+          showCloseButton={false}
+          className="w-full max-w-[550px] bg-black border-l border-white/10 text-white p-0 overflow-hidden flex flex-col"
         >
           {selectedOrder && (
-            <div className="flex flex-col h-full w-full max-h-[85vh]">
+            <div className="flex flex-col h-full w-full">
               {/* Sticky Header */}
               <div className="px-4 sm:px-6 pt-6 pb-4 border-b border-white/5 flex-shrink-0 flex items-center justify-between">
                 <div>
@@ -852,24 +852,24 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                   <Info className="w-4 h-4 shrink-0" />
                   <span>This action may trigger refund or return flow</span>
                 </div>
+              </div>
 
-                {/* Inline Footer Button */}
-                <div className="pt-2">
-                  <button
-                    onClick={submitIssue}
-                    disabled={selectedIssueOption === "Other" && issueDetails.trim() === ""}
-                    className={`w-full py-3.5 text-sm font-semibold rounded-full flex items-center justify-center gap-2 transition-all ${selectedIssueOption === "Other" && issueDetails.trim() === ""
-                      ? "bg-white/10 text-[#8C8C8C] cursor-not-allowed"
-                      : "bg-gold-gradient text-black hover:opacity-90"
-                      }`}>
-                    Submit Issue <ArrowRight className="w-5 h-5" />
-                  </button>
-                </div>
+              {/* Fixed Footer */}
+              <div className="p-4 sm:px-6 sm:py-5 border-t border-white/5 flex-shrink-0 bg-black">
+                <button
+                  onClick={submitIssue}
+                  disabled={selectedIssueOption === "Other" && issueDetails.trim() === ""}
+                  className={`w-full py-3.5 text-sm font-semibold rounded-full flex items-center justify-center gap-2 transition-all ${selectedIssueOption === "Other" && issueDetails.trim() === ""
+                    ? "bg-white/10 text-[#8C8C8C] cursor-not-allowed"
+                    : "bg-gold-gradient text-black hover:opacity-90"
+                    }`}>
+                  Submit Issue <ArrowRight className="w-5 h-5" />
+                </button>
               </div>
             </div>
           )}
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
       {/* Issue Reported Success Dialog */}
       <Dialog open={issueStep === "success"} onOpenChange={(open) => !open && setIssueStep("form")}>
