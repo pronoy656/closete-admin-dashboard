@@ -226,51 +226,6 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                     <span className="w-20 text-[#8C8C8C] shrink-0">Delivery :</span>
                     <span className="text-[#EBEBEB]">{order.delivery}</span>
                   </div>
-                  <div className="flex items-center">
-                    <span className="w-20 text-[#8C8C8C] shrink-0">AI Insights :</span>
-                    <span className="text-[#EBEBEB]">
-                      {order.aiAnalysis ? (
-                        (() => {
-                          const isAuthentic = (order.aiAnalysis.originalPercent ?? 0) >= (order.aiAnalysis.fakePercent ?? 0);
-                          const percentage = isAuthentic ? order.aiAnalysis.originalPercent : order.aiAnalysis.fakePercent;
-                          const tooltipReason = order.aiAnalysis.reason || "Materials, hardware engravings, and logo stamps are fully consistent with authentic brand specifications.";
-                          const tooltipBg = isAuthentic ? "bg-[#142518] border-[#1D3C22]" : "bg-[#2D1416] border-[#4C1C1F]";
-
-                          return (
-                            <div className="flex items-center gap-1.5" onClick={(e) => { e.stopPropagation(); }}>
-                              <span className={isAuthentic ? "text-green-500 font-medium" : "text-[#FF383C] font-medium"}>
-                                {percentage}% {isAuthentic ? "Authentic" : "Fake"}
-                              </span>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <button 
-                                    type="button" 
-                                    className="cursor-pointer focus:outline-none"
-                                    onClick={(e) => { e.stopPropagation(); }}
-                                  >
-                                    <Info className="w-3.5 h-3.5 text-[#8C8C8C] hover:text-white transition-colors" />
-                                  </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent 
-                                  side="bottom"
-                                  sideOffset={8}
-                                  className={`w-64 p-3 ${tooltipBg} border text-white text-xs rounded-xl shadow-2xl text-center z-50`}
-                                >
-                                  <span className="block leading-relaxed">
-                                    {tooltipReason}
-                                  </span>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                          );
-                        })()
-                      ) : (
-                        <span className="flex items-center gap-1 text-[#8C8C8C]">
-                          <Loader2 className="w-3 h-3 animate-spin" /> Analyzing...
-                        </span>
-                      )}
-                    </span>
-                  </div>
                 </div>
               </div>
             ))
@@ -288,14 +243,13 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 <th className="px-6 py-5 border-y border-white/5">BUYER</th>
                 <th className="px-6 py-5 border-y border-white/5">PICKUP</th>
                 <th className="px-6 py-5 border-y border-white/5">DELIVERY</th>
-                <th className="px-6 py-5 text-center border-y border-white/5">AI INSIGHTS</th>
                 <th className="px-6 py-5 border-y border-r border-white/5 rounded-r-2xl">STATUS</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {filteredOrders.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-24 text-[#8C8C8C]">
+                  <td colSpan={7} className="text-center py-24 text-[#8C8C8C]">
                     <div className="flex flex-col items-center justify-center gap-2">
                       <img
                         src="/empty-cart.png"
@@ -345,84 +299,6 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                     </td>
                     <td className="px-6 py-4 text-[#8C8C8C]">
                       {order.delivery}
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      {order.aiAnalysis ? (
-                        (() => {
-                          const isAuthentic = (order.aiAnalysis.originalPercent ?? 0) >= (order.aiAnalysis.fakePercent ?? 0);
-                          const percentage = isAuthentic ? order.aiAnalysis.originalPercent : order.aiAnalysis.fakePercent;
-                          const strokeColor = isAuthentic ? "#22c55e" : "#FF383C";
-                          const radius = 16;
-                          const circumference = 2 * Math.PI * radius;
-                          const strokeDashoffset = circumference - (percentage / 100) * circumference;
-                          const tooltipReason = order.aiAnalysis.reason || "Materials, hardware engravings, and logo stamps are fully consistent with authentic brand specifications.";
-
-                          const tooltipBg = isAuthentic ? "bg-[#142518] border-[#1D3C22]" : "bg-[#2D1416] border-[#4C1C1F]";
-                          const caretBorderColor = isAuthentic ? "border-b-[#1D3C22]" : "border-b-[#4C1C1F]";
-                          const caretBgColor = isAuthentic ? "border-b-[#142518]" : "border-b-[#2D1416]";
-
-                          return (
-                            <div className="flex flex-col items-center justify-center gap-1.5 mx-auto w-fit">
-                              {/* Circular progress bar */}
-                              <div className="relative flex items-center justify-center w-12 h-12">
-                                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                                  {/* Background Track */}
-                                  <circle
-                                    cx="18"
-                                    cy="18"
-                                    r={radius}
-                                    fill="none"
-                                    stroke="#27272A"
-                                    strokeWidth="3.5"
-                                  />
-                                  {/* Progress Segment */}
-                                  <circle
-                                    cx="18"
-                                    cy="18"
-                                    r={radius}
-                                    fill="none"
-                                    stroke={strokeColor}
-                                    strokeWidth="3.5"
-                                    strokeDasharray={circumference}
-                                    strokeDashoffset={strokeDashoffset}
-                                    strokeLinecap="round"
-                                    className="transition-all duration-1000 ease-out"
-                                  />
-                                </svg>
-                                <span className="absolute text-[11px] font-semibold text-white">{percentage}%</span>
-                              </div>
-
-                              {/* Label & Tooltip */}
-                              <div onClick={(e) => e.stopPropagation()}>
-                                <Tooltip delayDuration={100}>
-                                  <TooltipTrigger asChild>
-                                    <div className="relative group/tooltip inline-flex items-center gap-1 cursor-pointer">
-                                      <span className="text-xs text-[#8C8C8C] group-hover/tooltip:text-white transition-colors">
-                                        {isAuthentic ? "Authentic" : "Fake"}
-                                      </span>
-                                      <Info className="w-3.5 h-3.5 text-[#8C8C8C] group-hover/tooltip:text-white transition-colors" />
-                                    </div>
-                                  </TooltipTrigger>
-                                  <TooltipContent 
-                                    side="bottom"
-                                    sideOffset={8}
-                                    className={`w-64 p-3 ${tooltipBg} border text-white text-xs rounded-xl shadow-2xl text-center`}
-                                  >
-                                    <span className="block leading-relaxed">
-                                      {tooltipReason}
-                                    </span>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </div>
-                            </div>
-                          );
-                        })()
-                      ) : (
-                        <div className="flex flex-col items-center justify-center gap-2 text-xs text-[#8C8C8C] mx-auto w-fit">
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          <span>Analyzing...</span>
-                        </div>
-                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium transition-colors duration-500 ${order.statusBg} ${order.statusColor}`}>
