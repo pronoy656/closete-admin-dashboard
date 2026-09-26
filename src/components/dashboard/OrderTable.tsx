@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { Search, Calendar, ChevronDown, Phone, MapPin, Check, ArrowRight, Info, ShoppingBag, ChevronLeft, ShieldCheck, AlertTriangle, AlertCircle, Loader2, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useOrders, Order } from "@/context/OrdersContext";
+import { formatImageUrl } from "@/lib/utils";
+import { adminApi } from "@/lib/api";
 import {
   Sheet,
   SheetContent,
@@ -30,18 +32,167 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 
-const issueOptions = [
-  { id: "Item failed verification", desc: "Authentication mismatch detected" },
-  { id: "Seller unavailable", desc: "Seller could not complete pickup" },
-  { id: "Buyer rejected", desc: "Buyer rejected item at delivery" },
-  { id: "Other", desc: "Add issue manually" },
-];
+export type IssueOptionItem = {
+  id: string;
+  desc: string;
+  issueType: string;
+  defaultOutcome: string;
+  hasSubReasons?: boolean;
+  subReasons?: string[];
+};
+
+export const getIssueOptionsForStatus = (status?: string): IssueOptionItem[] => {
+  const s = (status || "Reserved").toLowerCase();
+
+  // Stage 1: Reserved / Awaiting Collection
+  if (s === "reserved" || s === "secured" || s === "collection_pending" || s === "awaiting collection") {
+    return [
+      {
+        id: "Seller unavailable",
+        desc: "Seller could not complete pickup",
+        issueType: "seller_unavailable",
+        defaultOutcome: "seller_unavailable",
+      },
+      {
+        id: "Buyer cancelled",
+        desc: "Buyer requested cancellation before collection",
+        issueType: "buyer_refused",
+        defaultOutcome: "buyer_changed_mind",
+      },
+      {
+        id: "Other",
+        desc: "Add issue manually",
+        issueType: "others",
+        defaultOutcome: "others",
+      },
+    ];
+  }
+
+  // Stage 2: Collected (At Hub / In transit to Hub)
+  if (s === "collected" || s === "in_transit") {
+    return [
+      {
+        id: "Item failed verification",
+        desc: "Authentication mismatch detected",
+        issueType: "verification_failed",
+        defaultOutcome: "authentication_failed",
+        hasSubReasons: true,
+        subReasons: ["Authentication mismatch", "Counterfeit / Replica", "Missing proof of authenticity"],
+      },
+      {
+        id: "Condition differs from listing",
+        desc: "Undisclosed flaws, stains or damage found",
+        issueType: "buyer_refused",
+        defaultOutcome: "condition_differs",
+      },
+      {
+        id: "Damaged in transit",
+        desc: "Item was damaged during pickup/transit to hub",
+        issueType: "buyer_refused",
+        defaultOutcome: "condition_differs",
+      },
+      {
+        id: "Buyer requested cancellation",
+        desc: "Buyer requested cancellation after collection",
+        issueType: "buyer_refused",
+        defaultOutcome: "buyer_changed_mind",
+      },
+      {
+        id: "Other",
+        desc: "Add issue manually",
+        issueType: "others",
+        defaultOutcome: "others",
+      },
+    ];
+  }
+
+  // Stage 3: Verification / Authenticated
+  if (s === "verified" || s === "verification" || s === "authenticated") {
+    return [
+      {
+        id: "Item failed verification",
+        desc: "Authentication mismatch detected",
+        issueType: "verification_failed",
+        defaultOutcome: "authentication_failed",
+        hasSubReasons: true,
+        subReasons: ["Authentication mismatch", "Counterfeit / Replica", "Missing proof of authenticity"],
+      },
+      {
+        id: "Condition differs from listing",
+        desc: "Undisclosed flaws, stains or damage found",
+        issueType: "buyer_refused",
+        defaultOutcome: "condition_differs",
+      },
+      {
+        id: "Missing inclusions / packaging",
+        desc: "Original box, dust bag or invoice missing",
+        issueType: "buyer_refused",
+        defaultOutcome: "not_as_described",
+      },
+      {
+        id: "Other",
+        desc: "Add issue manually",
+        issueType: "others",
+        defaultOutcome: "others",
+      },
+    ];
+  }
+
+  // Stage 4: Dispatched / Out for Delivery
+  if (s === "dispatched" || s === "ready_for_delivery") {
+    return [
+      {
+        id: "Buyer rejected",
+        desc: "Buyer rejected item at delivery",
+        issueType: "buyer_refused",
+        defaultOutcome: "buyer_changed_mind",
+        hasSubReasons: true,
+        subReasons: ["Changed mind", "Not as described", "Condition issue", "Other"],
+      },
+      {
+        id: "Buyer unreachable",
+        desc: "Buyer could not be reached after delivery attempts",
+        issueType: "buyer_refused",
+        defaultOutcome: "others",
+      },
+      {
+        id: "Damaged during delivery",
+        desc: "Package damaged while out for delivery",
+        issueType: "buyer_refused",
+        defaultOutcome: "condition_differs",
+      },
+      {
+        id: "Other",
+        desc: "Add issue manually",
+        issueType: "others",
+        defaultOutcome: "others",
+      },
+    ];
+  }
+
+  // Stage 5: Delivered / Completed or fallback
+  return [
+    {
+      id: "Post-delivery dispute",
+      desc: "Buyer raised dispute within return window",
+      issueType: "buyer_refused",
+      defaultOutcome: "others",
+    },
+    {
+      id: "Other",
+      desc: "Add issue manually",
+      issueType: "others",
+      defaultOutcome: "others",
+    },
+  ];
+};
 
 const orderSteps = [
   { title: "Reserved", desc: "Item reserved for you" },
   { title: "Collected", desc: "Picked up from seller" },
-  { title: "Verified", desc: "Authentication pending" },
-  { title: "Delivered", desc: "Delivery pending" }
+  { title: "Authenticated", desc: "Authentication passed" },
+  { title: "Dispatched", desc: "In transit to buyer" },
+  { title: "Delivered", desc: "Delivered to buyer" }
 ];
 
 type OrderTableProps = {
@@ -52,7 +203,7 @@ type OrderTableProps = {
 
 export default function OrderTable({ title, filterStatus, showAllStatuses }: OrderTableProps) {
   const router = useRouter();
-  const { orders, advanceOrder, resolveIssue } = useOrders();
+  const { orders, advanceOrder, resolveIssue, refreshOrders } = useOrders();
 
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -60,9 +211,11 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
   // Issue reporting state
   const [sheetView, setSheetView] = useState<"details" | "reportIssue">("details");
   const [issueStep, setIssueStep] = useState<"form" | "success">("form");
-  const [selectedIssueOption, setSelectedIssueOption] = useState<string>("Buyer rejected");
-  const [buyerRejectReason, setBuyerRejectReason] = useState("Changed mind");
+  const [selectedIssueOption, setSelectedIssueOption] = useState<string>("");
+  const [subReason, setSubReason] = useState("");
   const [issueDetails, setIssueDetails] = useState("");
+  const [isSubmittingIssue, setIsSubmittingIssue] = useState(false);
+  const [issueSubmitError, setIssueSubmitError] = useState<string | null>(null);
   const [successUpdateOrderId, setSuccessUpdateOrderId] = useState<string | null>(null);
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -86,7 +239,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
 
   const handleProgress = () => {
     if (!selectedOrder) return;
-    if (selectedOrder.progress >= 3) return;
+    if (selectedOrder.progress >= 4) return;
 
     advanceOrder(selectedOrder.id);
     setSuccessUpdateOrderId(selectedOrder.id);
@@ -103,20 +256,113 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
     setSelectedOrderId(null);
   };
 
+  const currentAvailableOptions = selectedOrder
+    ? getIssueOptionsForStatus(selectedOrder.status)
+    : [];
+
   const openReportIssue = (order: Order) => {
+    const opts = getIssueOptionsForStatus(order.status);
     setSelectedOrderId(order.id);
     setSheetView("reportIssue");
     setIssueStep("form");
-    setSelectedIssueOption("Buyer rejected");
-    setBuyerRejectReason("Changed mind");
+    setSelectedIssueOption(opts[0]?.id || "Other");
+    if (opts[0]?.hasSubReasons && opts[0]?.subReasons?.length) {
+      setSubReason(opts[0].subReasons[0]);
+    } else {
+      setSubReason("");
+    }
     setIssueDetails("");
+    setIssueSubmitError(null);
   };
 
-  const submitIssue = () => {
-    setSelectedOrderId(null);
-    setSheetView("details");
-    setIssueStep("success");
+  const submitIssue = async () => {
+    if (!selectedOrder) return;
+    const prodId = selectedOrder.productId;
+    const ordId = selectedOrder.backendId;
+
+    if (!prodId && !ordId) {
+      setIssueSubmitError("Order or Product reference is missing.");
+      return;
+    }
+
+    const matchedOption = currentAvailableOptions.find(
+      (opt) => opt.id === selectedIssueOption
+    );
+
+    let issueType = matchedOption?.issueType || "others";
+    let outcome = matchedOption?.defaultOutcome || "others";
+    let reason = matchedOption?.desc || "Issue reported";
+
+    if (selectedIssueOption === "Item failed verification") {
+      issueType = "verification_failed";
+      outcome = subReason?.includes("Counterfeit") ? "counterfeit" : "authentication_failed";
+      reason = subReason ? `Item failed verification: ${subReason}` : "Authentication mismatch detected";
+    } else if (selectedIssueOption === "Buyer rejected at doorstep" || selectedIssueOption === "Buyer rejected") {
+      issueType = "buyer_refused";
+      if (subReason === "Not as described") {
+        outcome = "not_as_described";
+        reason = "Buyer reported that the item was not as described";
+      } else if (subReason === "Condition issue") {
+        outcome = "condition_differs";
+        reason = "Buyer reported that the item condition differed from listing";
+      } else if (subReason === "Changed mind") {
+        outcome = "buyer_changed_mind";
+        reason = "Buyer changed their mind at delivery";
+      } else {
+        outcome = "others";
+        reason = issueDetails.trim() || subReason || "Buyer rejected item";
+      }
+    } else if (selectedIssueOption === "Seller unavailable") {
+      issueType = "seller_unavailable";
+      outcome = "seller_unavailable";
+      reason = "Seller could not complete pickup or was unavailable";
+    } else if (selectedIssueOption === "Buyer cancelled" || selectedIssueOption === "Buyer requested cancellation") {
+      issueType = "buyer_refused";
+      outcome = "buyer_changed_mind";
+      reason = "Buyer requested order cancellation";
+    } else if (selectedIssueOption === "Condition differs from listing" || selectedIssueOption === "Damaged in transit" || selectedIssueOption === "Damaged during delivery") {
+      issueType = "buyer_refused";
+      outcome = "condition_differs";
+      reason = matchedOption?.desc || "Condition differs or item damaged";
+    } else if (selectedIssueOption === "Missing inclusions / packaging") {
+      issueType = "buyer_refused";
+      outcome = "not_as_described";
+      reason = "Original inclusions or packaging missing";
+    } else if (selectedIssueOption === "Other") {
+      issueType = "others";
+      outcome = "others";
+      reason = issueDetails.trim() || "Issue reported manually by admin";
+    }
+
+    setIsSubmittingIssue(true);
+    setIssueSubmitError(null);
+    try {
+      const res = await adminApi.reportIssue({
+        productId: prodId,
+        orderId: ordId,
+        issueType,
+        outcome,
+        reason,
+      });
+
+      if (!res.success) {
+        setIssueSubmitError(res.message || "Failed to submit issue");
+        return;
+      }
+
+      setSuccessUpdateOrderId(selectedOrder.id);
+      await refreshOrders();
+      setSelectedOrderId(null);
+      setSheetView("details");
+      setIssueStep("success");
+    } catch (err: any) {
+      setIssueSubmitError(err?.message || "Failed to report issue");
+    } finally {
+      setIsSubmittingIssue(false);
+    }
   };
+
+
 
   const handleBackToDashboard = () => {
     setIssueStep("form");
@@ -186,7 +432,14 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 {/* Card top: image + name + status */}
                 <div className="flex items-center gap-3 p-3 pb-2.5">
                   <div className="w-11 h-11 rounded-xl overflow-hidden bg-white/10 flex-shrink-0">
-                    <img src={order.item.image} alt={order.item.name} className="w-full h-full object-cover" />
+                    <img
+                      src={formatImageUrl(order.item.image)}
+                      alt={order.item.name}
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = "/gucchi-bag.webp";
+                      }}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <span className="flex-1 font-medium text-[#EBEBEB] text-[15px] leading-tight truncate">{order.item.name}</span>
                   <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold shrink-0 ${order.statusBg} ${order.statusColor}`}>
@@ -204,11 +457,20 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                     <span className="w-20 text-[#8C8C8C] shrink-0">Order ID :</span>
                     <span className="font-semibold text-[#FFAF2C]">{order.id}</span>
                   </div>
-                  <div className="flex">
+                  <div className="flex items-center">
                     <span className="w-20 text-[#8C8C8C] shrink-0">Seller :</span>
-                    <span className="text-[#EBEBEB] truncate">
-                      <span className="text-[#8C8C8C] mr-1 text-[11px]">{order.seller.location}</span>
+                    <span className="text-[#EBEBEB] truncate flex items-center gap-1.5">
+                      <span className="text-[#8C8C8C] text-[11px]">{order.seller.location}</span>
                       {order.seller.name}
+                      {order.seller.payoutsEnabled ? (
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          ✓ Payout
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                          Pending
+                        </span>
+                      )}
                     </span>
                   </div>
                   <div className="flex">
@@ -277,14 +539,32 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded bg-white/10 flex-shrink-0 overflow-hidden">
-                          <img src={order.item.image} alt={order.item.name} className="w-full h-full object-cover" />
+                          <img
+                            src={formatImageUrl(order.item.image)}
+                            alt={order.item.name}
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = "/gucchi-bag.webp";
+                            }}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
                         <span className="font-medium text-[#EBEBEB] w-24 truncate">{order.item.name}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
-                        <span className="font-medium text-[#EBEBEB]">{order.seller.name}</span>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-medium text-[#EBEBEB]">{order.seller.name}</span>
+                          {order.seller.payoutsEnabled ? (
+                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" title="Stripe Payout Account Connected">
+                              ✓ Payout Connected
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20" title="Payout Setup Pending">
+                              Payout Pending
+                            </span>
+                          )}
+                        </div>
                         <span className="text-xs text-[#8C8C8C]">{order.seller.location}</span>
                       </div>
                     </td>
@@ -352,8 +632,11 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                                 style={idx === 0 ? { marginLeft: `-${currentImageIndex * 100}%` } : {}}
                               >
                                 <img 
-                                  src={img} 
-                                  alt={`${selectedOrder.item.name} - ${idx + 1}`} 
+                                  src={formatImageUrl(img)} 
+                                  alt={`${selectedOrder.item.name} - ${idx + 1}`}
+                                  onError={(e) => {
+                                    (e.currentTarget as HTMLImageElement).src = "/gucchi-bag.webp";
+                                  }}
                                   className="w-full h-full object-cover rounded-xl" 
                                 />
                               </div>
@@ -371,7 +654,14 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                         </button>
                       </>
                     ) : (
-                      <img src={selectedOrder?.item.image} alt={selectedOrder?.item.name} className="w-full h-full object-cover rounded-xl" />
+                      <img
+                        src={formatImageUrl(selectedOrder?.item.image)}
+                        alt={selectedOrder?.item.name}
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = "/gucchi-bag.webp";
+                        }}
+                        className="w-full h-full object-cover rounded-xl"
+                      />
                     )}
                   </div>
                   
@@ -427,7 +717,12 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 {/* Seller / Buyer */}
                 <div className="flex flex-col sm:flex-row gap-3">
                   <div className="flex-1">
-                    <div className="text-sm text-[#8C8C8C] uppercase mb-2 font-medium">Seller</div>
+                    <div className="text-sm text-[#8C8C8C] uppercase mb-2 font-medium flex items-center justify-between">
+                      <span>Seller</span>
+                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 capitalize tracking-normal">
+                        <Check className="w-3 h-3" /> Payout Account Connected
+                      </span>
+                    </div>
                     <div className="bg-[#1A1A1D] rounded-xl p-5">
                       <div className="font-semibold text-lg mb-2">{selectedOrder?.seller.name}</div>
                       <div className="flex items-center gap-2 text-[15px] text-[#8C8C8C] mb-2">
@@ -567,30 +862,23 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 )}
 
                 {/* Action Buttons */}
-                {selectedOrder && selectedOrder.status !== "Issue" && (
-                  selectedOrder.progress < 3 ? (
-                    <div className="flex flex-col sm:flex-row gap-3 w-full">
-                      <button
-                        onClick={handleProgress}
-                        className="w-full py-3.5 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity border-0 outline-none text-sm">
-                        {selectedOrder.progress === 0 && "Mark As Collected"}
-                        {selectedOrder.progress === 1 && "Mark As Verified"}
-                        {selectedOrder.progress === 2 && "Mark As Delivered"}
-                        <ArrowRight className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => openReportIssue(selectedOrder)}
-                        className="w-full py-3.5 bg-[#27272A] text-[#8C8C8C] font-semibold rounded-full flex items-center justify-center hover:bg-white/5 transition-colors border border-white/10 text-sm">
-                        Report an Issue
-                      </button>
-                    </div>
-                  ) : (
+                {selectedOrder && selectedOrder.status !== "Issue" && selectedOrder.progress < 4 && (
+                  <div className="flex flex-col sm:flex-row gap-3 w-full">
+                    <button
+                      onClick={handleProgress}
+                      className="w-full py-3.5 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity border-0 outline-none text-sm cursor-pointer">
+                      {selectedOrder.progress === 0 && "Mark As Collected"}
+                      {selectedOrder.progress === 1 && "Mark As Authenticated"}
+                      {selectedOrder.progress === 2 && "Mark As Dispatched"}
+                      {selectedOrder.progress === 3 && "Mark As Delivered"}
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
                     <button
                       onClick={() => openReportIssue(selectedOrder)}
-                      className="w-full h-12 bg-[#27272A] text-[#8C8C8C] font-semibold rounded-full flex items-center justify-center hover:bg-white/5 transition-colors border border-white/10 text-sm">
-                      Report An Issue
+                      className="w-full py-3.5 bg-[#27272A] text-[#8C8C8C] font-semibold rounded-full flex items-center justify-center hover:bg-white/5 transition-colors border border-white/10 text-sm cursor-pointer">
+                      Report an Issue
                     </button>
-                  )
+                  </div>
                 )}
               </div>
 
@@ -629,7 +917,14 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 {/* Order summary card */}
                 <div className="bg-[#1A1A1D] border border-white/5 rounded-xl p-4 flex gap-4 items-center">
                   <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
-                    <img src={selectedOrder.item.image} alt="Item" className="w-full h-full object-cover" />
+                    <img
+                      src={formatImageUrl(selectedOrder.item.image)}
+                      alt="Item"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = "/gucchi-bag.webp";
+                      }}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-[#FFAF2C] font-medium text-sm mb-1">{selectedOrder.id}</div>
@@ -642,18 +937,24 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                 <div>
                   <div className="text-xs text-[#8C8C8C] uppercase font-medium mb-3">Issue Options</div>
                   <div className="space-y-3">
-                    {issueOptions.map((opt) => {
+                    {currentAvailableOptions.map((opt) => {
                       const isSelected = selectedIssueOption === opt.id;
+                      const hasSub = !!(opt.hasSubReasons && opt.subReasons?.length);
                       return (
                         <div key={opt.id} className="space-y-2">
                           <div
                             onClick={() => {
                               setSelectedIssueOption(opt.id);
+                              if (hasSub && opt.subReasons?.length) {
+                                setSubReason(opt.subReasons[0]);
+                              } else {
+                                setSubReason("");
+                              }
                               if (opt.id !== "Other") {
                                 setIssueDetails("");
                               }
                             }}
-                            className={`${isSelected && opt.id === "Buyer rejected" ? 'flex flex-col gap-3' : 'flex items-center justify-between'} p-4 rounded-xl border cursor-pointer transition-colors ${isSelected ? 'bg-[#1A1A1D] border-[#FFAF2C]' : 'bg-black border-white/10 hover:border-white/20'}`}
+                            className={`${isSelected && hasSub ? 'flex flex-col gap-3' : 'flex items-center justify-between'} p-4 rounded-xl border cursor-pointer transition-colors ${isSelected ? 'bg-[#1A1A1D] border-[#FFAF2C]' : 'bg-black border-white/10 hover:border-white/20'}`}
                           >
                             <div className="flex items-center justify-between w-full">
                               <div>
@@ -664,7 +965,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                                 {isSelected && <div className="w-2.5 h-2.5 bg-[#FFAF2C] rounded-full" />}
                               </div>
                             </div>
-                            {isSelected && opt.id === "Buyer rejected" && (
+                            {isSelected && hasSub && opt.subReasons && (
                               <div
                                 className="relative w-full"
                                 onClick={(e) => e.stopPropagation()}
@@ -675,7 +976,7 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                                   onClick={() => setDropdownOpen((o) => !o)}
                                   className="w-full bg-[#1E1E21] border border-white/10 rounded-xl h-12 px-4 text-sm text-white flex items-center justify-between focus:outline-none"
                                 >
-                                  <span>{buyerRejectReason}</span>
+                                  <span>{subReason || opt.subReasons[0]}</span>
                                   {dropdownOpen
                                     ? <ChevronDown className="w-4 h-4 text-[#8C8C8C] rotate-180 transition-transform" />
                                     : <ChevronDown className="w-4 h-4 text-[#8C8C8C] transition-transform" />}
@@ -684,18 +985,18 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                                 {/* Dropdown list */}
                                 {dropdownOpen && (
                                   <div className="absolute left-0 right-0 top-[calc(100%+4px)] bg-[#1E1E21] rounded-xl border border-white/10 overflow-hidden z-50 shadow-2xl">
-                                    {["Changed mind", "Not as described", "Condition issue", "Other"].map((opt) => (
+                                    {opt.subReasons.map((sub) => (
                                       <button
-                                        key={opt}
+                                        key={sub}
                                         type="button"
                                         onClick={() => {
-                                          setBuyerRejectReason(opt);
+                                          setSubReason(sub);
                                           setDropdownOpen(false);
                                         }}
                                         className="w-full flex items-center justify-between px-4 py-3.5 text-sm text-[#8C8C8C] hover:bg-white/5 transition-colors text-left"
                                       >
-                                        <span className={buyerRejectReason === opt ? "text-white font-medium" : ""}>{opt}</span>
-                                        {buyerRejectReason === opt && (
+                                        <span className={subReason === sub ? "text-white font-medium" : ""}>{sub}</span>
+                                        {subReason === sub && (
                                           <Check className="w-4 h-4 text-white" />
                                         )}
                                       </button>
@@ -724,6 +1025,12 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                   </div>
                 )}
 
+                {issueSubmitError && (
+                  <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-400">
+                    {issueSubmitError}
+                  </div>
+                )}
+
                 <div className="flex items-center gap-2 text-xs text-red-500">
                   <Info className="w-4 h-4 shrink-0" />
                   <span>This action may trigger refund or return flow</span>
@@ -734,12 +1041,21 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
               <div className="p-4 sm:px-6 sm:py-5 border-t border-white/5 flex-shrink-0 bg-black">
                 <button
                   onClick={submitIssue}
-                  disabled={selectedIssueOption === "Other" && issueDetails.trim() === ""}
-                  className={`w-full py-3.5 text-sm font-semibold rounded-full flex items-center justify-center gap-2 transition-all ${selectedIssueOption === "Other" && issueDetails.trim() === ""
+                  disabled={isSubmittingIssue || (selectedIssueOption === "Other" && issueDetails.trim() === "")}
+                  className={`w-full py-3.5 text-sm font-semibold rounded-full flex items-center justify-center gap-2 transition-all ${
+                    isSubmittingIssue || (selectedIssueOption === "Other" && issueDetails.trim() === "")
                     ? "bg-white/10 text-[#8C8C8C] cursor-not-allowed"
                     : "bg-gold-gradient text-black hover:opacity-90"
                     }`}>
-                  Submit Issue <ArrowRight className="w-5 h-5" />
+                  {isSubmittingIssue ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" /> Submitting Issue...
+                    </>
+                  ) : (
+                    <>
+                      Submit Issue <ArrowRight className="w-5 h-5" />
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -844,7 +1160,14 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
               {/* Order card */}
               <div className="w-full bg-[#1A1A1D] rounded-2xl p-3 sm:p-4 mb-4 text-left flex gap-3 items-center">
                 <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden flex-shrink-0 bg-white/5">
-                  <img src={successOrder.item.image} alt={successOrder.item.name} className="w-full h-full object-cover" />
+                  <img
+                    src={formatImageUrl(successOrder.item.image)}
+                    alt={successOrder.item.name}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = "/gucchi-bag.webp";
+                    }}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start mb-1">

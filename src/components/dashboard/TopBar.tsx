@@ -43,9 +43,9 @@ export default function TopBar({ onMenuToggle }: TopBarProps) {
           </button>
 
           {/* Avatar */}
-          <button className="h-10 w-10 rounded-full overflow-hidden border-2 border-[#FFAF2C]/60">
-            <Image src="/auth-hero.png" alt="User" width={40} height={40} className="object-cover h-full w-full" />
-          </button>
+          <div className="h-10 w-10 rounded-full bg-[#FFAF2C]/10 border-2 border-[#FFAF2C]/60 flex items-center justify-center text-[#FFAF2C] font-semibold text-sm">
+            AD
+          </div>
         </div>
       </div>
     </>

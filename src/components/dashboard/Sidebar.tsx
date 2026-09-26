@@ -9,17 +9,21 @@ import {
   PackageCheck,
   ShieldCheck,
   Truck,
+  CheckCircle2,
   AlertCircle,
   LogOut,
-  X
+  X,
+  ClipboardList
 } from "lucide-react";
 
 const items = [
+  { href: "/pending-review", label: "Pending Review", Icon: ClipboardList },
   { href: "/all-orders", label: "All Orders", Icon: FileText },
   { href: "/awaiting-collection", label: "Awaiting Collection", Icon: Clock },
   { href: "/collected", label: "Collected", Icon: PackageCheck },
-  { href: "/verified", label: "Verified", Icon: ShieldCheck },
-  { href: "/delivered", label: "Delivered", Icon: Truck },
+  { href: "/verified", label: "Authenticated", Icon: ShieldCheck },
+  { href: "/dispatched", label: "Dispatched", Icon: Truck },
+  { href: "/delivered", label: "Delivered", Icon: CheckCircle2 },
   { href: "/issues", label: "Issues", Icon: AlertCircle },
 ];
 
