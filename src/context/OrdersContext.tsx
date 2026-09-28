@@ -138,7 +138,7 @@ function mapBackendOrderToOrder(raw: any): Order {
     seller: {
       name: seller.name || "Verified Seller",
       phone: seller.phone || seller.contact || "+971 50 123 4567",
-      location: seller.location || del.location || "Dubai, UAE",
+      location: seller.location || seller.address || seller.city || prod.collectionAddress || "Dubai, UAE",
       payoutsEnabled: Boolean(
         seller.payoutsEnabled || seller.stripeAccountId,
       ),
@@ -149,7 +149,7 @@ function mapBackendOrderToOrder(raw: any): Order {
     buyer: {
       name: buyer.name || del.name || "Buyer",
       phone: del.phone || buyer.phone || "+971 52 987 6543",
-      location: del.address || buyer.location || "Dubai, UAE",
+      location: del.address || del.location || buyer.location || buyer.address || "Dubai, UAE",
     },
     pickup: raw.pickupWindow?.start
       ? `Today • ${new Date(raw.pickupWindow.start).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`

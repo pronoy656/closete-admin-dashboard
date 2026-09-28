@@ -31,6 +31,151 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+// Exact SVG Icons from Closete UI Design File (1)
+function SearchIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <path
+        d="M9.58464 17.5003C13.9569 17.5003 17.5013 13.9559 17.5013 9.58366C17.5013 5.2114 13.9569 1.66699 9.58464 1.66699C5.21238 1.66699 1.66797 5.2114 1.66797 9.58366C1.66797 13.9559 5.21238 17.5003 9.58464 17.5003Z"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M18.3346 18.3337L16.668 16.667"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function CalendarIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <path
+        d="M6.66797 1.66699V4.16699"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M13.332 1.66699V4.16699"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M2.91797 7.5752H17.0846"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M17.5 7.08366V14.167C17.5 16.667 16.25 18.3337 13.3333 18.3337H6.66667C3.75 18.3337 2.5 16.667 2.5 14.167V7.08366C2.5 4.58366 3.75 2.91699 6.66667 2.91699H13.3333C16.25 2.91699 17.5 4.58366 17.5 7.08366Z"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M13.0781 11.416H13.0856"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M13.0781 13.916H13.0856"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.99609 11.416H10.0036"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.99609 13.916H10.0036"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M6.91016 11.416H6.91764"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M6.91016 13.916H6.91764"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function VerifiedBadge({ className }: { className?: string }) {
+  return (
+    <svg
+      width="15"
+      height="15"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <path
+        d="M8.0026 14.6693C11.6693 14.6693 14.6693 11.6693 14.6693 8.0026C14.6693 4.33594 11.6693 1.33594 8.0026 1.33594C4.33594 1.33594 1.33594 4.33594 1.33594 8.0026C1.33594 11.6693 4.33594 14.6693 8.0026 14.6693Z"
+        stroke="#107D2C"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M5.17188 8.00384L7.05854 9.89051L10.8385 6.11719"
+        stroke="#107D2C"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 
 export type IssueOptionItem = {
   id: string;
@@ -219,6 +364,9 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
   const [successUpdateOrderId, setSuccessUpdateOrderId] = useState<string | null>(null);
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDateFilter, setSelectedDateFilter] = useState("15 Jun, 2026");
+  const [statusFilterOverride, setStatusFilterOverride] = useState<string>("All");
 
   useEffect(() => {
     if (selectedOrderId) {
@@ -226,13 +374,37 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
     }
   }, [selectedOrderId]);
 
-  // Filter orders based on status
-  const filteredOrders = showAllStatuses
-    ? orders
-    : orders.filter(o => {
-      if (Array.isArray(filterStatus)) return filterStatus.includes(o.status);
-      return o.status === filterStatus;
-    });
+  // Filter orders based on status & search query
+  const filteredOrders = orders.filter((o) => {
+    // 1. Status Filter
+    if (statusFilterOverride !== "All") {
+      if (statusFilterOverride === "Issues") {
+        if (o.status !== "Issue" && o.status !== "Issues") return false;
+      } else if (o.status.toLowerCase() !== statusFilterOverride.toLowerCase()) {
+        return false;
+      }
+    } else if (!showAllStatuses && filterStatus) {
+      if (Array.isArray(filterStatus)) {
+        if (!filterStatus.includes(o.status)) return false;
+      } else if (o.status !== filterStatus) {
+        return false;
+      }
+    }
+
+    // 2. Search Query (Order ID, Item Name, Seller Name, Buyer Name)
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      const matchId = (o.id || "").toLowerCase().includes(q);
+      const matchItem = (o.item?.name || "").toLowerCase().includes(q);
+      const matchSeller = (o.seller?.name || "").toLowerCase().includes(q);
+      const matchBuyer = (o.buyer?.name || "").toLowerCase().includes(q);
+      if (!matchId && !matchItem && !matchSeller && !matchBuyer) {
+        return false;
+      }
+    }
+
+    return true;
+  });
 
   const selectedOrder = orders.find(o => o.id === selectedOrderId) || null;
   const successOrder = orders.find(o => o.id === successUpdateOrderId) || null;
@@ -387,28 +559,54 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
 
         {/* Header */}
         <div className="p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4">
-          <h2 className="text-lg sm:text-xl font-semibold">{title}</h2>
+          <h2 className="text-lg sm:text-xl font-semibold tracking-tight text-white">{title}</h2>
 
           <div className="flex flex-wrap items-center gap-2 md:gap-3">
+            {/* Search Input */}
             <div className="relative flex-1 min-w-0 md:w-64 md:flex-none">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8C8C8C]" />
+              <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8C8C8C]" />
               <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search orders.."
-                className="w-full bg-transparent border-white/10 rounded-full h-10 pl-10 text-sm focus-visible:ring-[#FFAF2C]/30 text-white"
+                className="w-full bg-transparent border-white/10 rounded-full h-10 pl-10 pr-4 text-sm focus-visible:ring-[#FFAF2C]/30 text-white placeholder:text-[#8C8C8C]"
               />
             </div>
 
+            {/* Date Filter Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center justify-center h-10 w-10 rounded-full border border-white/10 hover:bg-white/5 active:scale-95 transition-all shrink-0 cursor-pointer">
-                  <Calendar className="h-4 w-4 text-[#8C8C8C]" />
+                <button className="flex items-center gap-2 px-3.5 h-10 rounded-full border border-white/10 bg-transparent hover:bg-white/5 active:scale-95 transition-all text-sm text-[#EBEBEB] cursor-pointer shrink-0">
+                  <CalendarIcon className="h-4 w-4 text-[#8C8C8C]" />
+                  <span>{selectedDateFilter || "15 Jun, 2026"}</span>
+                  <ChevronDown className="h-4 w-4 text-[#8C8C8C] ml-0.5" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40 bg-[#1A1A1D] border-white/10 text-white rounded-xl shadow-2xl">
-                <DropdownMenuItem className="focus:bg-white/10 cursor-pointer">Today</DropdownMenuItem>
-                <DropdownMenuItem className="focus:bg-white/10 cursor-pointer">Yesterday</DropdownMenuItem>
-                <DropdownMenuItem className="focus:bg-white/10 cursor-pointer">Last 7 days</DropdownMenuItem>
-                <DropdownMenuItem className="focus:bg-white/10 cursor-pointer">Last 30 days</DropdownMenuItem>
+              <DropdownMenuContent align="end" className="w-44 bg-[#1A1A1D] border-white/10 text-white rounded-xl shadow-2xl p-1">
+                <DropdownMenuItem onClick={() => setSelectedDateFilter("Today")} className="focus:bg-white/10 cursor-pointer rounded-lg">Today</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedDateFilter("Yesterday")} className="focus:bg-white/10 cursor-pointer rounded-lg">Yesterday</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedDateFilter("Last 7 days")} className="focus:bg-white/10 cursor-pointer rounded-lg">Last 7 days</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedDateFilter("Last 30 days")} className="focus:bg-white/10 cursor-pointer rounded-lg">Last 30 days</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedDateFilter("All Time")} className="focus:bg-white/10 cursor-pointer rounded-lg">All Time</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Status Filter Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 px-4 h-10 rounded-full border border-white/10 bg-transparent hover:bg-white/5 active:scale-95 transition-all text-sm text-[#EBEBEB] cursor-pointer shrink-0">
+                  <span>{statusFilterOverride || (showAllStatuses ? "All" : (Array.isArray(filterStatus) ? "All" : filterStatus || "All"))}</span>
+                  <ChevronDown className="h-4 w-4 text-[#8C8C8C]" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40 bg-[#1A1A1D] border-white/10 text-white rounded-xl shadow-2xl p-1">
+                <DropdownMenuItem onClick={() => setStatusFilterOverride("All")} className="focus:bg-white/10 cursor-pointer rounded-lg">All</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilterOverride("Reserved")} className="focus:bg-white/10 cursor-pointer rounded-lg">Reserved</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilterOverride("Collected")} className="focus:bg-white/10 cursor-pointer rounded-lg">Collected</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilterOverride("Verified")} className="focus:bg-white/10 cursor-pointer rounded-lg">Verified</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilterOverride("Dispatched")} className="focus:bg-white/10 cursor-pointer rounded-lg">Dispatched</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilterOverride("Delivered")} className="focus:bg-white/10 cursor-pointer rounded-lg">Delivered</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilterOverride("Issues")} className="focus:bg-white/10 cursor-pointer rounded-lg">Issues</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -457,28 +655,26 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                     <span className="w-20 text-[#8C8C8C] shrink-0">Order ID :</span>
                     <span className="font-semibold text-[#FFAF2C]">{order.id}</span>
                   </div>
-                  <div className="flex items-center">
+                  <div className="flex">
                     <span className="w-20 text-[#8C8C8C] shrink-0">Seller :</span>
-                    <span className="text-[#EBEBEB] truncate flex items-center gap-1.5">
-                      <span className="text-[#8C8C8C] text-[11px]">{order.seller.location}</span>
-                      {order.seller.name}
-                      {order.seller.payoutsEnabled ? (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                          ✓ Payout
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                          Pending
-                        </span>
-                      )}
-                    </span>
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 text-[#EBEBEB]">
+                        <span className="truncate">{order.seller.name}</span>
+                        {order.seller.payoutsEnabled && (
+                          <span title="Stripe Payout Account Connected" className="inline-flex items-center">
+                            <VerifiedBadge className="shrink-0" />
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[#8C8C8C] text-[11px] mt-0.5">{order.seller.location}</span>
+                    </div>
                   </div>
                   <div className="flex">
                     <span className="w-20 text-[#8C8C8C] shrink-0">Buyer :</span>
-                    <span className="text-[#EBEBEB] truncate">
-                      <span className="text-[#8C8C8C] mr-1 text-[11px]">{order.buyer.location}</span>
-                      {order.buyer.name}
-                    </span>
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <span className="text-[#EBEBEB] truncate">{order.buyer.name}</span>
+                      <span className="text-[#8C8C8C] text-[11px] mt-0.5">{order.buyer.location}</span>
+                    </div>
                   </div>
                   <div className="flex">
                     <span className="w-20 text-[#8C8C8C] shrink-0">Pickup :</span>
@@ -553,25 +749,21 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
-                        <div className="flex items-center gap-1.5 flex-wrap">
+                        <div className="flex items-center gap-1.5">
                           <span className="font-medium text-[#EBEBEB]">{order.seller.name}</span>
-                          {order.seller.payoutsEnabled ? (
-                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" title="Stripe Payout Account Connected">
-                              ✓ Payout Connected
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20" title="Payout Setup Pending">
-                              Payout Pending
+                          {order.seller.payoutsEnabled && (
+                            <span title="Stripe Payout Account Connected" className="inline-flex items-center">
+                              <VerifiedBadge className="shrink-0" />
                             </span>
                           )}
                         </div>
-                        <span className="text-xs text-[#8C8C8C]">{order.seller.location}</span>
+                        <span className="text-xs text-[#8C8C8C] mt-0.5">{order.seller.location}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
                         <span className="font-medium text-[#EBEBEB]">{order.buyer.name}</span>
-                        <span className="text-xs text-[#8C8C8C]">{order.buyer.location}</span>
+                        <span className="text-xs text-[#8C8C8C] mt-0.5">{order.buyer.location}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-[#8C8C8C]">
