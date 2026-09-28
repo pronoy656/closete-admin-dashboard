@@ -1,12 +1,13 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Calendar, ChevronDown, Phone, MapPin, Check, ArrowRight, Info, ShoppingBag, ChevronLeft, ShieldCheck, AlertTriangle, AlertCircle, Loader2, X } from "lucide-react";
+import { Search, Calendar, ChevronDown, Phone, MapPin, Check, CheckCircle2, ArrowRight, Info, ShoppingBag, ChevronLeft, ShieldCheck, AlertTriangle, AlertCircle, Loader2, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useOrders, Order } from "@/context/OrdersContext";
 import { formatImageUrl } from "@/lib/utils";
 import { adminApi } from "@/lib/api";
 import { ProductImageSlider } from "./ProductImageSlider";
+import { ActionSuccessDialog } from "./ActionSuccessDialog";
 import {
   Sheet,
   SheetContent,
@@ -857,46 +858,57 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
 
                 {/* Seller / Buyer */}
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <div className="flex-1">
-                    <div className="text-sm text-[#8C8C8C] uppercase mb-2 font-medium flex items-center justify-between">
-                      <span>Seller</span>
-                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 capitalize tracking-normal">
-                        <Check className="w-3 h-3" /> Payout Account Connected
-                      </span>
+                  <div className="flex-1 flex flex-col">
+                    <div className="text-xs text-[#8C8C8C] uppercase mb-2 font-medium">
+                      SELLER
                     </div>
-                    <div className="bg-[#1A1A1D] rounded-xl p-5">
-                      <div className="font-semibold text-lg mb-2">{selectedOrder?.seller.name}</div>
-                      <div className="flex items-center gap-2 text-[15px] text-[#8C8C8C] mb-2">
-                        <Phone className="w-4 h-4 shrink-0" /> <span className="truncate">{selectedOrder?.seller.phone}</span>
+                    <div className="bg-[#1A1A1D] rounded-xl p-4 sm:p-5 flex-1 flex flex-col">
+                      <div className="font-semibold text-base sm:text-lg mb-2 text-white">
+                        {selectedOrder?.seller.name}
                       </div>
-                      <div className="flex items-center gap-2 text-[15px] text-[#8C8C8C]">
-                        <MapPin className="w-4 h-4 shrink-0" /> <span className="truncate">{selectedOrder?.seller.location}</span>
+                      <div className="inline-flex items-center gap-1.5 text-xs text-[#107D2C] font-medium bg-[#107D2C]/10 border border-[#107D2C]/30 px-2.5 py-1 rounded-lg select-none mb-3 self-start">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#107D2C] shrink-0" strokeWidth={2} />
+                        <span>Payout Verified</span>
+                      </div>
+                      <div className="mt-auto space-y-2">
+                        <div className="flex items-center gap-2 text-xs sm:text-sm text-[#8C8C8C]">
+                          <Phone className="w-4 h-4 shrink-0" /> <span className="truncate">{selectedOrder?.seller.phone}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs sm:text-sm text-[#8C8C8C]">
+                          <MapPin className="w-4 h-4 shrink-0" /> <span className="truncate">{selectedOrder?.seller.location}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div className="flex-1">
-                    <div className="text-sm text-[#8C8C8C] uppercase mb-2 font-medium">Buyer</div>
-                    <div className="bg-[#1A1A1D] rounded-xl p-5">
-                      <div className="font-semibold text-lg mb-2">{selectedOrder?.buyer.name}</div>
-                      <div className="flex items-center gap-2 text-[15px] text-[#8C8C8C] mb-2">
-                        <Phone className="w-4 h-4 shrink-0" /> <span className="truncate">{selectedOrder?.buyer.phone}</span>
+                  <div className="flex-1 flex flex-col">
+                    <div className="text-xs text-[#8C8C8C] uppercase mb-2 font-medium">
+                      BUYER
+                    </div>
+                    <div className="bg-[#1A1A1D] rounded-xl p-4 sm:p-5 flex-1 flex flex-col">
+                      <div className="font-semibold text-base sm:text-lg mb-2 text-white">
+                        {selectedOrder?.buyer.name}
                       </div>
-                      <div className="flex items-center gap-2 text-[15px] text-[#8C8C8C]">
-                        <MapPin className="w-4 h-4 shrink-0" /> <span className="truncate">{selectedOrder?.buyer.location}</span>
+                      <div className="mt-auto space-y-2">
+                        <div className="flex items-center gap-2 text-xs sm:text-sm text-[#8C8C8C]">
+                          <Phone className="w-4 h-4 shrink-0" /> <span className="truncate">{selectedOrder?.buyer.phone}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs sm:text-sm text-[#8C8C8C]">
+                          <MapPin className="w-4 h-4 shrink-0" /> <span className="truncate">{selectedOrder?.buyer.location}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Note section */}
-                {selectedOrder?.note && (
-                  <div>
-                    <div className="text-xs text-[#8C8C8C] uppercase mb-2 font-medium">Note</div>
-                    <div className="bg-[#1A1A1D] rounded-xl p-4">
-                      <div className="text-sm text-[#8C8C8C]">{selectedOrder.note}</div>
+                <div>
+                  <div className="text-xs text-[#8C8C8C] uppercase mb-2 font-medium">NOTE</div>
+                  <div className="bg-[#1A1A1D] rounded-xl p-4">
+                    <div className="text-xs sm:text-sm text-[#8C8C8C] leading-relaxed">
+                      {selectedOrder?.note || "Visible scratches reported on the hardware. Buyer declined acceptance at delivery."}
                     </div>
                   </div>
-                )}
+                </div>
 
                 {/* Progress */}
                 {selectedOrder?.status !== "Issue" && (
@@ -1205,140 +1217,52 @@ export default function OrderTable({ title, filterStatus, showAllStatuses }: Ord
       </Sheet>
 
       {/* Issue Reported Success Dialog */}
-      <Dialog open={issueStep === "success"} onOpenChange={(open) => !open && setIssueStep("form")}>
-        <DialogContent
-          className="text-white w-[calc(100vw-32px)] max-w-[380px] p-0 shadow-2xl rounded-3xl overflow-hidden [&>button]:hidden"
-          style={{
-            background: 'linear-gradient(#0D0D0F, #0D0D0F) padding-box, linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.12) 40%, transparent 85%) border-box',
-            border: '1px solid transparent',
-          }}
-        >
-          <div className="relative flex flex-col items-center text-center px-4 sm:px-6 pt-7 pb-6">
-
-            {/* Close button */}
-            <button
-              onClick={() => setIssueStep("form")}
-              className="absolute top-4 right-4 w-6 h-6 rounded-full border-2 border-white/80 flex items-center justify-center hover:border-white transition-colors flex-shrink-0"
-            >
-              <X className="w-3 h-3 text-white" strokeWidth={2.5} />
-            </button>
-
-            {/* Layered circle icon */}
-            <div className="relative flex items-center justify-center mb-5">
-              <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-[#1A1A1D]" />
-              <div className="absolute w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#222224]" />
-              <img
-                src="/image 12.png"
-                alt="Success"
-                className="absolute w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-2xl"
-              />
-            </div>
-
-            <DialogTitle className="text-xl sm:text-2xl font-bold text-white mb-1">Issue reported</DialogTitle>
-            <DialogDescription className="text-sm text-[#8C8C8C] mb-4">Order status updated successfully</DialogDescription>
-
-            {/* Info card */}
-            <div className="w-full bg-[#1A1A1D] rounded-2xl p-4 mb-4 text-left space-y-3">
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-[#8C8C8C]">Report Reference</span>
-                <span className="font-semibold text-[#FFAF2C]">#RP-992-K</span>
-              </div>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-[#8C8C8C]">Update Time</span>
-                <span className="font-medium text-white">{getCurrentFormattedTime()}</span>
-              </div>
-            </div>
-
-            <button
-              onClick={handleBackToDashboard}
-              className="w-full h-11 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
-              Back To Dashboard <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ActionSuccessDialog
+        open={issueStep === "success"}
+        onOpenChange={(open) => !open && setIssueStep("form")}
+        type="issue"
+        title="Issue reported"
+        description="Order status updated successfully"
+        infoRows={[
+          { label: "Report Reference", value: "#RP-992-K", valueColor: "text-[#FFAF2C]" },
+          { label: "Update Time", value: getCurrentFormattedTime(), valueColor: "text-white" },
+        ]}
+        buttonText="Back To Dashboard"
+        onButtonClick={handleBackToDashboard}
+      />
 
       {/* Success Dialog for Status Update */}
-      <Dialog open={successUpdateOrderId !== null} onOpenChange={(open) => !open && setSuccessUpdateOrderId(null)}>
-        <DialogContent
-          className="text-white w-[calc(100vw-32px)] max-w-[400px] p-0 shadow-2xl rounded-3xl overflow-hidden [&>button]:hidden"
-          style={{
-            background: 'linear-gradient(#0D0D0F, #0D0D0F) padding-box, linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.12) 40%, transparent 85%) border-box',
-            border: '1px solid transparent',
+      {successOrder && (
+        <ActionSuccessDialog
+          open={successUpdateOrderId !== null}
+          onOpenChange={(open) => !open && setSuccessUpdateOrderId(null)}
+          type="update"
+          title="Order updated successfully"
+          description={
+            successOrder.progress >= 3
+              ? "Order has been delivered successfully"
+              : successOrder.progress === 2
+                ? "Product verification complete"
+                : "Item picked up from seller"
+          }
+          itemData={{
+            id: successOrder.id,
+            name: successOrder.item.name,
+            subtitle: `Buyer : ${successOrder.buyer.name}`,
+            image: successOrder.item.image,
+            statusText: successOrder.status,
+            statusBg: successOrder.statusBg,
+            statusColor: successOrder.statusColor,
+            dotColor: successOrder.dotColor,
           }}
-        >
-          {successOrder && (
-            <div className="relative flex flex-col items-center text-center px-4 sm:px-6 pt-7 pb-6">
-
-              {/* Close button */}
-              <button
-                onClick={() => setSuccessUpdateOrderId(null)}
-                className="absolute top-4 right-4 w-6 h-6 rounded-full border-2 border-white/80 flex items-center justify-center hover:border-white transition-colors flex-shrink-0"
-              >
-                <X className="w-3 h-3 text-white" strokeWidth={2.5} />
-              </button>
-
-              {/* Layered circle icon */}
-              <div className="relative flex items-center justify-center mb-5">
-                <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-[#1A1A1D]" />
-                <div className="absolute w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#222224]" />
-                <img
-                  src="/image 12.png"
-                  alt="Success"
-                  className="absolute w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-2xl"
-                />
-              </div>
-
-              <DialogTitle className="text-xl sm:text-2xl font-bold text-white mb-1">Order updated successfully</DialogTitle>
-              <DialogDescription className="text-sm text-[#8C8C8C] mb-4">
-                {successOrder.progress >= 3
-                  ? "Order has been delivered successfully"
-                  : successOrder.progress === 2
-                    ? "Product verification complete"
-                    : "Item picked up from seller"}
-              </DialogDescription>
-
-              {/* Order card */}
-              <div className="w-full bg-[#1A1A1D] rounded-2xl p-3 sm:p-4 mb-4 text-left flex gap-3 items-center">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden flex-shrink-0 bg-white/5">
-                  <img
-                    src={formatImageUrl(successOrder.item.image)}
-                    alt={successOrder.item.name}
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = "/gucchi-bag.webp";
-                    }}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-start mb-1">
-                    <span className="text-[#FFAF2C] font-semibold text-sm">{successOrder.id}</span>
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold ${successOrder.statusBg} ${successOrder.statusColor}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${successOrder.dotColor}`} />
-                      {successOrder.status}
-                    </span>
-                  </div>
-                  <div className="font-semibold text-white text-[14px] sm:text-[15px] mb-0.5 truncate">{successOrder.item.name}</div>
-                  <div className="text-xs text-[#8C8C8C]">Buyer : <span className="text-white font-medium">{successOrder.buyer.name}</span></div>
-                </div>
-              </div>
-
-              {/* Approval reason */}
-              <div className="text-xs sm:text-sm text-[#00D22B] mb-4">
-                Approval reason : Status changed to {successOrder.status}
-              </div>
-
-              <button
-                onClick={() => setSuccessUpdateOrderId(null)}
-                className="w-full h-11 bg-gold-gradient text-black font-semibold rounded-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity border-0 outline-none">
-                Back To Dashboard <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
-
+          reasonBadge={{
+            text: `Approval reason : Status changed to ${successOrder.status}`,
+            type: "green",
+          }}
+          buttonText="Back To Dashboard"
+          onButtonClick={() => setSuccessUpdateOrderId(null)}
+        />
+      )}
     </>
   );
 }
