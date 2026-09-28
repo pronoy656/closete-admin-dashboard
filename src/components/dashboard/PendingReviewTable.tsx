@@ -14,7 +14,11 @@ import {
   Phone,
   MapPin,
   Tag,
-  DollarSign
+  DollarSign,
+  X,
+  ArrowRight,
+  FileText,
+  ExternalLink
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -38,6 +42,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { adminApi } from "@/lib/api";
 import { formatImageUrl } from "@/lib/utils";
+import { ProductImageSlider } from "./ProductImageSlider";
 
 // Exact SVG Icons from Closete UI Design File (1)
 function SearchIcon({ className }: { className?: string }) {
@@ -170,6 +175,7 @@ export interface PendingProduct {
   condition: string;
   originalPackagingAvailable?: boolean;
   packaging?: string;
+  proofOfPurchase?: string;
   collectionAddress?: string;
   sellerPhone?: string;
   images: string[];
@@ -192,107 +198,104 @@ const SAMPLE_PENDING_ITEMS: PendingProduct[] = [
   {
     _id: "demo-1",
     name: "Classic Flap Bag",
-    brand: "CHANEL",
-    description: "Iconic Chanel Classic Medium Flap Bag in quilted lambskin leather with gold-tone hardware.",
+    brand: "Channel",
+    description: "Black caviar leather with gold hardware. Comes with original dust bag and authenticity card.",
     condition: "Excellent",
     price: 3200,
+    proofOfPurchase: "Bill.pdf",
+    originalPackagingAvailable: true,
     packaging: "Original box, dust bag and authenticity card included",
-    collectionAddress: "Al Wasl Road, Villa 42, Jumeirah 2, Dubai",
-    sellerPhone: "+971 50 123 4567",
-    images: ["/dior-bag.webp", "/gucchi-bag.webp"],
+    collectionAddress: "703, Marina Quays East Tower, Dubai, UAE",
+    sellerPhone: "+1 (626) 389-2743",
+    images: ["/dior-bag.webp", "/gucchi-bag.webp", "/dior-bag.webp", "/gucchi-bag.webp"],
     status: "Pending Review",
     createdAt: new Date().toISOString(),
-    seller: { name: "Sarah Al Mansoori", email: "sarah@example.com", location: "Dubai, UAE", payoutsEnabled: true }
+    seller: { name: "Kim Kardashian", email: "kim@example.com", location: "703, Marina Quays East Tower, Dubai, UAE", phone: "+1 (626) 389-2743", payoutsEnabled: true }
   },
   {
     _id: "demo-2",
     name: "Classic Flap Bag",
-    brand: "CHANEL",
+    brand: "Channel",
     description: "Chanel Classic Double Flap in caviar leather with silver hardware. Pristine corners.",
     condition: "Pristine",
     price: 3200,
+    proofOfPurchase: "Bill.pdf",
+    originalPackagingAvailable: true,
     packaging: "Includes dust bag and serial sticker intact",
     collectionAddress: "Downtown Boulevard, Standpoint Tower A, Apt 1402, Dubai",
     sellerPhone: "+971 55 987 6543",
-    images: ["/gucchi-bag.webp", "/dior-bag.webp"],
+    images: ["/gucchi-bag.webp", "/dior-bag.webp", "/gucchi-bag.webp"],
     status: "Pending Review",
     createdAt: new Date().toISOString(),
-    seller: { name: "Noura Khalid", email: "noura@example.com", location: "Dubai, UAE", payoutsEnabled: true }
+    seller: { name: "Noura Khalid", email: "noura@example.com", location: "Downtown Boulevard, Dubai, UAE", phone: "+971 55 987 6543", payoutsEnabled: true }
   },
   {
     _id: "demo-3",
     name: "Classic Flap Bag",
-    brand: "CHANEL",
+    brand: "Channel",
     description: "Vintage Chanel Flap in smooth lambskin with 24k gold plated hardware.",
     condition: "Very Good",
     price: 3200,
+    proofOfPurchase: "Bill.pdf",
+    originalPackagingAvailable: true,
     packaging: "Original box and dust bag included",
     collectionAddress: "Palm Jumeirah, Shoreline 10, Dubai",
     sellerPhone: "+971 52 456 7890",
     images: ["/dior-bag.webp", "/gucchi-bag.webp"],
     status: "Pending Review",
     createdAt: new Date().toISOString(),
-    seller: { name: "Layla Hassan", email: "layla@example.com", location: "Dubai, UAE", payoutsEnabled: false }
+    seller: { name: "Layla Hassan", email: "layla@example.com", location: "Palm Jumeirah, Dubai, UAE", phone: "+971 52 456 7890", payoutsEnabled: true }
   },
   {
     _id: "demo-4",
     name: "Classic Flap Bag",
-    brand: "CHANEL",
+    brand: "Channel",
     description: "Chanel Medium Classic Flap in beige caviar leather with gold hardware.",
     condition: "Like New",
     price: 3200,
+    proofOfPurchase: "Bill.pdf",
+    originalPackagingAvailable: true,
     packaging: "Complete set with boutique receipt and box",
     collectionAddress: "Dubai Marina, Marina Gate 2, Dubai",
     sellerPhone: "+971 58 112 2334",
     images: ["/gucchi-bag.webp", "/dior-bag.webp"],
     status: "Pending Review",
     createdAt: new Date().toISOString(),
-    seller: { name: "Mariam Salem", email: "mariam@example.com", location: "Dubai, UAE", payoutsEnabled: true }
+    seller: { name: "Mariam Salem", email: "mariam@example.com", location: "Dubai Marina, Dubai, UAE", phone: "+971 58 112 2334", payoutsEnabled: true }
   },
   {
     _id: "demo-5",
     name: "Classic Flap Bag",
-    brand: "CHANEL",
+    brand: "Channel",
     description: "Chanel Classic Flap in black caviar leather with champagne gold hardware.",
     condition: "Excellent",
     price: 3200,
+    proofOfPurchase: "Bill.pdf",
+    originalPackagingAvailable: true,
     packaging: "Original dust bag included",
     collectionAddress: "Emirates Hills, Sector E, Dubai",
     sellerPhone: "+971 50 998 8776",
     images: ["/dior-bag.webp", "/gucchi-bag.webp"],
     status: "Pending Review",
     createdAt: new Date().toISOString(),
-    seller: { name: "Fatima Al Suwaidi", email: "fatima@example.com", location: "Dubai, UAE", payoutsEnabled: true }
+    seller: { name: "Fatima Al Suwaidi", email: "fatima@example.com", location: "Emirates Hills, Dubai, UAE", phone: "+971 50 998 8776", payoutsEnabled: true }
   },
   {
     _id: "demo-6",
     name: "Classic Flap Bag",
-    brand: "CHANEL",
+    brand: "Channel",
     description: "Chanel Classic Flap in burgundy quilted caviar leather.",
     condition: "Pristine",
     price: 3200,
+    proofOfPurchase: "Bill.pdf",
+    originalPackagingAvailable: true,
     packaging: "Full original packaging with invoice",
     collectionAddress: "City Walk, Building 14, Dubai",
     sellerPhone: "+971 54 332 1100",
     images: ["/gucchi-bag.webp", "/dior-bag.webp"],
     status: "Pending Review",
     createdAt: new Date().toISOString(),
-    seller: { name: "Hind Al Nuaimi", email: "hind@example.com", location: "Dubai, UAE", payoutsEnabled: true }
-  },
-  {
-    _id: "demo-7",
-    name: "Classic Flap Bag",
-    brand: "CHANEL",
-    description: "Chanel Classic Flap Bag in timeless black lambskin with gold chain.",
-    condition: "Excellent",
-    price: 3200,
-    packaging: "Includes dust bag and microchip verification",
-    collectionAddress: "Business Bay, Executive Towers, Dubai",
-    sellerPhone: "+971 56 778 8990",
-    images: ["/dior-bag.webp", "/gucchi-bag.webp"],
-    status: "Pending Review",
-    createdAt: new Date().toISOString(),
-    seller: { name: "Reem Al Hashimi", email: "reem@example.com", location: "Dubai, UAE", payoutsEnabled: false }
+    seller: { name: "Hind Al Nuaimi", email: "hind@example.com", location: "City Walk, Dubai, UAE", phone: "+971 54 332 1100", payoutsEnabled: true }
   },
 ];
 
@@ -315,6 +318,7 @@ export default function PendingReviewTable() {
   const [statusFilterOverride, setStatusFilterOverride] = useState<string>("All");
   const [selectedItem, setSelectedItem] = useState<PendingProduct | null>(null);
   const [activeImageIdx, setActiveImageIdx] = useState(0);
+  const [isEditingDetails, setIsEditingDetails] = useState(false);
 
   // Edit / Moderation state
   const [editForm, setEditForm] = useState<{
@@ -377,6 +381,7 @@ export default function PendingReviewTable() {
   const openReviewDrawer = (item: PendingProduct) => {
     setSelectedItem(item);
     setActiveImageIdx(0);
+    setIsEditingDetails(false);
     setEditForm({
       name: item.name,
       brand: item.brand,
@@ -385,8 +390,8 @@ export default function PendingReviewTable() {
       condition: item.condition,
       packaging: item.packaging || "",
       price: item.price,
-      collectionAddress: item.collectionAddress || "",
-      sellerPhone: item.sellerPhone || item.seller?.phone || "",
+      collectionAddress: item.collectionAddress || item.seller?.location || "703, Marina Quays East Tower, Dubai, UAE",
+      sellerPhone: item.sellerPhone || item.seller?.phone || "+1 (626) 389-2743",
     });
   };
 
@@ -537,7 +542,15 @@ export default function PendingReviewTable() {
                 <div className="flex justify-between items-start gap-4">
                   {/* Left Info Column */}
                   <div className="flex-1 min-w-0">
-                    <span className="inline-block px-3 py-1 rounded-md text-xs font-semibold bg-[#107D2C]/15 text-[#107D2C] mb-3 select-none">
+                    <span
+                      className="inline-flex items-center px-3 py-1.5 rounded-md mb-3 select-none text-[14px] leading-none"
+                      style={{
+                        fontFamily: 'var(--font-dm-sans, "DM Sans"), sans-serif',
+                        fontWeight: 500,
+                        color: '#107D2C',
+                        background: 'rgba(16, 125, 44, 0.22)',
+                      }}
+                    >
                       Pending Review
                     </span>
 
@@ -583,139 +596,157 @@ export default function PendingReviewTable() {
         )}
       </div>
 
-      {/* Review & Edit Drawer */}
+      {/* Review Listing Drawer matching exact Dashboard Design */}
       <Sheet open={!!selectedItem} onOpenChange={(open) => !open && setSelectedItem(null)}>
-        <SheetContent className="w-full sm:max-w-2xl bg-[#0D0D0F] border-l border-white/10 text-white overflow-y-auto p-0">
+        <SheetContent showCloseButton={false} className="w-full max-w-[550px] bg-black border-l border-white/10 text-white p-0 overflow-hidden flex flex-col z-50">
           {selectedItem && (
-            <div className="flex flex-col h-full">
-              {/* Drawer Header */}
-              <div className="p-6 border-b border-white/10 bg-[#141416]/80 backdrop-blur sticky top-0 z-10 flex items-center justify-between">
-                <div>
-                  <span className="text-xs font-semibold uppercase tracking-wider text-[#D6A042]">
-                    Ops Review & Moderation
-                  </span>
-                  <SheetTitle className="text-xl font-bold text-white mt-0.5">
-                    Listing #{selectedItem.orderId || selectedItem._id.slice(-5)}
-                  </SheetTitle>
-                </div>
+            <div className="flex flex-col h-full w-full">
+              {/* Sticky Header */}
+              <div className="px-4 sm:px-6 pt-3 pb-1.5 flex-shrink-0 flex items-center justify-between">
+                <SheetTitle className="text-2xl font-semibold text-white">
+                  Review Listing
+                </SheetTitle>
+                <button
+                  type="button"
+                  onClick={() => setSelectedItem(null)}
+                  className="w-6 h-6 flex items-center justify-center rounded-full border-2 border-white hover:border-white transition-colors text-white hover:text-white flex-shrink-0 cursor-pointer"
+                  aria-label="Close"
+                >
+                  <X className="w-3 h-3" strokeWidth={2.5} />
+                </button>
               </div>
 
-              {/* Drawer Body */}
-              <div className="p-6 space-y-6 flex-1">
-                {/* 3 Photos Gallery */}
-                <div className="space-y-3">
+              {/* Scrollable Body */}
+              <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 pb-6 no-scrollbar space-y-4">
+                {/* Product Image Slider Custom Component */}
+                <ProductImageSlider
+                  images={selectedItem.images}
+                  itemName={selectedItem.name}
+                />
+
+                {/* Title & Status Badge Row */}
+                <div className="flex items-center justify-between gap-3 pt-1">
+                  <h3 className="text-xl font-medium text-white tracking-tight">
+                    {editForm.name || selectedItem.name}
+                  </h3>
+                  <span
+                    className="inline-flex items-center px-3 py-1.5 rounded-md shrink-0 select-none text-[14px] leading-none"
+                    style={{
+                      fontFamily: 'var(--font-dm-sans, "DM Sans"), sans-serif',
+                      fontWeight: 500,
+                      color: '#107D2C',
+                      background: 'rgba(16, 125, 44, 0.22)',
+                    }}
+                  >
+                    Pending Review
+                  </span>
+                </div>
+
+                {/* PRODUCT DETAILS Section Header */}
+                <div className="space-y-2.5 pt-1">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-medium uppercase text-[#8C8C8C] flex items-center gap-1.5">
-                      <Layers className="w-3.5 h-3.5 text-[#D6A042]" /> Seller Photos
-                    </label>
-                    <span className="text-xs text-[#8C8C8C]">
-                      Photo {activeImageIdx + 1} of {selectedItem.images?.length || 1}
+                    <span className="text-xs font-semibold text-[#8C8C8C] tracking-wider uppercase">
+                      PRODUCT DETAILS
                     </span>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingDetails(!isEditingDetails)}
+                      className="text-[#FFAF2C] underline decoration-solid text-[14px] font-medium leading-none cursor-pointer hover:opacity-85 transition-opacity"
+                      style={{ fontFamily: 'var(--font-dm-sans, "DM Sans"), sans-serif', fontWeight: 500 }}
+                    >
+                      {isEditingDetails ? "Done Editing" : "Edit Listing Details"}
+                    </button>
                   </div>
 
-                  {/* Main Large Photo */}
-                  <div className="relative rounded-2xl overflow-hidden aspect-[16/10] bg-black border border-white/10">
-                    <img
-                      src={formatImageUrl(
-                        selectedItem.images?.[activeImageIdx] ||
-                        selectedItem.images?.[0]
-                      )}
-                      alt={selectedItem.name}
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = "/gucchi-bag.webp";
-                      }}
-                      className="w-full h-full object-contain"
-                    />
-                    {selectedItem.images?.length > 1 && (
-                      <div className="absolute inset-x-3 top-1/2 -translate-y-1/2 flex justify-between pointer-events-none">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setActiveImageIdx((prev) =>
-                              prev === 0 ? selectedItem.images.length - 1 : prev - 1
-                            )
-                          }
-                          className="w-9 h-9 rounded-full bg-black/60 backdrop-blur text-white flex items-center justify-center hover:bg-black/80 pointer-events-auto transition-colors"
-                        >
-                          <ChevronLeft className="w-5 h-5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setActiveImageIdx((prev) =>
-                              prev === selectedItem.images.length - 1 ? 0 : prev + 1
-                            )
-                          }
-                          className="w-9 h-9 rounded-full bg-black/60 backdrop-blur text-white flex items-center justify-center hover:bg-black/80 pointer-events-auto transition-colors"
-                        >
-                          <ChevronRight className="w-5 h-5" />
-                        </button>
-                      </div>
+                  {/* 1. Title Row */}
+                  <div
+                    style={{ background: "linear-gradient(270.21deg, #2B2D32 -23.83%, #1C1D20 92.92%)" }}
+                    className="border border-white/[0.04] rounded-xl px-4 py-3.5 flex items-center justify-between gap-4"
+                  >
+                    <span className="text-sm text-[#8C8C8C] shrink-0">Title</span>
+                    {isEditingDetails ? (
+                      <Input
+                        value={editForm.name}
+                        onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                        className="h-8 text-right bg-transparent border-white/20 text-sm text-white focus-visible:ring-[#FFAF2C]"
+                      />
+                    ) : (
+                      <span className="text-sm font-medium text-white text-right truncate">
+                        {editForm.name}
+                      </span>
                     )}
                   </div>
 
-                  {/* Photo Thumbnails */}
-                  {selectedItem.images && selectedItem.images.length > 1 && (
-                    <div className="flex gap-2">
-                      {selectedItem.images.map((img, i) => (
-                        <button
-                          key={i}
-                          type="button"
-                          onClick={() => setActiveImageIdx(i)}
-                          className={`relative rounded-xl overflow-hidden w-20 h-14 border-2 transition-all ${activeImageIdx === i
-                              ? "border-[#D6A042] scale-105"
-                              : "border-white/10 opacity-60 hover:opacity-100"
-                            }`}
-                        >
-                          <img
-                            src={formatImageUrl(img)}
-                            alt=""
-                            className="w-full h-full object-cover"
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Moderation Form */}
-                <div className="space-y-4 pt-2">
-                  <div className="text-xs font-semibold uppercase tracking-wider text-[#D6A042] border-b border-white/5 pb-2">
-                    Review / Polish Details
-                  </div>
-
-                  {/* Title */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs text-[#8C8C8C]">Listing Title</label>
-                    <Input
-                      value={editForm.name}
-                      onChange={(e) =>
-                        setEditForm((prev) => ({ ...prev, name: e.target.value }))
-                      }
-                      className="bg-[#141416] border-white/10 text-white rounded-xl text-sm focus-visible:ring-[#D6A042]"
-                    />
-                  </div>
-
-                  {/* Brand & Condition */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <label className="text-xs text-[#8C8C8C]">Brand</label>
+                  {/* 2. Brand Row */}
+                  <div
+                    style={{ background: "linear-gradient(270.21deg, #2B2D32 -23.83%, #1C1D20 92.92%)" }}
+                    className="border border-white/[0.04] rounded-xl px-4 py-3.5 flex items-center justify-between gap-4"
+                  >
+                    <span className="text-sm text-[#8C8C8C] shrink-0">Brand</span>
+                    {isEditingDetails ? (
                       <Input
                         value={editForm.brand}
-                        onChange={(e) =>
-                          setEditForm((prev) => ({ ...prev, brand: e.target.value }))
-                        }
-                        className="bg-[#141416] border-white/10 text-white rounded-xl text-sm focus-visible:ring-[#D6A042]"
+                        onChange={(e) => setEditForm({ ...editForm, brand: e.target.value })}
+                        className="h-8 text-right bg-transparent border-white/20 text-sm text-white focus-visible:ring-[#FFAF2C]"
                       />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs text-[#8C8C8C]">Condition Rating</label>
+                    ) : (
+                      <span className="text-sm font-medium text-white text-right">
+                        {editForm.brand}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* 3. Description Block */}
+                  <div
+                    style={{ background: "linear-gradient(270.21deg, #2B2D32 -23.83%, #1C1D20 92.92%)" }}
+                    className="border border-white/[0.04] rounded-xl p-4 space-y-1.5"
+                  >
+                    <span className="text-sm text-[#8C8C8C] block">Description</span>
+                    {isEditingDetails ? (
+                      <textarea
+                        rows={3}
+                        value={editForm.description}
+                        onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                        className="w-full p-2 rounded-lg bg-black/40 border border-white/20 text-white text-xs placeholder:text-[#555] focus:outline-none focus:ring-1 focus:ring-[#FFAF2C] resize-none"
+                      />
+                    ) : (
+                      <p className="text-sm text-white leading-relaxed font-normal">
+                        {editForm.description}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* 4. Listing price Row */}
+                  <div
+                    style={{ background: "linear-gradient(270.21deg, #2B2D32 -23.83%, #1C1D20 92.92%)" }}
+                    className="border border-white/[0.04] rounded-xl px-4 py-3.5 flex items-center justify-between gap-4"
+                  >
+                    <span className="text-sm text-[#8C8C8C] shrink-0">listing price</span>
+                    {isEditingDetails ? (
+                      <Input
+                        type="number"
+                        value={editForm.price}
+                        onChange={(e) => setEditForm({ ...editForm, price: Number(e.target.value) || 0 })}
+                        className="h-8 text-right bg-transparent border-white/20 text-sm text-white focus-visible:ring-[#FFAF2C]"
+                      />
+                    ) : (
+                      <span className="text-sm font-medium text-white">
+                        AED {editForm.price?.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* 5. Condition Row */}
+                  <div
+                    style={{ background: "linear-gradient(270.21deg, #2B2D32 -23.83%, #1C1D20 92.92%)" }}
+                    className="border border-white/[0.04] rounded-xl px-4 py-3.5 flex items-center justify-between gap-4"
+                  >
+                    <span className="text-sm text-[#8C8C8C] shrink-0">Condition</span>
+                    {isEditingDetails ? (
                       <select
                         value={editForm.condition}
-                        onChange={(e) =>
-                          setEditForm((prev) => ({ ...prev, condition: e.target.value }))
-                        }
-                        className="w-full h-10 px-3 rounded-xl bg-[#141416] border border-white/10 text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#D6A042]"
+                        onChange={(e) => setEditForm({ ...editForm, condition: e.target.value })}
+                        className="h-8 px-2 rounded-lg bg-black/60 border border-white/20 text-white text-xs focus:outline-none focus:ring-1 focus:ring-[#FFAF2C]"
                       >
                         <option value="New / Unworn">New / Unworn</option>
                         <option value="Pristine">Pristine</option>
@@ -724,109 +755,100 @@ export default function PendingReviewTable() {
                         <option value="Good">Good</option>
                         <option value="Fair">Fair</option>
                       </select>
+                    ) : (
+                      <span className="text-sm font-medium text-white">
+                        {editForm.condition}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* 6. Proof of purchase Row */}
+                  <div
+                    style={{ background: "linear-gradient(270.21deg, #2B2D32 -23.83%, #1C1D20 92.92%)" }}
+                    className="border border-white/[0.04] rounded-xl px-4 py-3.5 flex items-center justify-between gap-4"
+                  >
+                    <span className="text-sm text-[#8C8C8C] shrink-0">Proof of purchase</span>
+                    <a
+                      href="#"
+                      onClick={(e) => e.preventDefault()}
+                      className="text-sm font-medium text-[#FFAF2C] inline-flex items-center gap-1.5 hover:underline cursor-pointer"
+                    >
+                      <span className="bg-[#FFAF2C] text-black text-[9px] font-bold px-1.5 py-0.5 rounded leading-none">
+                        PDF
+                      </span>
+                      <span>{selectedItem.proofOfPurchase || "Bill.pdf"}</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+
+                  {/* Packaging Note */}
+                  <div className="text-xs text-[#8C8C8C] flex items-center gap-2 pt-1">
+                    <Check className="w-3.5 h-3.5 text-[#8C8C8C]" />
+                    <span>Available original packaging.</span>
+                  </div>
+                </div>
+
+                {/* SELLER Section */}
+                <div className="space-y-2 pt-2">
+                  <span className="text-xs font-semibold text-[#8C8C8C] tracking-wider uppercase block">
+                    SELLER
+                  </span>
+
+                  <div
+                    style={{ background: "linear-gradient(270.21deg, #2B2D32 -23.83%, #1C1D20 92.92%)" }}
+                    className="border border-white/[0.04] rounded-xl p-4 space-y-3"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold text-white">
+                        {selectedItem.seller?.name || "Kim Kardashian"}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-xs text-[#107D2C] font-medium">
+                        <Check className="w-3.5 h-3.5 text-[#107D2C]" /> Payout Verified
+                      </span>
                     </div>
-                  </div>
 
-                  {/* Description */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs text-[#8C8C8C]">Description</label>
-                    <textarea
-                      rows={3}
-                      value={editForm.description}
-                      onChange={(e) =>
-                        setEditForm((prev) => ({ ...prev, description: e.target.value }))
-                      }
-                      className="w-full p-3 rounded-xl bg-[#141416] border border-white/10 text-white text-xs placeholder:text-[#555] focus:outline-none focus:ring-1 focus:ring-[#D6A042] resize-none"
-                    />
-                  </div>
-
-                  {/* Packaging */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs text-[#8C8C8C]">Packaging / Inclusions</label>
-                    <Input
-                      value={editForm.packaging}
-                      onChange={(e) =>
-                        setEditForm((prev) => ({ ...prev, packaging: e.target.value }))
-                      }
-                      className="bg-[#141416] border-white/10 text-white rounded-xl text-sm focus-visible:ring-[#D6A042]"
-                    />
-                  </div>
-
-                  {/* Pricing Breakdown */}
-                  <div className="bg-[#141416] border border-white/5 rounded-2xl p-4 space-y-3">
-                    <div className="flex items-center justify-between text-xs text-[#8C8C8C] border-b border-white/5 pb-2">
-                      <span className="font-semibold uppercase text-white">Pricing Breakdown</span>
-                      <span>Closeté 12% Fee</span>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-3 text-center">
-                      <div className="p-2.5 rounded-xl bg-white/[0.02] border border-white/5">
-                        <span className="text-[11px] text-[#8C8C8C] block">Listing Price</span>
-                        <div className="text-base font-bold text-white mt-0.5">
-                          AED {editForm.price?.toLocaleString()}
-                        </div>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[#8C8C8C]">
+                      <div className="flex items-center gap-1.5">
+                        <Phone className="w-3.5 h-3.5 text-[#8C8C8C]" />
+                        <span>{editForm.sellerPhone || selectedItem.sellerPhone || "+1 (626) 389-2743"}</span>
                       </div>
-
-                      <div className="p-2.5 rounded-xl bg-[#D6A042]/5 border border-[#D6A042]/20">
-                        <span className="text-[11px] text-[#D6A042] block">Commission (12%)</span>
-                        <div className="text-base font-bold text-[#D6A042] mt-0.5">
-                          AED {calculatedCommission.toLocaleString()}
-                        </div>
+                      <div className="flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5 text-[#8C8C8C]" />
+                        <span>{editForm.collectionAddress || selectedItem.collectionAddress || "703, Marina Quays East Tower, Dubai, UAE"}</span>
                       </div>
-
-                      <div className="p-2.5 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
-                        <span className="text-[11px] text-emerald-400 block">Seller Payout</span>
-                        <div className="text-base font-bold text-emerald-400 mt-0.5">
-                          AED {calculatedEarnings.toLocaleString()}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Seller Info */}
-                  <div className="bg-[#141416] border border-white/5 rounded-2xl p-4 space-y-2 text-xs">
-                    <span className="font-semibold uppercase text-white block mb-1">
-                      Seller Collection Info
-                    </span>
-                    <div className="flex items-center gap-2 text-[#8C8C8C]">
-                      <span className="text-white font-medium">Seller:</span>
-                      <span>{selectedItem.seller?.name || "Verified Seller"}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[#8C8C8C]">
-                      <Phone className="w-3.5 h-3.5 text-[#D6A042]" />
-                      <span>{editForm.sellerPhone || selectedItem.sellerPhone || "+971 50 123 4567"}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[#8C8C8C]">
-                      <MapPin className="w-3.5 h-3.5 text-[#D6A042]" />
-                      <span>{editForm.collectionAddress || "Dubai, UAE"}</span>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Action Buttons */}
-              <div className="p-6 border-t border-white/10 bg-[#141416]/90 backdrop-blur sticky bottom-0 z-10 flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsRejectOpen(true)}
-                  disabled={isSubmitting}
-                  className="flex-1 py-3 px-4 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 font-semibold text-sm transition-colors flex items-center justify-center gap-2"
-                >
-                  <XCircle className="w-4 h-4" /> Reject Listing
-                </button>
-                <button
-                  type="button"
-                  onClick={handleApprove}
-                  disabled={isSubmitting}
-                  className="flex-1 py-3 px-4 rounded-xl bg-gold-gradient text-black font-bold text-sm tracking-wide shadow-lg shadow-[#D6A042]/20 hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
-                >
-                  {isSubmitting ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <CheckCircle2 className="w-4 h-4" />
-                  )}
-                  Approve & Publish Live
-                </button>
+                {/* Bottom Action Buttons */}
+                <div className="pt-4 flex items-center gap-3">
+                  {/* Approve & Publish */}
+                  <button
+                    type="button"
+                    onClick={handleApprove}
+                    disabled={isSubmitting}
+                    className="flex-1 py-3.5 px-6 rounded-full bg-gold-gradient text-black font-bold text-sm tracking-wide shadow-lg shadow-[#D6A042]/20 hover:opacity-95 active:scale-[0.98] transition-all flex items-center justify-center gap-2 select-none"
+                  >
+                    {isSubmitting ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <>
+                        <span>Approve & Publish</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
+
+                  {/* Reject Listing */}
+                  <button
+                    type="button"
+                    onClick={() => setIsRejectOpen(true)}
+                    disabled={isSubmitting}
+                    className="flex-1 py-3.5 px-6 rounded-full bg-[#242428] hover:bg-[#2C2C32] text-white/90 font-semibold text-sm transition-colors border border-white/5 flex items-center justify-center select-none"
+                  >
+                    Reject Listing
+                  </button>
+                </div>
               </div>
             </div>
           )}
