@@ -161,6 +161,15 @@ function CalendarIcon({ className }: { className?: string }) {
   );
 }
 
+function PdfSolidIcon({ className }: { className?: string }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+      <path d="M4.20156 9.60039H3.60156V8.40039H4.20156C4.36069 8.40039 4.5133 8.4636 4.62583 8.57613C4.73835 8.68865 4.80156 8.84126 4.80156 9.00039C4.80156 9.15952 4.73835 9.31213 4.62583 9.42465C4.5133 9.53718 4.36069 9.60039 4.20156 9.60039ZM8.40156 12.0004V8.40039H9.00156C9.16069 8.40039 9.3133 8.4636 9.42583 8.57613C9.53835 8.68865 9.60156 8.84126 9.60156 9.00039V11.4004C9.60156 11.5595 9.53835 11.7121 9.42583 11.8247C9.3133 11.9372 9.16069 12.0004 9.00156 12.0004H8.40156Z" fill="#FFAF2C"/>
+      <path fillRule="evenodd" clipRule="evenodd" d="M1.19922 1.8C1.19922 1.32261 1.38886 0.864773 1.72643 0.527208C2.06399 0.189642 2.52183 0 2.99922 0L12.8476 0L16.7992 3.9516V16.2C16.7992 16.6774 16.6096 17.1352 16.272 17.4728C15.9344 17.8104 15.4766 18 14.9992 18H2.99922C2.52183 18 2.06399 17.8104 1.72643 17.4728C1.38886 17.1352 1.19922 16.6774 1.19922 16.2V1.8ZM4.19922 7.2H2.39922V13.2H3.59922V10.8H4.19922C4.67661 10.8 5.13445 10.6104 5.47201 10.2728C5.80958 9.93523 5.99922 9.47739 5.99922 9C5.99922 8.52261 5.80958 8.06477 5.47201 7.72721C5.13445 7.38964 4.67661 7.2 4.19922 7.2ZM8.99922 7.2H7.19922V13.2H8.99922C9.47661 13.2 9.93445 13.0104 10.272 12.6728C10.6096 12.3352 10.7992 11.8774 10.7992 11.4V9C10.7992 8.52261 10.6096 8.06477 10.272 7.72721C9.93445 7.38964 9.47661 7.2 8.99922 7.2ZM11.9992 13.2V7.2H15.5992V8.4H13.1992V9.6H14.3992V10.8H13.1992V13.2H11.9992Z" fill="#FFAF2C"/>
+    </svg>
+  );
+}
+
 export interface PendingProduct {
   _id: string;
   orderId?: number;
@@ -650,25 +659,69 @@ export default function PendingReviewTable() {
                     </span>
                     <button
                       type="button"
-                      onClick={() => setIsEditingDetails(!isEditingDetails)}
+                      onClick={() => {
+                        if (isEditingDetails) {
+                          // Save edits to current selected item & items list
+                          if (selectedItem) {
+                            setSelectedItem({
+                              ...selectedItem,
+                              name: editForm.name,
+                              brand: editForm.brand,
+                              description: editForm.description,
+                              condition: editForm.condition,
+                              price: editForm.price,
+                              collectionAddress: editForm.collectionAddress,
+                              sellerPhone: editForm.sellerPhone,
+                            });
+                            setItems((prev) =>
+                              prev.map((p) =>
+                                p._id === selectedItem._id
+                                  ? {
+                                      ...p,
+                                      name: editForm.name,
+                                      brand: editForm.brand,
+                                      description: editForm.description,
+                                      condition: editForm.condition,
+                                      price: editForm.price,
+                                      collectionAddress: editForm.collectionAddress,
+                                      sellerPhone: editForm.sellerPhone,
+                                    }
+                                  : p
+                              )
+                            );
+                          }
+                          setIsEditingDetails(false);
+                        } else {
+                          setIsEditingDetails(true);
+                        }
+                      }}
                       className="text-[#FFAF2C] underline decoration-solid text-[14px] font-medium leading-none cursor-pointer hover:opacity-85 transition-opacity"
                       style={{ fontFamily: 'var(--font-dm-sans, "DM Sans"), sans-serif', fontWeight: 500 }}
                     >
-                      {isEditingDetails ? "Done Editing" : "Edit Listing Details"}
+                      {isEditingDetails ? "Done" : "Edit Listing Details"}
                     </button>
                   </div>
 
                   {/* 1. Title Row */}
                   <div
-                    style={{ background: "linear-gradient(270.21deg, #2B2D32 -23.83%, #1C1D20 92.92%)" }}
-                    className="border border-white/[0.04] rounded-xl px-4 py-3.5 flex items-center justify-between gap-4"
+                    style={
+                      isEditingDetails
+                        ? { background: "#000000", border: "1px solid #FFFFFF33" }
+                        : {
+                            background:
+                              "linear-gradient(270.21deg, #2B2D32 -23.83%, #1C1D20 92.92%) padding-box, linear-gradient(180deg, rgba(255, 255, 255, 0.2) -8.12%, rgba(255, 255, 255, 0) 86.73%) border-box",
+                            border: "1px solid transparent",
+                          }
+                    }
+                    className="rounded-xl px-4 py-3.5 flex items-center justify-between gap-4 transition-all"
                   >
                     <span className="text-sm text-[#8C8C8C] shrink-0">Title</span>
                     {isEditingDetails ? (
-                      <Input
+                      <input
+                        type="text"
                         value={editForm.name}
                         onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                        className="h-8 text-right bg-transparent border-white/20 text-sm text-white focus-visible:ring-[#FFAF2C]"
+                        className="w-full text-right bg-transparent border-0 text-sm text-white font-normal focus:outline-none placeholder:text-[#555]"
                       />
                     ) : (
                       <span className="text-sm font-medium text-white text-right truncate">
@@ -679,15 +732,24 @@ export default function PendingReviewTable() {
 
                   {/* 2. Brand Row */}
                   <div
-                    style={{ background: "linear-gradient(270.21deg, #2B2D32 -23.83%, #1C1D20 92.92%)" }}
-                    className="border border-white/[0.04] rounded-xl px-4 py-3.5 flex items-center justify-between gap-4"
+                    style={
+                      isEditingDetails
+                        ? { background: "#000000", border: "1px solid #FFFFFF33" }
+                        : {
+                            background:
+                              "linear-gradient(270.21deg, #2B2D32 -23.83%, #1C1D20 92.92%) padding-box, linear-gradient(180deg, rgba(255, 255, 255, 0.2) -8.12%, rgba(255, 255, 255, 0) 86.73%) border-box",
+                            border: "1px solid transparent",
+                          }
+                    }
+                    className="rounded-xl px-4 py-3.5 flex items-center justify-between gap-4 transition-all"
                   >
                     <span className="text-sm text-[#8C8C8C] shrink-0">Brand</span>
                     {isEditingDetails ? (
-                      <Input
+                      <input
+                        type="text"
                         value={editForm.brand}
                         onChange={(e) => setEditForm({ ...editForm, brand: e.target.value })}
-                        className="h-8 text-right bg-transparent border-white/20 text-sm text-white focus-visible:ring-[#FFAF2C]"
+                        className="w-full text-right bg-transparent border-0 text-sm text-white font-normal focus:outline-none placeholder:text-[#555]"
                       />
                     ) : (
                       <span className="text-sm font-medium text-white text-right">
@@ -698,8 +760,16 @@ export default function PendingReviewTable() {
 
                   {/* 3. Description Block */}
                   <div
-                    style={{ background: "linear-gradient(270.21deg, #2B2D32 -23.83%, #1C1D20 92.92%)" }}
-                    className="border border-white/[0.04] rounded-xl p-4 space-y-1.5"
+                    style={
+                      isEditingDetails
+                        ? { background: "#000000", border: "1px solid #FFFFFF33" }
+                        : {
+                            background:
+                              "linear-gradient(270.21deg, #2B2D32 -23.83%, #1C1D20 92.92%) padding-box, linear-gradient(180deg, rgba(255, 255, 255, 0.2) -8.12%, rgba(255, 255, 255, 0) 86.73%) border-box",
+                            border: "1px solid transparent",
+                          }
+                    }
+                    className="rounded-xl p-4 space-y-1.5 transition-all"
                   >
                     <span className="text-sm text-[#8C8C8C] block">Description</span>
                     {isEditingDetails ? (
@@ -707,7 +777,7 @@ export default function PendingReviewTable() {
                         rows={3}
                         value={editForm.description}
                         onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                        className="w-full p-2 rounded-lg bg-black/40 border border-white/20 text-white text-xs placeholder:text-[#555] focus:outline-none focus:ring-1 focus:ring-[#FFAF2C] resize-none"
+                        className="w-full bg-transparent border-0 text-sm text-white font-normal focus:outline-none resize-none leading-relaxed p-0 placeholder:text-[#555]"
                       />
                     ) : (
                       <p className="text-sm text-white leading-relaxed font-normal">
@@ -718,17 +788,31 @@ export default function PendingReviewTable() {
 
                   {/* 4. Listing price Row */}
                   <div
-                    style={{ background: "linear-gradient(270.21deg, #2B2D32 -23.83%, #1C1D20 92.92%)" }}
-                    className="border border-white/[0.04] rounded-xl px-4 py-3.5 flex items-center justify-between gap-4"
+                    style={
+                      isEditingDetails
+                        ? { background: "#000000", border: "1px solid #FFFFFF33" }
+                        : {
+                            background:
+                              "linear-gradient(270.21deg, #2B2D32 -23.83%, #1C1D20 92.92%) padding-box, linear-gradient(180deg, rgba(255, 255, 255, 0.2) -8.12%, rgba(255, 255, 255, 0) 86.73%) border-box",
+                            border: "1px solid transparent",
+                          }
+                    }
+                    className="rounded-xl px-4 py-3.5 flex items-center justify-between gap-4 transition-all"
                   >
                     <span className="text-sm text-[#8C8C8C] shrink-0">listing price</span>
                     {isEditingDetails ? (
-                      <Input
-                        type="number"
-                        value={editForm.price}
-                        onChange={(e) => setEditForm({ ...editForm, price: Number(e.target.value) || 0 })}
-                        className="h-8 text-right bg-transparent border-white/20 text-sm text-white focus-visible:ring-[#FFAF2C]"
-                      />
+                      <div className="flex items-center gap-1.5 justify-end">
+                        <span className="text-sm font-normal text-white">AED</span>
+                        <input
+                          type="text"
+                          value={editForm.price ? editForm.price.toLocaleString() : ""}
+                          onChange={(e) => {
+                            const raw = e.target.value.replace(/[^0-9]/g, "");
+                            setEditForm({ ...editForm, price: raw ? Number(raw) : 0 });
+                          }}
+                          className="w-24 text-right bg-transparent border-0 text-sm text-white font-normal focus:outline-none"
+                        />
+                      </div>
                     ) : (
                       <span className="text-sm font-medium text-white">
                         AED {editForm.price?.toLocaleString()}
@@ -736,56 +820,121 @@ export default function PendingReviewTable() {
                     )}
                   </div>
 
-                  {/* 5. Condition Row */}
+                  {/* 5. Condition Row with Custom Dropdown */}
                   <div
-                    style={{ background: "linear-gradient(270.21deg, #2B2D32 -23.83%, #1C1D20 92.92%)" }}
-                    className="border border-white/[0.04] rounded-xl px-4 py-3.5 flex items-center justify-between gap-4"
+                    style={
+                      isEditingDetails
+                        ? { background: "#000000", border: "1px solid #FFFFFF33" }
+                        : {
+                            background:
+                              "linear-gradient(270.21deg, #2B2D32 -23.83%, #1C1D20 92.92%) padding-box, linear-gradient(180deg, rgba(255, 255, 255, 0.2) -8.12%, rgba(255, 255, 255, 0) 86.73%) border-box",
+                            border: "1px solid transparent",
+                          }
+                    }
+                    className="rounded-xl px-4 py-3.5 flex items-center justify-between gap-4 transition-all"
                   >
                     <span className="text-sm text-[#8C8C8C] shrink-0">Condition</span>
                     {isEditingDetails ? (
-                      <select
-                        value={editForm.condition}
-                        onChange={(e) => setEditForm({ ...editForm, condition: e.target.value })}
-                        className="h-8 px-2 rounded-lg bg-black/60 border border-white/20 text-white text-xs focus:outline-none focus:ring-1 focus:ring-[#FFAF2C]"
-                      >
-                        <option value="New / Unworn">New / Unworn</option>
-                        <option value="Pristine">Pristine</option>
-                        <option value="Excellent">Excellent</option>
-                        <option value="Very Good">Very Good</option>
-                        <option value="Good">Good</option>
-                        <option value="Fair">Fair</option>
-                      </select>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="inline-flex items-center gap-2 text-sm text-white font-normal focus:outline-none cursor-pointer select-none">
+                          <span>{editForm.condition || "Excellent"}</span>
+                          <ChevronDown className="w-4 h-4 text-white shrink-0" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="end"
+                          className="bg-[#1E2024] border border-white/10 rounded-2xl p-1.5 min-w-[160px] text-white shadow-2xl z-50 space-y-0.5"
+                        >
+                          {[
+                            "New with Tags",
+                            "Like New",
+                            "Excellent",
+                            "Very Good",
+                            "Good",
+                            "Fair",
+                          ].map((c) => (
+                            <DropdownMenuItem
+                              key={c}
+                              onClick={() => setEditForm({ ...editForm, condition: c })}
+                              className={`px-3.5 py-2 rounded-xl text-sm font-normal cursor-pointer transition-colors ${
+                                (editForm.condition || "Excellent") === c
+                                  ? "bg-[#34363F] text-white"
+                                  : "text-white/90 hover:bg-[#2B2D35] hover:text-white"
+                              }`}
+                            >
+                              {c}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     ) : (
                       <span className="text-sm font-medium text-white">
-                        {editForm.condition}
+                        {editForm.condition || "Excellent"}
                       </span>
                     )}
                   </div>
 
-                  {/* 6. Proof of purchase Row */}
+                  {/* 6. Proof of purchase Row (Color never changes, stays fixed gradient) */}
                   <div
-                    style={{ background: "linear-gradient(270.21deg, #2B2D32 -23.83%, #1C1D20 92.92%)" }}
-                    className="border border-white/[0.04] rounded-xl px-4 py-3.5 flex items-center justify-between gap-4"
+                    style={{
+                      background:
+                        "linear-gradient(270.21deg, #2B2D32 -23.83%, #1C1D20 92.92%) padding-box, linear-gradient(180deg, rgba(255, 255, 255, 0.2) -8.12%, rgba(255, 255, 255, 0) 86.73%) border-box",
+                      border: "1px solid transparent",
+                    }}
+                    className="rounded-xl px-4 py-3.5 flex items-center justify-between gap-4"
                   >
                     <span className="text-sm text-[#8C8C8C] shrink-0">Proof of purchase</span>
                     <a
                       href="#"
                       onClick={(e) => e.preventDefault()}
-                      className="text-sm font-medium text-[#FFAF2C] inline-flex items-center gap-1.5 hover:underline cursor-pointer"
+                      className="inline-flex items-center gap-1.5 hover:opacity-85 transition-opacity cursor-pointer group"
                     >
-                      <span className="bg-[#FFAF2C] text-black text-[9px] font-bold px-1.5 py-0.5 rounded leading-none">
-                        PDF
+                      <PdfSolidIcon className="w-[18px] h-[18px] shrink-0" />
+                      <span className="text-sm font-medium text-[#FFAF2C]">
+                        {selectedItem.proofOfPurchase || "Bill.pdf"}
                       </span>
-                      <span>{selectedItem.proofOfPurchase || "Bill.pdf"}</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#FFAF2C"
+                        strokeWidth="2.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="shrink-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"
+                      >
+                        <path d="M7 17L17 7" />
+                        <path d="M7 7h10v10" />
+                      </svg>
                     </a>
                   </div>
 
-                  {/* Packaging Note */}
-                  <div className="text-xs text-[#8C8C8C] flex items-center gap-2 pt-1">
-                    <Check className="w-3.5 h-3.5 text-[#8C8C8C]" />
-                    <span>Available original packaging.</span>
-                  </div>
+                  {/* Packaging Note (Dynamic: Available / Unavailable) */}
+                  {(() => {
+                    const isAvailable =
+                      selectedItem.originalPackagingAvailable !== false &&
+                      Boolean(
+                        editForm.packaging ||
+                          selectedItem.packaging ||
+                          selectedItem.originalPackagingAvailable
+                      );
+
+                    return (
+                      <div className="text-xs text-[#8C8C8C] flex items-center gap-2 pt-1 font-normal select-none">
+                        {isAvailable ? (
+                          <>
+                            <CheckCircle2 className="w-4 h-4 text-[#8C8C8C] shrink-0" strokeWidth={1.8} />
+                            <span>Available original packaging.</span>
+                          </>
+                        ) : (
+                          <>
+                            <XCircle className="w-4 h-4 text-[#8C8C8C] shrink-0" strokeWidth={1.8} />
+                            <span>Unavailable original packaging.</span>
+                          </>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* SELLER Section */}
@@ -795,26 +944,32 @@ export default function PendingReviewTable() {
                   </span>
 
                   <div
-                    style={{ background: "linear-gradient(270.21deg, #2B2D32 -23.83%, #1C1D20 92.92%)" }}
-                    className="border border-white/[0.04] rounded-xl p-4 space-y-3"
+                    style={{
+                      background:
+                        "linear-gradient(270.21deg, #2B2D32 -23.83%, #1C1D20 92.92%) padding-box, linear-gradient(180deg, rgba(255, 255, 255, 0.2) -8.12%, rgba(255, 255, 255, 0) 86.73%) border-box",
+                      border: "1px solid transparent",
+                    }}
+                    className="rounded-xl p-4 space-y-3"
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-semibold text-white">
                         {selectedItem.seller?.name || "Kim Kardashian"}
                       </span>
-                      <span className="inline-flex items-center gap-1 text-xs text-[#107D2C] font-medium">
-                        <Check className="w-3.5 h-3.5 text-[#107D2C]" /> Payout Verified
+                      <span className="inline-flex items-center gap-1 text-xs text-[#107D2C] font-medium bg-[#107D2C]/15 border border-[#107D2C]/30 px-2.5 py-0.5 rounded-full select-none">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#107D2C]" strokeWidth={2} />
+                        <span>Payout Verified</span>
                       </span>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[#8C8C8C]">
-                      <div className="flex items-center gap-1.5">
-                        <Phone className="w-3.5 h-3.5 text-[#8C8C8C]" />
+                    <div className="flex items-center gap-3 text-xs text-[#8C8C8C] overflow-hidden">
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <Phone className="w-3.5 h-3.5 text-[#8C8C8C] shrink-0" />
                         <span>{editForm.sellerPhone || selectedItem.sellerPhone || "+1 (626) 389-2743"}</span>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-[#8C8C8C]" />
-                        <span>{editForm.collectionAddress || selectedItem.collectionAddress || "703, Marina Quays East Tower, Dubai, UAE"}</span>
+                      <span className="h-3.5 w-[1px] bg-white/10 shrink-0" />
+                      <div className="flex items-center gap-1.5 min-w-0 truncate">
+                        <MapPin className="w-3.5 h-3.5 text-[#8C8C8C] shrink-0" />
+                        <span className="truncate">{editForm.collectionAddress || selectedItem.collectionAddress || "703, Marina Quays East Tower, Dubai, UAE"}</span>
                       </div>
                     </div>
                   </div>
@@ -826,15 +981,19 @@ export default function PendingReviewTable() {
                   <button
                     type="button"
                     onClick={handleApprove}
-                    disabled={isSubmitting}
-                    className="flex-1 py-3.5 px-6 rounded-full bg-gold-gradient text-black font-bold text-sm tracking-wide shadow-lg shadow-[#D6A042]/20 hover:opacity-95 active:scale-[0.98] transition-all flex items-center justify-center gap-2 select-none"
+                    disabled={isSubmitting || isEditingDetails}
+                    className={`flex-1 py-3.5 px-6 rounded-full text-sm font-semibold transition-all flex items-center justify-center gap-2 select-none ${
+                      isEditingDetails
+                        ? "bg-[#383A40] text-white/70 cursor-not-allowed"
+                        : "bg-gold-gradient text-black font-bold tracking-wide shadow-lg shadow-[#D6A042]/20 hover:opacity-95 active:scale-[0.98] cursor-pointer"
+                    }`}
                   >
                     {isSubmitting ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
                       <>
                         <span>Approve & Publish</span>
-                        <ArrowRight className="w-4 h-4" />
+                        <ArrowRight className="w-4 h-4" strokeWidth={2.5} />
                       </>
                     )}
                   </button>
@@ -843,8 +1002,12 @@ export default function PendingReviewTable() {
                   <button
                     type="button"
                     onClick={() => setIsRejectOpen(true)}
-                    disabled={isSubmitting}
-                    className="flex-1 py-3.5 px-6 rounded-full bg-[#242428] hover:bg-[#2C2C32] text-white/90 font-semibold text-sm transition-colors border border-white/5 flex items-center justify-center select-none"
+                    disabled={isSubmitting || isEditingDetails}
+                    className={`flex-1 py-3.5 px-6 rounded-full text-sm font-semibold transition-colors border border-white/5 flex items-center justify-center select-none ${
+                      isEditingDetails
+                        ? "bg-[#202124] text-white/50 cursor-not-allowed"
+                        : "bg-[#242428] hover:bg-[#2C2C32] text-white/90 cursor-pointer"
+                    }`}
                   >
                     Reject Listing
                   </button>
