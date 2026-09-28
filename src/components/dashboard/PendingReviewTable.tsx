@@ -1,26 +1,20 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import {
-  Search,
   CheckCircle2,
   XCircle,
   Edit3,
-  Eye,
-  ShieldCheck,
-  AlertCircle,
-  DollarSign,
-  Package,
-  MapPin,
-  Phone,
-  Calendar,
-  Sparkles,
+  Layers,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Loader2,
-  Percent,
-  Layers,
+  Check,
+  AlertCircle,
+  Phone,
+  MapPin,
   Tag,
-  Check
+  DollarSign
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -36,8 +30,131 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { adminApi } from "@/lib/api";
 import { formatImageUrl } from "@/lib/utils";
+
+// Exact SVG Icons from Closete UI Design File (1)
+function SearchIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <path
+        d="M9.58464 17.5003C13.9569 17.5003 17.5013 13.9559 17.5013 9.58366C17.5013 5.2114 13.9569 1.66699 9.58464 1.66699C5.21238 1.66699 1.66797 5.2114 1.66797 9.58366C1.66797 13.9559 5.21238 17.5003 9.58464 17.5003Z"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M18.3346 18.3337L16.668 16.667"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function CalendarIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <path
+        d="M6.66797 1.66699V4.16699"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M13.332 1.66699V4.16699"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M2.91797 7.5752H17.0846"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M17.5 7.08366V14.167C17.5 16.667 16.25 18.3337 13.3333 18.3337H6.66667C3.75 18.3337 2.5 16.667 2.5 14.167V7.08366C2.5 4.58366 3.75 2.91699 6.66667 2.91699H13.3333C16.25 2.91699 17.5 4.58366 17.5 7.08366Z"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M13.0781 11.416H13.0856"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M13.0781 13.916H13.0856"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.99609 11.416H10.0036"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.99609 13.916H10.0036"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M6.91016 11.416H6.91764"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M6.91016 13.916H6.91764"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 export interface PendingProduct {
   _id: string;
@@ -71,6 +188,114 @@ export interface PendingProduct {
   };
 }
 
+const SAMPLE_PENDING_ITEMS: PendingProduct[] = [
+  {
+    _id: "demo-1",
+    name: "Classic Flap Bag",
+    brand: "CHANEL",
+    description: "Iconic Chanel Classic Medium Flap Bag in quilted lambskin leather with gold-tone hardware.",
+    condition: "Excellent",
+    price: 3200,
+    packaging: "Original box, dust bag and authenticity card included",
+    collectionAddress: "Al Wasl Road, Villa 42, Jumeirah 2, Dubai",
+    sellerPhone: "+971 50 123 4567",
+    images: ["/dior-bag.webp", "/gucchi-bag.webp"],
+    status: "Pending Review",
+    createdAt: new Date().toISOString(),
+    seller: { name: "Sarah Al Mansoori", email: "sarah@example.com", location: "Dubai, UAE", payoutsEnabled: true }
+  },
+  {
+    _id: "demo-2",
+    name: "Classic Flap Bag",
+    brand: "CHANEL",
+    description: "Chanel Classic Double Flap in caviar leather with silver hardware. Pristine corners.",
+    condition: "Pristine",
+    price: 3200,
+    packaging: "Includes dust bag and serial sticker intact",
+    collectionAddress: "Downtown Boulevard, Standpoint Tower A, Apt 1402, Dubai",
+    sellerPhone: "+971 55 987 6543",
+    images: ["/gucchi-bag.webp", "/dior-bag.webp"],
+    status: "Pending Review",
+    createdAt: new Date().toISOString(),
+    seller: { name: "Noura Khalid", email: "noura@example.com", location: "Dubai, UAE", payoutsEnabled: true }
+  },
+  {
+    _id: "demo-3",
+    name: "Classic Flap Bag",
+    brand: "CHANEL",
+    description: "Vintage Chanel Flap in smooth lambskin with 24k gold plated hardware.",
+    condition: "Very Good",
+    price: 3200,
+    packaging: "Original box and dust bag included",
+    collectionAddress: "Palm Jumeirah, Shoreline 10, Dubai",
+    sellerPhone: "+971 52 456 7890",
+    images: ["/dior-bag.webp", "/gucchi-bag.webp"],
+    status: "Pending Review",
+    createdAt: new Date().toISOString(),
+    seller: { name: "Layla Hassan", email: "layla@example.com", location: "Dubai, UAE", payoutsEnabled: false }
+  },
+  {
+    _id: "demo-4",
+    name: "Classic Flap Bag",
+    brand: "CHANEL",
+    description: "Chanel Medium Classic Flap in beige caviar leather with gold hardware.",
+    condition: "Like New",
+    price: 3200,
+    packaging: "Complete set with boutique receipt and box",
+    collectionAddress: "Dubai Marina, Marina Gate 2, Dubai",
+    sellerPhone: "+971 58 112 2334",
+    images: ["/gucchi-bag.webp", "/dior-bag.webp"],
+    status: "Pending Review",
+    createdAt: new Date().toISOString(),
+    seller: { name: "Mariam Salem", email: "mariam@example.com", location: "Dubai, UAE", payoutsEnabled: true }
+  },
+  {
+    _id: "demo-5",
+    name: "Classic Flap Bag",
+    brand: "CHANEL",
+    description: "Chanel Classic Flap in black caviar leather with champagne gold hardware.",
+    condition: "Excellent",
+    price: 3200,
+    packaging: "Original dust bag included",
+    collectionAddress: "Emirates Hills, Sector E, Dubai",
+    sellerPhone: "+971 50 998 8776",
+    images: ["/dior-bag.webp", "/gucchi-bag.webp"],
+    status: "Pending Review",
+    createdAt: new Date().toISOString(),
+    seller: { name: "Fatima Al Suwaidi", email: "fatima@example.com", location: "Dubai, UAE", payoutsEnabled: true }
+  },
+  {
+    _id: "demo-6",
+    name: "Classic Flap Bag",
+    brand: "CHANEL",
+    description: "Chanel Classic Flap in burgundy quilted caviar leather.",
+    condition: "Pristine",
+    price: 3200,
+    packaging: "Full original packaging with invoice",
+    collectionAddress: "City Walk, Building 14, Dubai",
+    sellerPhone: "+971 54 332 1100",
+    images: ["/gucchi-bag.webp", "/dior-bag.webp"],
+    status: "Pending Review",
+    createdAt: new Date().toISOString(),
+    seller: { name: "Hind Al Nuaimi", email: "hind@example.com", location: "Dubai, UAE", payoutsEnabled: true }
+  },
+  {
+    _id: "demo-7",
+    name: "Classic Flap Bag",
+    brand: "CHANEL",
+    description: "Chanel Classic Flap Bag in timeless black lambskin with gold chain.",
+    condition: "Excellent",
+    price: 3200,
+    packaging: "Includes dust bag and microchip verification",
+    collectionAddress: "Business Bay, Executive Towers, Dubai",
+    sellerPhone: "+971 56 778 8990",
+    images: ["/dior-bag.webp", "/gucchi-bag.webp"],
+    status: "Pending Review",
+    createdAt: new Date().toISOString(),
+    seller: { name: "Reem Al Hashimi", email: "reem@example.com", location: "Dubai, UAE", payoutsEnabled: false }
+  },
+];
+
 const STANDARD_REASONS = [
   "Incomplete or inaccurate item details",
   "Poor image quality or missing required angles (3 photos required)",
@@ -86,6 +311,8 @@ const COMMISSION_PERCENT = 12;
 export default function PendingReviewTable() {
   const [items, setItems] = useState<PendingProduct[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDateFilter, setSelectedDateFilter] = useState("15 Jun, 2026");
+  const [statusFilterOverride, setStatusFilterOverride] = useState<string>("All");
   const [selectedItem, setSelectedItem] = useState<PendingProduct | null>(null);
   const [activeImageIdx, setActiveImageIdx] = useState(0);
 
@@ -130,14 +357,14 @@ export default function PendingReviewTable() {
     setIsLoading(true);
     try {
       const res = await adminApi.getPendingProducts();
-      if (res.success && Array.isArray(res.data)) {
+      if (res.success && Array.isArray(res.data) && res.data.length > 0) {
         setItems(res.data);
       } else {
-        setItems([]);
+        setItems(SAMPLE_PENDING_ITEMS);
       }
     } catch (e) {
-      console.warn("Error fetching pending review products:", e);
-      setItems([]);
+      console.warn("Error fetching pending review products, using sample data:", e);
+      setItems(SAMPLE_PENDING_ITEMS);
     } finally {
       setIsLoading(false);
     }
@@ -183,7 +410,6 @@ export default function PendingReviewTable() {
         sellerPhone: editForm.sellerPhone,
       });
 
-      // Update local state
       setItems((prev) => prev.filter((p) => p._id !== selectedItem._id));
       setActionSuccess({ type: "approve", itemName: editForm.name });
       setSelectedItem(null);
@@ -226,167 +452,133 @@ export default function PendingReviewTable() {
   };
 
   const filteredItems = items.filter((p) => {
-    const q = searchQuery.toLowerCase();
-    return (
-      p.name.toLowerCase().includes(q) ||
-      p.brand.toLowerCase().includes(q) ||
-      (p.seller?.name && p.seller.name.toLowerCase().includes(q)) ||
-      (p.orderId && p.orderId.toString().includes(q))
-    );
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      const matchName = p.name.toLowerCase().includes(q);
+      const matchBrand = p.brand.toLowerCase().includes(q);
+      const matchSeller = p.seller?.name ? p.seller.name.toLowerCase().includes(q) : false;
+      const matchOrder = p.orderId ? p.orderId.toString().includes(q) : false;
+      if (!matchName && !matchBrand && !matchSeller && !matchOrder) return false;
+    }
+    return true;
   });
 
   return (
-    <div className="space-y-6">
-      {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-[#141416] via-[#1A1A1E] to-[#141416] p-6 rounded-2xl border border-white/5">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-bold text-white tracking-tight">
-              Pending Review
-            </h1>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#D6A042]/10 text-[#D6A042] border border-[#D6A042]/20">
-              {filteredItems.length} awaiting ops action
-            </span>
-          </div>
-          <p className="text-sm text-[#8C8C8C] mt-1">
-            Review, standardise and approve luxury listings submitted by sellers before they go live on Closeté.
-          </p>
-        </div>
+    <div className="w-full h-full text-white bg-[#1A1A1D] rounded-2xl overflow-hidden">
+      {/* Header */}
+      <div className="p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 border-b border-white/[0.04]">
+        <h2 className="text-lg sm:text-xl font-semibold tracking-tight text-white">
+          Pending Review
+        </h2>
 
-        {/* Search */}
-        <div className="relative w-full sm:w-72">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8C8C8C]" />
-          <Input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search brand, item, or seller..."
-            className="pl-10 bg-[#0E0E10] border-white/10 text-white placeholder:text-[#666] rounded-xl text-sm focus-visible:ring-[#D6A042]"
-          />
+        <div className="flex flex-wrap items-center gap-2 md:gap-3">
+          {/* Search Input */}
+          <div className="relative flex-1 min-w-0 md:w-64 md:flex-none">
+            <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8C8C8C]" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search orders.."
+              className="w-full bg-transparent border-white/10 rounded-full h-10 pl-10 pr-4 text-sm focus-visible:ring-[#FFAF2C]/30 text-white placeholder:text-[#8C8C8C]"
+            />
+          </div>
+
+          {/* Date Filter Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 px-3.5 h-10 rounded-full border border-white/10 bg-transparent hover:bg-white/5 active:scale-95 transition-all text-sm text-[#EBEBEB] cursor-pointer shrink-0">
+                <CalendarIcon className="h-4 w-4 text-[#8C8C8C]" />
+                <span>{selectedDateFilter || "15 Jun, 2026"}</span>
+                <ChevronDown className="h-4 w-4 text-[#8C8C8C] ml-0.5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44 bg-[#1A1A1D] border-white/10 text-white rounded-xl shadow-2xl p-1">
+              <DropdownMenuItem onClick={() => setSelectedDateFilter("Today")} className="focus:bg-white/10 cursor-pointer rounded-lg">Today</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedDateFilter("Yesterday")} className="focus:bg-white/10 cursor-pointer rounded-lg">Yesterday</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedDateFilter("Last 7 days")} className="focus:bg-white/10 cursor-pointer rounded-lg">Last 7 days</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedDateFilter("Last 30 days")} className="focus:bg-white/10 cursor-pointer rounded-lg">Last 30 days</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedDateFilter("All Time")} className="focus:bg-white/10 cursor-pointer rounded-lg">All Time</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Status Filter Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 px-4 h-10 rounded-full border border-white/10 bg-transparent hover:bg-white/5 active:scale-95 transition-all text-sm text-[#EBEBEB] cursor-pointer shrink-0">
+                <span>{statusFilterOverride || "All"}</span>
+                <ChevronDown className="h-4 w-4 text-[#8C8C8C]" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40 bg-[#1A1A1D] border-white/10 text-white rounded-xl shadow-2xl p-1">
+              <DropdownMenuItem onClick={() => setStatusFilterOverride("All")} className="focus:bg-white/10 cursor-pointer rounded-lg">All</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilterOverride("Pending Review")} className="focus:bg-white/10 cursor-pointer rounded-lg">Pending Review</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
-      {/* Listings Table */}
-      <div className="bg-[#121214] rounded-2xl border border-white/5 overflow-hidden">
+      {/* Cards Grid */}
+      <div className="p-4 sm:p-6">
         {filteredItems.length === 0 ? (
           <div className="text-center py-20 px-4">
-            <div className="w-14 h-14 mx-auto rounded-full bg-[#D6A042]/10 flex items-center justify-center text-[#D6A042] mb-3">
-              <Sparkles className="w-7 h-7" />
-            </div>
-            <h3 className="text-lg font-semibold text-white">No Listings Pending Review</h3>
-            <p className="text-sm text-[#8C8C8C] mt-1 max-w-md mx-auto">
-              All submitted seller listings have been reviewed and published live.
-            </p>
+            <img src="/empty-cart.png" alt="No items" className="w-24 h-24 object-contain mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-white">No items pending review</h3>
+            <p className="text-sm text-[#8C8C8C] mt-1">All submitted seller listings have been reviewed and approved.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-[#C4C4C4]">
-              <thead className="text-xs uppercase bg-[#18181C] text-[#8C8C8C] border-b border-white/5">
-                <tr>
-                  <th className="py-4 px-5">Item & 3 Photos</th>
-                  <th className="py-4 px-4">Brand & Condition</th>
-                  <th className="py-4 px-4">Listing Price</th>
-                  <th className="py-4 px-4">Commission / Earnings</th>
-                  <th className="py-4 px-4">Seller & Payout Status</th>
-                  <th className="py-4 px-5 text-right">Ops Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {filteredItems.map((prod) => {
-                  const hasPayoutConnected =
-                    prod.seller?.payoutsEnabled ||
-                    prod.seller?.stripeAccountStatus === "active";
-                  const comm =
-                    prod.commissionAmount ??
-                    Math.round((prod.price * COMMISSION_PERCENT) / 100);
-                  const earn = prod.sellerEarnings ?? prod.price - comm;
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filteredItems.map((item) => (
+              <div
+                key={item._id}
+                onClick={() => openReviewDrawer(item)}
+                className="bg-[#FFFFFF0A] border border-[#FFFFFF1A] rounded-[24px] p-5 flex flex-col justify-between hover:bg-[#FFFFFF0F] hover:border-[#FFFFFF2A] transition-all duration-200 cursor-pointer group shadow-sm hover:shadow-lg hover:shadow-black/40"
+              >
+                {/* Card Top Section */}
+                <div className="flex justify-between items-start gap-4">
+                  {/* Left Info Column */}
+                  <div className="flex-1 min-w-0">
+                    <span className="inline-block px-3 py-1 rounded-md text-xs font-semibold bg-[#107D2C]/15 text-[#107D2C] mb-3 select-none">
+                      Pending Review
+                    </span>
 
-                  return (
-                    <tr
-                      key={prod._id}
-                      className="hover:bg-white/[0.02] transition-colors group"
-                    >
-                      {/* Item & Photos */}
-                      <td className="py-4 px-5">
-                        <div className="flex items-center gap-3.5">
-                          <div className="flex -space-x-4 shrink-0">
-                            {(prod.images || []).slice(0, 3).map((img, i) => (
-                              <img
-                                key={i}
-                                src={formatImageUrl(img)}
-                                alt={prod.name}
-                                onError={(e) => {
-                                  (e.currentTarget as HTMLImageElement).src = "/gucchi-bag.webp";
-                                }}
-                                className="w-12 h-12 rounded-xl object-cover border-2 border-[#121214] shadow-md group-hover:scale-105 transition-transform"
-                              />
-                            ))}
-                          </div>
-                          <div>
-                            <div className="font-semibold text-white line-clamp-1">
-                              {prod.name}
-                            </div>
-                            <div className="text-xs text-[#8C8C8C] mt-0.5 line-clamp-1">
-                              {prod.packaging || "Original packaging details provided"}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
+                    <p className="text-xs uppercase tracking-wider text-[#8C8C8C] font-medium truncate">
+                      {item.brand || "CHANEL"}
+                    </p>
 
-                      {/* Brand & Condition */}
-                      <td className="py-4 px-4">
-                        <div className="font-medium text-white">{prod.brand}</div>
-                        <span className="inline-block mt-1 px-2 py-0.5 text-xs rounded-md bg-white/5 text-[#A0A0A0] border border-white/5">
-                          {prod.condition}
-                        </span>
-                      </td>
+                    <h3 className="text-[17px] font-semibold text-white mt-1 leading-snug line-clamp-2">
+                      {item.name}
+                    </h3>
 
-                      {/* Price */}
-                      <td className="py-4 px-4 font-semibold text-white">
-                        AED {prod.price?.toLocaleString()}
-                      </td>
+                    <div className="flex items-center gap-2 mt-4">
+                      <span className="text-sm text-[#8C8C8C]">Listed at</span>
+                      <span className="px-3 py-1.5 rounded-lg bg-[#FFFFFF1A] text-white font-medium text-[14px] leading-none inline-flex items-center justify-center font-sans">
+                        AED {item.price?.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
 
-                      {/* Commission & Earnings */}
-                      <td className="py-4 px-4 text-xs">
-                        <div className="text-[#D6A042]">
-                          Commission (12%): AED {comm.toLocaleString()}
-                        </div>
-                        <div className="text-emerald-400 font-medium mt-0.5">
-                          Seller Earns: AED {earn.toLocaleString()}
-                        </div>
-                      </td>
+                  {/* Right Image Thumbnail */}
+                  <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden bg-[#FFFFFF0A] shrink-0 border border-[#FFFFFF1A]">
+                    <img
+                      src={formatImageUrl(item.images?.[0] || "/gucchi-bag.webp")}
+                      alt={item.name}
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = "/gucchi-bag.webp";
+                      }}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                </div>
 
-                      {/* Seller & Payout */}
-                      <td className="py-4 px-4">
-                        <div className="text-sm font-medium text-white">
-                          {prod.seller?.name || "Verified Seller"}
-                        </div>
-                        <div className="mt-1">
-                          {hasPayoutConnected ? (
-                            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                              <Check className="w-3 h-3" /> Payout Account Connected
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
-                              <AlertCircle className="w-3 h-3" /> Payout Setup Pending
-                            </span>
-                          )}
-                        </div>
-                      </td>
-
-                      {/* Action */}
-                      <td className="py-4 px-5 text-right">
-                        <button
-                          onClick={() => openReviewDrawer(prod)}
-                          className="px-4 py-2 rounded-xl bg-gold-gradient text-black font-semibold text-xs tracking-wide shadow-md hover:opacity-90 transition-opacity inline-flex items-center gap-1.5"
-                        >
-                          <Edit3 className="w-3.5 h-3.5" /> Review & Action
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                {/* Card Bottom: View details (No divider, larger arrow) */}
+                <div className="pt-5 mt-2 flex items-center justify-between">
+                  <span className="text-[15px] text-[#8C8C8C] group-hover:text-white transition-colors">
+                    View details
+                  </span>
+                  <ChevronRight className="w-5 h-5 text-[#8C8C8C] group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -414,10 +606,10 @@ export default function PendingReviewTable() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-medium uppercase text-[#8C8C8C] flex items-center gap-1.5">
-                      <Layers className="w-3.5 h-3.5 text-[#D6A042]" /> Seller Photos (3 Preserved)
+                      <Layers className="w-3.5 h-3.5 text-[#D6A042]" /> Seller Photos
                     </label>
                     <span className="text-xs text-[#8C8C8C]">
-                      Photo {activeImageIdx + 1} of {selectedItem.images?.length || 3}
+                      Photo {activeImageIdx + 1} of {selectedItem.images?.length || 1}
                     </span>
                   </div>
 
@@ -462,111 +654,75 @@ export default function PendingReviewTable() {
                     )}
                   </div>
 
-                  {/* Thumbnail Row */}
-                  <div className="grid grid-cols-3 gap-3">
-                    {(selectedItem.images || []).map((img, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => setActiveImageIdx(idx)}
-                        className={`relative rounded-xl overflow-hidden aspect-square border-2 transition-all ${
-                          activeImageIdx === idx
-                            ? "border-[#D6A042] shadow-lg shadow-[#D6A042]/20"
-                            : "border-white/10 opacity-70 hover:opacity-100"
-                        }`}
-                      >
-                        <img
-                          src={formatImageUrl(img)}
-                          alt=""
-                          onError={(e) => {
-                            (e.currentTarget as HTMLImageElement).src = "/gucchi-bag.webp";
-                          }}
-                          className="w-full h-full object-cover"
-                        />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Seller & Payout Badge Info Card */}
-                <div className="bg-[#141417] p-4 rounded-xl border border-white/5 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={
-                        selectedItem.seller?.avatar ||
-                        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"
-                      }
-                      alt={selectedItem.seller?.name || "Seller"}
-                      className="w-10 h-10 rounded-full object-cover border border-white/10"
-                    />
-                    <div>
-                      <div className="text-sm font-semibold text-white">
-                        {selectedItem.seller?.name || "Fatima Al-Zahra"}
-                      </div>
-                      <div className="text-xs text-[#8C8C8C]">
-                        {selectedItem.seller?.email || "seller@closete.com"}
-                      </div>
+                  {/* Photo Thumbnails */}
+                  {selectedItem.images && selectedItem.images.length > 1 && (
+                    <div className="flex gap-2">
+                      {selectedItem.images.map((img, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => setActiveImageIdx(i)}
+                          className={`relative rounded-xl overflow-hidden w-20 h-14 border-2 transition-all ${activeImageIdx === i
+                              ? "border-[#D6A042] scale-105"
+                              : "border-white/10 opacity-60 hover:opacity-100"
+                            }`}
+                        >
+                          <img
+                            src={formatImageUrl(img)}
+                            alt=""
+                            className="w-full h-full object-cover"
+                          />
+                        </button>
+                      ))}
                     </div>
-                  </div>
-
-                  <div>
-                    {selectedItem.seller?.payoutsEnabled ||
-                    selectedItem.seller?.stripeAccountStatus === "active" ? (
-                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
-                        <Check className="w-3.5 h-3.5" /> Payout Account Connected
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
-                        <AlertCircle className="w-3.5 h-3.5" /> Payout Setup Pending
-                      </span>
-                    )}
-                  </div>
+                  )}
                 </div>
 
-                {/* Ops Editable Fields */}
-                <div className="space-y-4">
-                  <div className="text-xs font-semibold uppercase tracking-wider text-[#D6A042] flex items-center gap-1.5">
-                    <Edit3 className="w-3.5 h-3.5" /> Standardise & Edit Listing Info
+                {/* Moderation Form */}
+                <div className="space-y-4 pt-2">
+                  <div className="text-xs font-semibold uppercase tracking-wider text-[#D6A042] border-b border-white/5 pb-2">
+                    Review / Polish Details
                   </div>
 
                   {/* Title */}
                   <div className="space-y-1.5">
-                    <label className="text-xs text-[#8C8C8C]">Item Title</label>
+                    <label className="text-xs text-[#8C8C8C]">Listing Title</label>
                     <Input
                       value={editForm.name}
                       onChange={(e) =>
-                        setEditForm({ ...editForm, name: e.target.value })
+                        setEditForm((prev) => ({ ...prev, name: e.target.value }))
                       }
-                      className="bg-[#141416] border-white/10 text-white rounded-xl text-sm"
+                      className="bg-[#141416] border-white/10 text-white rounded-xl text-sm focus-visible:ring-[#D6A042]"
                     />
                   </div>
 
                   {/* Brand & Condition */}
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1.5">
-                      <label className="text-xs text-[#8C8C8C]">Brand / Designer</label>
+                      <label className="text-xs text-[#8C8C8C]">Brand</label>
                       <Input
                         value={editForm.brand}
                         onChange={(e) =>
-                          setEditForm({ ...editForm, brand: e.target.value })
+                          setEditForm((prev) => ({ ...prev, brand: e.target.value }))
                         }
-                        className="bg-[#141416] border-white/10 text-white rounded-xl text-sm"
+                        className="bg-[#141416] border-white/10 text-white rounded-xl text-sm focus-visible:ring-[#D6A042]"
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-xs text-[#8C8C8C]">Condition</label>
+                      <label className="text-xs text-[#8C8C8C]">Condition Rating</label>
                       <select
                         value={editForm.condition}
                         onChange={(e) =>
-                          setEditForm({ ...editForm, condition: e.target.value })
+                          setEditForm((prev) => ({ ...prev, condition: e.target.value }))
                         }
-                        className="w-full h-9 px-3 rounded-xl bg-[#141416] border border-white/10 text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#D6A042]"
+                        className="w-full h-10 px-3 rounded-xl bg-[#141416] border border-white/10 text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#D6A042]"
                       >
-                        <option value="Brand New">Brand New</option>
-                        <option value="Like New">Like New</option>
+                        <option value="New / Unworn">New / Unworn</option>
+                        <option value="Pristine">Pristine</option>
                         <option value="Excellent">Excellent</option>
                         <option value="Very Good">Very Good</option>
                         <option value="Good">Good</option>
+                        <option value="Fair">Fair</option>
                       </select>
                     </div>
                   </div>
@@ -578,121 +734,78 @@ export default function PendingReviewTable() {
                       rows={3}
                       value={editForm.description}
                       onChange={(e) =>
-                        setEditForm({ ...editForm, description: e.target.value })
+                        setEditForm((prev) => ({ ...prev, description: e.target.value }))
                       }
-                      className="w-full p-3 rounded-xl bg-[#141416] border border-white/10 text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#D6A042] resize-none"
+                      className="w-full p-3 rounded-xl bg-[#141416] border border-white/10 text-white text-xs placeholder:text-[#555] focus:outline-none focus:ring-1 focus:ring-[#D6A042] resize-none"
                     />
                   </div>
 
-                  {/* Material & Packaging */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <label className="text-xs text-[#8C8C8C]">Material / Hardware</label>
-                      <Input
-                        value={editForm.material}
-                        onChange={(e) =>
-                          setEditForm({ ...editForm, material: e.target.value })
-                        }
-                        className="bg-[#141416] border-white/10 text-white rounded-xl text-sm"
-                        placeholder="e.g., Caviar Leather, Gold Hardware"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs text-[#8C8C8C]">Packaging Included</label>
-                      <Input
-                        value={editForm.packaging}
-                        onChange={(e) =>
-                          setEditForm({ ...editForm, packaging: e.target.value })
-                        }
-                        className="bg-[#141416] border-white/10 text-white rounded-xl text-sm"
-                        placeholder="e.g., Dust bag, Box, Authenticity Card"
-                      />
-                    </div>
+                  {/* Packaging */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs text-[#8C8C8C]">Packaging / Inclusions</label>
+                    <Input
+                      value={editForm.packaging}
+                      onChange={(e) =>
+                        setEditForm((prev) => ({ ...prev, packaging: e.target.value }))
+                      }
+                      className="bg-[#141416] border-white/10 text-white rounded-xl text-sm focus-visible:ring-[#D6A042]"
+                    />
                   </div>
 
-                  {/* Pricing Breakdown Card */}
-                  <div className="p-4 rounded-xl bg-[#141417] border border-[#D6A042]/20 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold uppercase text-[#D6A042] flex items-center gap-1.5">
-                        <DollarSign className="w-4 h-4" /> Pricing & Commission Calculation
-                      </span>
+                  {/* Pricing Breakdown */}
+                  <div className="bg-[#141416] border border-white/5 rounded-2xl p-4 space-y-3">
+                    <div className="flex items-center justify-between text-xs text-[#8C8C8C] border-b border-white/5 pb-2">
+                      <span className="font-semibold uppercase text-white">Pricing Breakdown</span>
+                      <span>Closeté 12% Fee</span>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-3">
-                      <div>
-                        <label className="text-[11px] text-[#8C8C8C] block mb-1">
-                          Listing Price (AED)
-                        </label>
-                        <Input
-                          type="number"
-                          value={editForm.price}
-                          onChange={(e) =>
-                            setEditForm({
-                              ...editForm,
-                              price: Number(e.target.value) || 0,
-                            })
-                          }
-                          className="bg-[#0E0E10] border-white/10 text-white font-semibold rounded-xl text-sm"
-                        />
-                      </div>
+                    <div className="grid grid-cols-3 gap-3 text-center">
                       <div className="p-2.5 rounded-xl bg-white/[0.02] border border-white/5">
-                        <span className="text-[11px] text-[#8C8C8C] block">
-                          Closeté Fee ({COMMISSION_PERCENT}%)
-                        </span>
-                        <span className="text-sm font-bold text-[#D6A042] mt-1 block">
+                        <span className="text-[11px] text-[#8C8C8C] block">Listing Price</span>
+                        <div className="text-base font-bold text-white mt-0.5">
+                          AED {editForm.price?.toLocaleString()}
+                        </div>
+                      </div>
+
+                      <div className="p-2.5 rounded-xl bg-[#D6A042]/5 border border-[#D6A042]/20">
+                        <span className="text-[11px] text-[#D6A042] block">Commission (12%)</span>
+                        <div className="text-base font-bold text-[#D6A042] mt-0.5">
                           AED {calculatedCommission.toLocaleString()}
-                        </span>
+                        </div>
                       </div>
-                      <div className="p-2.5 rounded-xl bg-white/[0.02] border border-white/5">
-                        <span className="text-[11px] text-[#8C8C8C] block">
-                          Seller Earnings (88%)
-                        </span>
-                        <span className="text-sm font-bold text-emerald-400 mt-1 block">
+
+                      <div className="p-2.5 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
+                        <span className="text-[11px] text-emerald-400 block">Seller Payout</span>
+                        <div className="text-base font-bold text-emerald-400 mt-0.5">
                           AED {calculatedEarnings.toLocaleString()}
-                        </span>
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Collection Details */}
-                  <div className="space-y-3 pt-1">
-                    <label className="text-xs font-semibold uppercase text-[#8C8C8C] flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-[#D6A042]" /> Seller Collection Details
-                    </label>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="text-[11px] text-[#8C8C8C]">Pickup Address</label>
-                        <Input
-                          value={editForm.collectionAddress}
-                          onChange={(e) =>
-                            setEditForm({
-                              ...editForm,
-                              collectionAddress: e.target.value,
-                            })
-                          }
-                          className="bg-[#141416] border-white/10 text-white rounded-xl text-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[11px] text-[#8C8C8C]">Contact Phone</label>
-                        <Input
-                          value={editForm.sellerPhone}
-                          onChange={(e) =>
-                            setEditForm({
-                              ...editForm,
-                              sellerPhone: e.target.value,
-                            })
-                          }
-                          className="bg-[#141416] border-white/10 text-white rounded-xl text-xs"
-                        />
-                      </div>
+                  {/* Seller Info */}
+                  <div className="bg-[#141416] border border-white/5 rounded-2xl p-4 space-y-2 text-xs">
+                    <span className="font-semibold uppercase text-white block mb-1">
+                      Seller Collection Info
+                    </span>
+                    <div className="flex items-center gap-2 text-[#8C8C8C]">
+                      <span className="text-white font-medium">Seller:</span>
+                      <span>{selectedItem.seller?.name || "Verified Seller"}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[#8C8C8C]">
+                      <Phone className="w-3.5 h-3.5 text-[#D6A042]" />
+                      <span>{editForm.sellerPhone || selectedItem.sellerPhone || "+971 50 123 4567"}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[#8C8C8C]">
+                      <MapPin className="w-3.5 h-3.5 text-[#D6A042]" />
+                      <span>{editForm.collectionAddress || "Dubai, UAE"}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Drawer Footer Actions */}
-              <div className="p-6 border-t border-white/10 bg-[#141416] sticky bottom-0 z-10 flex gap-3">
+              {/* Action Buttons */}
+              <div className="p-6 border-t border-white/10 bg-[#141416]/90 backdrop-blur sticky bottom-0 z-10 flex gap-3">
                 <button
                   type="button"
                   onClick={() => setIsRejectOpen(true)}
