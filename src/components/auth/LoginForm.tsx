@@ -1,23 +1,41 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CustomInput } from "@/components/ui/CustomInput";
 import Link from "next/link";
-import { User, Key, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { Mail, Key, Lock, ArrowRight, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { adminApi, setAuthToken } from "@/lib/api";
 
 export default function LoginForm() {
   const router = useRouter();
+  const [email, setEmail] = useState("admin@example.com");
+  const [password, setPassword] = useState("AdminPassword123!@");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setErrorMessage("");
     setLoading(true);
-    setTimeout(() => {
-      router.push("/all-orders");
-    }, 600);
+
+    try {
+      const res = await adminApi.login(email.trim(), password);
+      if (res.success && res.data?.accessToken) {
+        setAuthToken(res.data.accessToken);
+        if (res.data.user) {
+          localStorage.setItem("admin_user", JSON.stringify(res.data.user));
+        }
+        router.push("/all-orders");
+      } else {
+        setErrorMessage(res.message || "Invalid administrator credentials");
+      }
+    } catch (err: any) {
+      setErrorMessage(err?.message || "Failed to sign in. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -30,14 +48,23 @@ export default function LoginForm() {
       {/* Divider */}
       <div className="w-full h-[1px] bg-white/5 mb-8" />
 
+      {errorMessage && (
+        <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-2.5">
+          <AlertCircle className="w-5 h-5 shrink-0" />
+          <span>{errorMessage}</span>
+        </div>
+      )}
+
       <form onSubmit={onSubmit} className="space-y-6">
         <div>
-          <label className="text-sm font-medium text-[#EBEBEB] mb-2.5 block">User name</label>
+          <label className="text-sm font-medium text-[#EBEBEB] mb-2.5 block">Email Address</label>
           <CustomInput
-            type="text"
+            type="email"
             required
-            placeholder="Enter username"
-            leftIcon={<User className="h-5 w-5" />}
+            value={email}
+            onChange={(e: any) => setEmail(e.target.value)}
+            placeholder="admin@example.com"
+            leftIcon={<Mail className="h-5 w-5" />}
           />
         </div>
 
@@ -47,6 +74,8 @@ export default function LoginForm() {
             <CustomInput
               type={showPassword ? "text" : "password"}
               required
+              value={password}
+              onChange={(e: any) => setPassword(e.target.value)}
               placeholder="Enter password"
               leftIcon={<Key className="h-5 w-5" />}
               rightIcon={

@@ -1,6 +1,7 @@
 "use client";
-import OrderTable from "@/components/dashboard/OrderTable";
+import IssuesTable from "@/components/dashboard/IssuesTable";
 
 export default function IssuesPage() {
-  return <OrderTable title="Reported Issues" filterStatus="Issue" />;
+  return <IssuesTable />;
 }
+
